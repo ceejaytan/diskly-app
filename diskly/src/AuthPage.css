@@ -1,0 +1,104 @@
+.auth-container {
+  max-width: 500px;
+  margin: auto;
+  padding: 2rem;
+}
+
+.auth-container h2 {
+  color: #63D6DD;
+  margin-bottom: 20px
+}
+
+
+
+.form-group {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  font-style: italic;
+  color: #b6aeae;
+  font-size: 15px;
+  
+}
+
+.form-group input {
+  padding: 0.5rem;
+  width: 100%;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;     /* vertical center alignment */
+  gap: 0.5rem;             /* space between checkbox and text */
+  margin-bottom: 1rem;
+  grid-column: 1 / -1;     /* make it span both columns if inside a grid */
+  
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 18px;             /* fixed visible size */
+  height: 18px;
+  margin: 0;
+  flex: 0 0 18px;
+  cursor: pointer;
+  -webkit-appearance: checkbox;
+  appearance: checkbox;
+  color: #63D6DD;
+}
+
+.checkbox-group label {
+  display: inline-flex;
+  align-items: center;     /* ensure text is aligned with checkbox */
+  gap: 0.35rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  color: #b6aeae;
+}
+
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  flex: 1;
+  padding: 0.5rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  background-color: #63D6DD ;
+}
+
+/* Specific button styles */
+.btn-clear {
+  background-color: #6E6E6E;
+}
+
+.btn-back {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: #6E6E6E;
+}
+
+.btn-toggle {
+  color: #63D6DD;
+  text-decoration: underline;
+  background: none;
+}
+
+.terms-link {
+  color: #63D6DD; /* red example */
+  text-decoration: underline;
+  font-weight: 500;
+}
