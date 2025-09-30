@@ -5,9 +5,10 @@ import {
   Route,
   useNavigate,
 } from "react-router-dom";
-import HomeContent from "./HomeContent";
-import TermsPage from "./Terms";
-import AuthPage from "./AuthPage";
+import HomeContent from "./Routes/HomeContent";
+import TermsPage from "./components/Terms";
+import AuthPage from "./Routes/AuthPage";
+import NotFound from "./Routes/NotFound";
 
 const App: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ const App: React.FC = () => {
         <Route path="/" element={<HomeWrapper />} />
         <Route path="/Terms" element={<TermsWrapper />} />
         <Route path="/AuthPage" element={<AuthWrapper />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

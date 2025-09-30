@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./App.css";
+import "../App.css";
 
 const Header: React.FC<{ onTermsClick?: () => void }> = ({ onTermsClick }) => {
   const [isOpen, setIsOpen] = useState(false);
