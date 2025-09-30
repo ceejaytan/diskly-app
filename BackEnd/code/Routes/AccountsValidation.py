@@ -41,6 +41,7 @@ def register(
     response: Response,
     request: Accounts.RegisterRequest = Form(...)
     ):
+    print(request)
 
     if not re.match(Accounts.USERNAME_REGEX, request.username) or \
         not re.match(Accounts.EMAIL_REGEX, request.email) or \

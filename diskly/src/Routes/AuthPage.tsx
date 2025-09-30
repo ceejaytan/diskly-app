@@ -17,5 +17,3 @@ const AuthPage: React.FC = () => {
 };
 
 export default AuthPage;
-
-// moved it in components directory

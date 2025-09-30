@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { submitLogin } from "./Login_script";
+
 interface LoginFormProps {
   toggleForm: () => void;
 }
@@ -8,23 +10,39 @@ interface LoginFormProps {
 const LoginForm: React.FC<LoginFormProps> = ({ toggleForm }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
+  const [loginMessage, setLoginMessage] = useState("");
+
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    console.log("Logging in:", username, password);
-    navigate("/home");
-  };
+
+    if ( await submitLogin(username, password)){
+      navigate("/home")
+    }else{
+      setLoginMessage("Login Failed")
+    }
+
+  }
 
   const handleCancel = () => {
     setUsername("");
     setPassword("");
   };
 
+
+
+
   return (
     <form onSubmit={handleSubmit}>
       <h2>Sign In</h2>
 
+
+      {loginMessage &&(
+        <small>{ loginMessage }</small>
+      )}
       <div className="form-group">
         <label>Username</label>
         <input
@@ -44,7 +62,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ toggleForm }) => {
           required
         />
       </div>
-
 
       <div className="button-stack">
         <button type="submit" className="btn btn-primary">

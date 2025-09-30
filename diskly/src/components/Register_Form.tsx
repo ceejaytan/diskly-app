@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { SendRegister, CheckUsername, CheckEmail } from "./Register_script";
+import { SendRegister } from "./Register_script";
 import { API_URL } from "../API/config";
+import hiddenIcon from "../assets/password-hidden.svg";
+import shownIcon from "../assets/password-shown.svg";
 
 interface RegisterFormProps {
   toggleForm: () => void;
 }
-
-
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ toggleForm }) => {
   const [fullname, setFullName] = useState("");
@@ -21,9 +21,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ toggleForm }) => {
 
   const [usernameMessage, setUsernameMessage] = useState("");
   const [usernameValid, setUsernameValid] = useState(false);
-  const [usernameAvailable, setUsernameAvailable] = useState(false);
 
-  const [emailAvailable, setEmailAvailable] = useState(false);
   const [emailMessage, setEmailMessage] = useState("");
   const [emailValid, setEmailValid] = useState(false);
 
@@ -32,6 +30,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ toggleForm }) => {
 
   const [confirmpasswordMessage, setConfirmPasswordMessage] = useState("");
   const [confirmpasswordValid, setConfirmPasswordValid] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [contactMessage, setContactMessage] = useState("");
   const [contactValid, setContactValid] = useState(false);
@@ -41,7 +40,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ toggleForm }) => {
 
   const [birthdayMessage, setBirthdayMessage] = useState("");
   const [birthdayValid, setBirthdayValid] = useState(true);
-  
+
   const navigate = useNavigate();
 
 
@@ -49,6 +48,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ toggleForm }) => {
   const usernameRegex = /^(?=[A-Za-z0-9_]{3,20}$)(?!.*_$)(?!.*__)(?=(?:.*[A-Za-z]){3,})[A-Za-z][A-Za-z0-9_]{2,20}$/;
   const emailRegex = /^[A-Za-z0-9._+-]{3,20}@[^\s@]+\.[A-Za-z]{2,}$/;
   const contactRegex = /^(?:\+639|09)\d{9}$/
+
 
 useEffect(() => {
     if (!fullname) {
@@ -62,8 +62,38 @@ useEffect(() => {
       setFullNameMessage("");
       setFullNameValid(true);
     }
-
   })
+
+
+useEffect(() => {
+  if (!birthday) {
+    setBirthdayValid(false);
+    return;
+  }
+
+  const birthDate = new Date(birthday);
+  const today = new Date();
+
+  const minAge = 13;
+  const maxAge = 120;
+
+  const age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  const dayDiff = today.getDate() - birthDate.getDate();
+  const adjustedAge = monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? age - 1 : age;
+
+  if (birthDate > today) {
+    setBirthdayValid(false);
+    setBirthdayMessage("Cannot be in the future")
+  } else if (adjustedAge < minAge || adjustedAge > maxAge) {
+    setBirthdayValid(false);
+    setBirthdayMessage("Invalid Birthdate ( Must be 13+ )")
+  } else {
+    setBirthdayValid(true);
+    setBirthdayMessage("")
+
+  }
+}, [birthday]);
 
 
 useEffect(() => {
@@ -194,16 +224,6 @@ useEffect(() => {
       return;
     }
 
-    console.log("Registering:", {
-      fullname,
-      username,
-      email,
-      birthday,
-      contact,
-      password,
-      confirmpassword,
-    });
-
     const ok = await SendRegister({
       fullname,
       username,
@@ -306,7 +326,20 @@ useEffect(() => {
             value={birthday}
             onChange={(e) => setBirthday(e.target.value)}
             required
+            className={
+              birthday === ""
+              ? ""
+              : birthdayValid
+                ? "Inputvalid"
+                : "Inputinvalid"
+            }
           />
+          {birthday && (
+              <small>
+                {birthdayMessage}
+              </small>
+            )}
+
         </div>
 
         <div className="form-group">
@@ -335,8 +368,9 @@ useEffect(() => {
       <div className="form-row">
         <div className="form-group">
           <label>Password</label>
+          <div className="password-wrapper">
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -348,6 +382,18 @@ useEffect(() => {
                   : "Inputinvalid"
               }
           />
+
+          <button
+            type="button"
+            className="toggle-password"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            <img
+              src={showPassword ? shownIcon : hiddenIcon}
+              alt={showPassword ? "Hide password" : "Show password"}
+            />
+          </button>
+          </div>
           {password && (
               <small>
                 {passwordMessage}
@@ -357,20 +403,40 @@ useEffect(() => {
         </div>
         <div className="form-group">
           <label>Confirm Password</label>
+          <div className="password-wrapper">
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             value={confirmpassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
             className={
-              password === "" ? "" :
-              confirmpassword === "" ? "" : 
+              confirmpassword === "" ? "" :
               confirmpasswordValid
                 ? "Inputvalid"
                 : "Inputinvalid"
             }
           />
+
+          <button
+            type="button"
+            className="toggle-password"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            <img
+              src={showPassword ? shownIcon : hiddenIcon}
+              alt={showPassword ? "Hide password" : "Show password"}
+            />
+          </button>
+      </div>
+
+          {confirmpassword && (
+              <small>
+                {confirmpasswordMessage}
+              </small>
+        )}
         </div>
+
+
       </div>
 
       <div className="form-group checkbox-group">
