@@ -1,5 +1,5 @@
 import React from "react";
-import "./Terms.css";
+import "../Css/Terms.css";
 
 const TermsPage: React.FC<{ navigateBack: () => void }> = ({
   navigateBack,

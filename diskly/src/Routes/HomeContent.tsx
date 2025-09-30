@@ -1,11 +1,30 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./App.css";
+import "../App.css";
+
+import checkLoginSession from "../components/CheckLoginSession";
 
 const Header: React.FC<{ onTermsClick?: () => void }> = ({ onTermsClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [searchTerm, setSearchTerm] = useState("");
+
+
+  const [session, setSession] = useState<{
+                                        username: string,
+                                        } | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const userdata = await checkLoginSession();
+      if (userdata && userdata.logged_in){
+        setSession({username: userdata.username});
+      }else{
+        setSession(null)
+      }
+    })
+  }, [])
+
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
