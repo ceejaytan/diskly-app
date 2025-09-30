@@ -193,7 +193,7 @@ const AuthPage: React.FC = () => {
           className="btn btn-toggle"
           onClick={() => setIsLogin(!isLogin)}
         >
-          {isLogin ? "Register" : "Login"}
+          {isLogin ? "Register" : "Sign In"}
         </button>
       </p>
     </div>
