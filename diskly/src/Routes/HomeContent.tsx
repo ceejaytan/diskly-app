@@ -59,7 +59,6 @@ export default function HomeContent({ navigateToTerms }: HomeContentProps) {
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
               style={{
-                width: "250px",
                 borderRadius: "8px",
                 border: "2px solid #ffffff",
                 transition: "transform 0.3s ease, box-shadow 0.3s ease",

@@ -14,8 +14,16 @@ export default function Header({ onTermsClick }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [session, setSession] = useState<SessionType>(null);
+
+
+  const param = new URLSearchParams(window.location.search).get("search") || "";
+
+  useEffect(() => {
+    setSearchTerm(param)
+  }, [])
 
   useEffect(() => {
     (async () => {
@@ -43,15 +51,15 @@ export default function Header({ onTermsClick }: HeaderProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert(`Searching for: ${searchTerm}`);
-  };
+const handleSearch = (e: React.FormEvent) => {
+  e.preventDefault();
+  window.location.href = `/games-list?search=${encodeURIComponent(searchTerm)}`;
+};
 
   return (
 <header className="header">
   <div className="logo">
-    <img src="/images/diskly-logo.png" alt="Diskly Logo" style={{ height: "70px" }} />
+    <img src="/images/diskly-logo.png" alt="Diskly Logo" className="img-diskly-logo" onClick={() => window.location.href="/"} />
   </div>
 
   <form className="search-bar" onSubmit={handleSearch}>
@@ -71,6 +79,7 @@ export default function Header({ onTermsClick }: HeaderProps) {
   <nav ref={menuRef} className={`nav ${isOpen ? "open" : ""}`}>
     <ul>
       {session && (
+          <>
         <li className="header-profile">
           <img
             src={`${API_URL}/images/Walter_White.jpg`}
@@ -80,18 +89,21 @@ export default function Header({ onTermsClick }: HeaderProps) {
           <span className="profile-username">Your profile: {session.username}</span>
           <button className="logout-btn" onClick={() => logout_session()}>Logout</button>
         </li>
+
+          <li><a href="/home">Home</a></li>
+          <li><a href="#">Catalog</a></li>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="/Terms">T&C</a></li>
+        </>
       )}
 
       {!session && (
         <li>
-          <a href="/AuthPage">Sign In</a>
+          <a href="/AuthPage?type=login">Sign In</a>
+          <a href="/AuthPage?type=register">Register</a>
         </li>
       )}
 
-      <li><a href="#">Home</a></li>
-      <li><a href="#">Catalog</a></li>
-      <li><a href="#">Contact Us</a></li>
-      <li><a href="/Terms">T&C</a></li>
     </ul>
   </nav>
 </header>

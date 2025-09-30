@@ -26,6 +26,7 @@ app.title = "GameDISK rental API"
 origins = [
     "http://localhost:6969",
     "http://localhost:5173",
+    "http://192.168.1.7:6969",
 ]
 
 app.add_middleware(

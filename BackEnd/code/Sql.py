@@ -180,3 +180,29 @@ class SqlGameCatalog_API:
 
 
 
+
+    @staticmethod
+    def game_search(game_name: str) -> list:
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT ID, game_name, cover_image_path from game_catalog
+                    WHERE game_name LIKE '%' || ? || '%' COLLATE NOCASE
+                               """, (game_name, ))
+
+                row = cursor.fetchall()
+
+                for i in range(len(row)):
+                    print(row[i])
+                    row[i] = {
+                        "id": row[i][0],
+                        "name": row[i][1],
+                        "cover_path": row[i][2]
+                    }
+
+                return row
+        except sqlite3.Error as err:
+            print(err)
+            return []
+
