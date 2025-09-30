@@ -9,6 +9,7 @@ import HomeContent from "./Routes/HomeContent";
 import TermsPage from "./components/Terms";
 import AuthPage from "./Routes/AuthPage";
 import Home from "./Routes/Home";
+import GamesPage from "./Routes/Games_List";
 import NotFound from "./Routes/NotFound";
 
 const App: React.FC = () => {
@@ -20,6 +21,7 @@ const App: React.FC = () => {
         <Route path="/AuthPage" element={<AuthWrapper />} />
 
         <Route path="/home" element={<Home />} />
+        <Route path="/games-list" element={<GamesPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
