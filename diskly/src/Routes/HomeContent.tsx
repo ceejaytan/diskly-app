@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../App.css";
 
-import checkLoginSession from "../components/CheckLoginSession";
+import checkLoginSession from "../components/Login/CheckLoginSession";
 
 const Header: React.FC<{ onTermsClick?: () => void }> = ({ onTermsClick }) => {
   const [isOpen, setIsOpen] = useState(false);
