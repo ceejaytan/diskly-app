@@ -13,3 +13,15 @@ export async function checkBackendStatus(){
     return false
   }
 }
+
+export function logout_session(){
+  fetch(`${API_URL}/accounts/logout`, {
+    method: "GET",
+    credentials: "include"
+  })
+  .then( res => {
+    if (res.ok){
+        window.location.href = "/"
+      }
+    })
+}

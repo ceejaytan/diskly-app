@@ -20,7 +20,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ toggleForm }) => {
     e.preventDefault();
 
     if ( await submitLogin(username, password)){
-      navigate("/home")
+      navigate("/")
     }else{
       setLoginMessage("Login Failed")
     }

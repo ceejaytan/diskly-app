@@ -16,15 +16,10 @@ body {
 }
 
 
-
-
-
 html, body, #root {
   height: 100%;
   width: 100%;
 }
-
-
 
 .menu-toggle {
   background: none;
@@ -79,9 +74,6 @@ html, body, #root {
 .nav ul li a:hover {
   background: #333;
 }
-
-
-
 
 .app-container {
   display: flex;
@@ -149,8 +141,6 @@ html, body, #root {
   flex: 1;
   padding: 40px;
   text-align: left;
-  
-
  
   background-image: url("/cod.png"); 
   background-size: cover;   
@@ -164,8 +154,6 @@ html, body, #root {
   color: white; 
   min-height: 100vh;
   padding-bottom: 140px;
- 
-  
 }
 
 .main-content h1 {

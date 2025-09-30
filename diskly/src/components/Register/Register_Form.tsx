@@ -234,7 +234,7 @@ useEffect(() => {
       confirmpassword,
     });
 
-    if (ok) navigate("/home");
+    if (ok) navigate("/");
   };
 
   const handleCancel = () => {
