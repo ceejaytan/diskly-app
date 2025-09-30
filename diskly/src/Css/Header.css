@@ -1,0 +1,37 @@
+.header-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #63D6DD;
+  border-radius: 8px;
+  background-color: #f0faff;
+}
+
+.profile-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-username {
+  font-weight: bold;
+  color: #63D6DD;
+  font-size: 0.95rem;
+}
+
+.logout-btn {
+  margin-left: auto;
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.logout-btn:hover {
+  background-color: #ff4b4b;
+}

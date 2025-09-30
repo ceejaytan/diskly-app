@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
-import checkLoginSession from "../components/CheckLoginSession"
+import checkLoginSession from "../components/Login/CheckLoginSession"
+import { checkBackendStatus } from "../API/config"
 
 export default function Home(){
   const [loginSession, setLoginSession] = useState({
@@ -7,6 +8,17 @@ export default function Home(){
     logged_in: null
   })
   const [IsLoggedIn, setIsLoggedIn] = useState(false)
+
+
+  useEffect(() => {
+    (async () => {
+      if (!await checkBackendStatus()){
+        alert("Backend Is Not Running")
+        window.location.href = "/"
+      }
+    })();
+  }, [])
+
 
   useEffect(() => {
     (async () => {
@@ -23,8 +35,16 @@ export default function Home(){
 
   return(
   <>
-      {IsLoggedIn && <p>Logged In as: {loginSession.username}</p>}
-      {!IsLoggedIn && <p>Not Logged In</p>}
+      {IsLoggedIn && (
+          <p>Logged In as: {loginSession.username}</p> 
+        )}
+
+      {!IsLoggedIn && (
+        <p>Not Logged In</p> 
+      )}
+
   </>
   )
+
+
 }
