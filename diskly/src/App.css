@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-body {
+body, html {
   font-family: "Helvetica Neue", sans-serif;
 }
 
@@ -15,16 +15,10 @@ body {
   
 }
 
-
-
-
-
 html, body, #root {
   height: 100%;
   width: 100%;
 }
-
-
 
 .menu-toggle {
   background: none;
@@ -39,49 +33,6 @@ html, body, #root {
   font-weight: bold;
 }
 
-.nav {
-  position: absolute;
-  top: 70px;
-  right: 20px;
-  background: #171F21;
-  border-radius: 8px;
-  overflow: hidden;
-  max-height: 0;
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: all 0.3s ease;
-  pointer-events: none;
-  z-index: 1000;
-}
-
-.nav.open {
-  max-height: 500px;
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.nav ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.nav ul li a {
-  display: block;
-  padding: 12px 12px;
-  color: #63D6DD;
-  text-decoration: none;
-  font-weight: 600;
-  transition: background 0.3s ease;
-}
-
-.nav ul li a:hover {
-  background: #333;
-}
-
-
-
 
 .app-container {
   display: flex;
@@ -89,25 +40,6 @@ html, body, #root {
   min-height: 100vh; 
 }
 
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #171F21;
-  color: #63D6DD;
-  padding: 25px 30px;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-}
-
-.logo-img {
-  height: 1000px;   
-  width: auto;    
-}
 
 .nav ul {
   list-style: none;
@@ -149,9 +81,6 @@ html, body, #root {
   flex: 1;
   padding: 40px;
   text-align: left;
-  
-
- 
   background-image: url("/cod.png"); 
   background-size: cover;   
   background-position: center; 
@@ -170,10 +99,10 @@ html, body, #root {
 
 .main-content h1 {
   color: #63D6DD;
-   text-shadow: 2px 2px 4px black;
-   font-size: 120px; 
-   gap: 3px;
-   font-family: Trebuchet MS, sans-serif;
+  text-shadow: 2px 2px 4px black;
+  font-size: 120px;
+  gap: 3px;
+  font-family: Trebuchet MS, sans-serif;
    
 }
 
@@ -249,54 +178,6 @@ html, body, #root {
 }
 
 
-.search-bar {
-  display: flex;
-  align-items: center;
-  margin: 0 20px;
-  flex: 1; 
-  max-width: 700px;
-  
-}
-
-.search-bar input::placeholder {
-  color: #63D6DD;
-  opacity: 0.5;
-  font-style: italic;
-}
-
-.search-bar input {
-  flex: 1;
-  padding: 11px 12px;
-  border-radius: 6px 0 0 6px;
-  border: 2px solid #63D6DD;
-  outline: none;
-  font-size: 14px;
-  background-color: #6E6E6E;
-  color: #63D6DD;
-  opacity: 1;
-}
-
-.search-bar input ::placeholder-shown {
-  color: #63D6DD;
-}
-
-.search-bar button {
-  padding: 8.5px 12px;
-  border: 2px solid #63D6DD;
-  border-left: none;
-  background: #63D6DD;
-  color: #171F21;
-  border-radius: 0 6px 6px 0;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background 0.3s ease;
-}
-
-.search-bar button:hover {
-  background: #6E6E6E;
-  color: #63D6DD;
-  border: #63D6DD;
-}
 
 .second-container {
   position: relative;
@@ -310,17 +191,11 @@ html, body, #root {
 
 
 .second-text {
-  position: absolute; 
-  top: 0;             
-  left: 0;           
-  width: 100%;       
-  height: 100%;       
-  background-color: #171F21; 
-  padding-top: 50px;
-  padding-bottom: 100px;
+  position: relative; /* instead of absolute */
+  width: 100%;
   text-align: center;
+  padding: 50px 5%;
   color: #63D6DD;
-  font-family: Trebuchet MS, sans-serif;
 }
 
 .second-text p {
@@ -359,8 +234,6 @@ html, body, #root {
 }
 
 .image-gallery-container {
-
-  display: flex;
   align-items: flex-start;
   gap: 40px; 
   flex-wrap: wrap; 
@@ -381,6 +254,7 @@ html, body, #root {
   max-width: auto;
   text-align: center;
   margin-bottom: 70px;
+  justify-content: center;
 }
 
 .categories-text .category h2 {
@@ -431,4 +305,35 @@ html, body, #root {
   color: #63D6DD;
 }
 
+@media(max-width: 1350px){
+  .first-gallery {
+    display: flex;
+    gap: 20px;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding: 50px 20px;
+    scroll-behavior: smooth;
+  }
+
+  .first-gallery img {
+    flex: 0 0 auto; 
+    width: 250px;
+    height: auto;
+    border-radius: 8px;
+    border: 2px solid #63D6DD;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  }
+}
+
+
+@media (max-width: 900px) {
+  .categories-text{
+    display: block;
+  }
+
+.main-content h1 {
+    font-size: 50px;
+  }
+
+}
 
