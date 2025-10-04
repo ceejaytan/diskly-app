@@ -25,7 +25,7 @@ $: pip install -r requirements.txt
 # start server
 $: uvicorn code:Main:app --port 8080
 
-# Make sure frontend svelte is running on port 5173
+# Make sure frontend ReactJS is running on port 5173
 ```
 
 
