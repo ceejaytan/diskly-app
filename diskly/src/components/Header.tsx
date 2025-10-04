@@ -1,29 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
-import checkLoginSession from "../components/Login/CheckLoginSession";
 
 import { API_URL, logout_session } from "../API/config";
 import "../Css/Header.css"
+import checkLoginSession from "./Login/CheckLoginSession";
 
-type HeaderProps = {
-  onTermsClick?: () => void;
-};
 
 type SessionType = { username: string; } | null;
 
-export default function Header({ onTermsClick }: HeaderProps) {
+export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-
-  const [searchTerm, setSearchTerm] = useState("");
   const [session, setSession] = useState<SessionType>(null);
 
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const param = new URLSearchParams(window.location.search).get("search") || "";
-
-  useEffect(() => {
-    setSearchTerm(param)
-  }, [])
 
   useEffect(() => {
     (async () => {
@@ -35,6 +26,19 @@ export default function Header({ onTermsClick }: HeaderProps) {
       }
     })();
   }, []);
+
+  const param = new URLSearchParams(window.location.search).get("search") || "";
+
+  useEffect(() => {
+    setSearchTerm(param)
+  }, [])
+
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    window.location.href = `/games-list?search=${encodeURIComponent(searchTerm)}`;
+  };
+
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -51,10 +55,7 @@ export default function Header({ onTermsClick }: HeaderProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-const handleSearch = (e: React.FormEvent) => {
-  e.preventDefault();
-  window.location.href = `/games-list?search=${encodeURIComponent(searchTerm)}`;
-};
+
 
   return (
 <header className="header">
@@ -82,12 +83,12 @@ const handleSearch = (e: React.FormEvent) => {
           <>
         <li className="header-profile">
           <img
-            src={`${API_URL}/images/Walter_White.jpg`}
+            src={`${API_URL}/images/DEFAULT_PIC.png`}
             alt="Profile"
             className="profile-avatar"
           />
           <span className="profile-username">Your profile: {session.username}</span>
-          <button className="logout-btn" onClick={() => logout_session()}>Logout</button>
+          <button className="logout-btn" onClick={() => {logout_session() }}>Logout</button>
         </li>
 
           <li><a href="/home">Home</a></li>

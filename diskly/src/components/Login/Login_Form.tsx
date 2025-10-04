@@ -14,15 +14,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ toggleForm }) => {
   const [loginMessage, setLoginMessage] = useState("");
 
   const navigate = useNavigate();
+  const searchParams = new URLSearchParams(location.search);
 
+  const redirect = searchParams.get("redirect");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     if ( await submitLogin(username, password)){
-      navigate("/")
+      navigate(redirect || "/")
     }else{
-      setLoginMessage("Login Failed")
+      setLoginMessage("Wrong Username Or Password")
     }
 
   }
@@ -31,8 +33,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ toggleForm }) => {
     setUsername("");
     setPassword("");
   };
-
-
 
 
   return (
@@ -48,7 +48,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ toggleForm }) => {
         <input
           type="text"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => { setUsername(e.target.value); setLoginMessage(""); }}
           required
         />
       </div>
@@ -58,7 +58,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ toggleForm }) => {
         <input
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {setPassword(e.target.value); setLoginMessage("")}}
           required
         />
       </div>

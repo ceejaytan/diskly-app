@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react"
-import checkLoginSession from "../components/Login/CheckLoginSession"
-import { checkBackendStatus } from "../API/config"
+import checkLoginSession from "../Login/CheckLoginSession"
+import { checkBackendStatus } from "../../API/config"
 
-import Header from "../components/Header"
+import Header from "../Header"
+import Footer from "../Footer"
+
+import "./Home.css"
 
 export default function Home(){
   const [loginSession, setLoginSession] = useState({
@@ -39,9 +42,22 @@ export default function Home(){
   <>
       {IsLoggedIn && (
         <>
-        <Header></Header>
+    <Header></Header>
+      <div className="home-content-bluebox">
+            <h3>text here</h3>
+        </div>
+      <main className="main-content main-home-content">
+        <h1 className="home-content-title">HELLDIVERS 2</h1>
+        <p>
+                Fast paced coop shooter
+        </p>
+        <div className="buttons">
+          <button className="rent-now-btn" onClick={() => window.location.href = "/games-list"}>Rent Now</button>
+          <button className="faqs-button" >Faq's</button>
+        </div>
+      </main>
 
-          <p>Logged In as: {loginSession.username}</p> 
+      <Footer />
           </>
         )}
 
