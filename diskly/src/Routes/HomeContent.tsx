@@ -53,6 +53,10 @@ export default function HomeContent() {
   </>
   )}
 
+  // if(session?.username === "admin"){
+  //   window.location.href = "/"
+  // }
+
   return (
     <div className="app-container">
 
