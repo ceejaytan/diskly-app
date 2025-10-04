@@ -43,7 +43,7 @@ export default function Home(){
         <>
     <Header></Header>
       <div className="home-content-bluebox">
-            <h3>text here</h3>
+            <h3>Welcome, {loginSession.username}</h3>
         </div>
       <main className="main-content main-home-content">
         <h1 className="home-content-title">HELLDIVERS 2</h1>
