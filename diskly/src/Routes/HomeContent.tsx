@@ -134,7 +134,7 @@ export default function HomeContent() {
       </div>
 
       <div className="rent-button-container">
-        <button className="rent-game-btn" onClick={handleRentNow}>Rent a Game Now</button>
+        <button className="rent-game-btn" onClick={() => window.location.href = "/AuthPage?type=login"}>Login To Rent</button>
       </div>
 
       <Footer />

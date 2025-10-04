@@ -78,6 +78,15 @@ export default function GamesPage() {
    </>
   )
 
+  if (games.length === 0) return(
+  <>
+    <Header></Header>
+      <div className="loading-error">
+      <p>No Results</p>
+    </div>
+    </>
+  )
+
   return (
     <>
     <Header></Header>
