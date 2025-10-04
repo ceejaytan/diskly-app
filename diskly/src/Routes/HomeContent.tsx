@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../App.css";
 
 import Home from "../components/Home/Home";
+
+import "../components/Home/Home.css"
 
 import checkLoginSession from "../components/Login/CheckLoginSession";
 
@@ -12,6 +14,7 @@ type SessionType = { username: string; } | null;
 export default function HomeContent() {
 
   const [session, setSession] = useState<SessionType>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
@@ -21,6 +24,7 @@ export default function HomeContent() {
       } else {
         setSession(null);
       }
+      setLoading(false);
     })();
   }, []);
 
@@ -35,11 +39,19 @@ export default function HomeContent() {
   const moreImages = ["/images/HOW.png"];
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  const handleRentNow = () => (window.location.href = "/rent-form");
   const handleHowItWorks = () => {
     const section = document.getElementById("second-gallery");
     if (section) section.scrollIntoView({ behavior: "smooth" });
   };
+
+  if (loading) { return (
+  <>
+    <Header></Header>
+      <div className="loading-error">
+      <div className="spinner"></div>
+    </div>
+  </>
+  )}
 
   return (
     <div className="app-container">
