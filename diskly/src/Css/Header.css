@@ -30,6 +30,7 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.85rem;
+  width: 100%;
 }
 
 .logout-btn:hover {

@@ -162,6 +162,11 @@
 }
 
 
-small {
+
+.message-valid {
+  color: green;
+}
+
+.message-invalid {
   color: red;
 }

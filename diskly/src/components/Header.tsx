@@ -95,24 +95,8 @@ export default function Header() {
                 <span className="profile-username">
                   Your profile: {session.username}
                 </span>
-                <button
-                  className="logout-btn"
-                  onClick={() => {
-                    logout_session();
-                  }}
-                >
-                  Logout
-                </button>
               </li>
 
-<<<<<<< HEAD
-          <li><a href="/home">Home</a></li>
-          <li><a href="/games-list">Catalog</a></li>
-          <li><a href="#">Contact Us</a></li>
-          <li><a href="/Terms">T&C</a></li>
-        </>
-      )}
-=======
               <li>
                 <a href="/home">Home</a>
               </li>
@@ -125,15 +109,25 @@ export default function Header() {
               <li>
                 <a href="/Terms">T&C</a>
               </li>
+
+              <li>
+                <button
+                  className="logout-btn"
+                  onClick={() => {
+                    logout_session();
+                  }}
+                >
+                  Logout
+                </button>
+
+              </li>
             </>
           )}
->>>>>>> main
 
           {!session && (
             <li>
               <a href="/AuthPage?type=login">Sign In</a>
               <a href="/AuthPage?type=register">Register</a>
-              <a href="/Stock">Admin</a>
             </li>
           )}
         </ul>

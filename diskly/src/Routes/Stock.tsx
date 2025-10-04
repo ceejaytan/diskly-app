@@ -1,31 +1,30 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { logout_session } from "../API/config";
+import checkLoginSession from "../components/Login/CheckLoginSession";
 import "../Css/Stock.css";
 
-type NavItem = {
-  id: string;
-  label: string;
-};
 
-type Props = {
-  profileName?: string;
-  onSignOut?: () => void;
-  active?: string;
-};
+type SessionType = { username: string } | null;
 
-export default function Stock({
-  profileName = "Grace",
-  onSignOut,
-  active = "dashboard",
-}: Props) {
-  const nav: NavItem[] = [
-    { id: "dashboard", label: "Dashboard" },
-    { id: "rentals", label: "Rentals" },
-    { id: "transactions", label: "Transactions" },
-    { id: "stock", label: "Stock" },
-    { id: "customers", label: "Customers" },
-  ];
+export default function Stock(){
+
+  const [session, setSession] = useState<SessionType>(null)
+
+  useEffect(() => {
+    (async () => {
+      const userdata = await checkLoginSession();
+      if (userdata && userdata.logged_in) {
+        setSession({ username: userdata.username });
+      } else {
+        setSession(null);
+        window.location.href = "/"
+      }
+    })();
+  }, []);
+
 
   return (
+    <div className="admin-container">
     <aside className="sidebar">
       <div>
         {}
@@ -42,7 +41,7 @@ export default function Stock({
           <div className="profile-avatar">👤</div>
           <div>
             <div className="profile-name">
-              Welcome, <i>AdminName</i>
+              Welcome, <i>{session?.username}</i>
             </div>
           </div>
         </div>
@@ -69,30 +68,17 @@ export default function Stock({
         {}
         <nav className="nav">
           <ul>
-            {nav.map((n) => {
-              const isActive = n.id === active;
-              return (
-                <li key={n.id}>
-                  <a
-                    href="#"
-                    className={`nav-link ${isActive ? "active" : ""}`}
-                    aria-current={isActive ? "page" : undefined}
-                  >
-                    <span>{n.label}</span>
-                  </a>
-                </li>
-              );
-            })}
           </ul>
         </nav>
       </div>
 
       {}
       <div className="signout">
-        <button onClick={onSignOut} className="signout-btn">
+        <button onClick={() => logout_session()} className="signout-btn">
           <span>Sign out</span>
         </button>
       </div>
     </aside>
+</div>
   );
 }
