@@ -1,0 +1,34 @@
+.main-home-content {
+  background-image: url("/Welcome, FirstName.png");
+  padding-bottom: 0px !important;
+}
+
+.home-content-bluebox{
+  background-color: #5ADFE4;
+  width: 100%;
+  height: 30px;
+  text-align: center;
+}
+
+.home-content-bluebox{
+  color: #000;
+
+}
+
+.home-content-title{
+  font-size: 5rem !important;
+  color: white !important;
+}
+
+
+.faqs-button{
+  background-color: transparent; 
+  color: #63D6DD; 
+  border: 2px solid #63D6DD; 
+  padding: 12px 60px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: bold;
+}

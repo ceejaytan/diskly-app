@@ -59,13 +59,23 @@ html, body, #root {
 }
 
 
+.main-content-img  {
+  background-image: url("/cod.png"); 
+}
+
 .main-content {
   flex: 1;
   padding: 40px;
-  text-align: center;
+  text-align: left;
+  background-size: cover;   
+  background-position: center; 
+  background-repeat: no-repeat; 
   display: flex;
   flex-direction: column;
-  justify-content: center; 
+  justify-content: center;
+  color: white; 
+  min-height: 100vh;
+  padding-bottom: 140px;
 }
 
 
@@ -77,25 +87,6 @@ html, body, #root {
   padding-top: 70px;
 }
 
-.main-content {
-  flex: 1;
-  padding: 40px;
-  text-align: left;
-  background-image: url("/cod.png"); 
-  background-size: cover;   
-  background-position: center; 
-  background-repeat: no-repeat; 
-  
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  color: white; 
-  min-height: 100vh;
-  padding-bottom: 140px;
- 
-  
-}
 
 .main-content h1 {
   color: #63D6DD;
@@ -146,7 +137,7 @@ html, body, #root {
   background-color: #63D6DD;
   color: #171F21;
   border: none;
-  padding: 12px 20px;
+  padding: 12px 40px;
   font-size: 16px;
   border-radius: 8px;
   cursor: pointer;

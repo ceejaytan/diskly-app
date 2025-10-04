@@ -26,6 +26,8 @@ def list_games(game_name_search: Optional[str] = ""):
     else:
         db_games = SqlGameCatalog_API.game_catalog_list()
 
+    # db_games.extend(list_games)
+
     print(db_games)
     return db_games
 
