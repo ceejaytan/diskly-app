@@ -5,7 +5,6 @@ import { checkBackendStatus } from "../../API/config"
 import Header from "../Header"
 import Footer from "../Footer"
 
-import "./Home.css"
 
 export default function Home(){
   const [loginSession, setLoginSession] = useState({

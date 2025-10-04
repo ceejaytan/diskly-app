@@ -124,7 +124,7 @@ class SqlAdmin:
 
 
     @staticmethod
-    def add_game(game_name: str, description: str, platform: str, genre: str, price_to_rent: float, total_stocks: int, cover_image_path: str) -> bool:
+    def add_game(game_name: str, cover_image_path: str) -> bool:
         """Admin Add Game"""
         print("add game")
 
@@ -132,14 +132,9 @@ class SqlAdmin:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    INSERT INTO game_catalog (game_name, description, platform, genre, price_to_rent, total_stocks, cover_image_path)
-                    VALUES ( ?, ?, ?, ?, ?, ?, ? )
+                    INSERT INTO game_catalog (game_name, cover_image_path)
+                    VALUES ( ?, ? )
                                """, (game_name,
-                                     description,
-                                     platform,
-                                     genre,
-                                     price_to_rent,
-                                     total_stocks,
                                      cover_image_path)
                                      )
 
@@ -148,6 +143,33 @@ class SqlAdmin:
         except sqlite3.Error as err:
             print(err)
             return False
+
+
+    # @staticmethod
+    # def add_game(game_name: str, description: str, platform: str, genre: str, price_to_rent: float, total_stocks: int, cover_image_path: str) -> bool:
+    #     """Admin Add Game"""
+    #     print("add game")
+    #
+    #     try:
+    #         with sqlite3.connect(db_path) as conn:
+    #             cursor = conn.cursor()
+    #             cursor.execute("""
+    #                 INSERT INTO game_catalog (game_name, description, platform, genre, price_to_rent, total_stocks, cover_image_path)
+    #                 VALUES ( ?, ?, ?, ?, ?, ?, ? )
+    #                            """, (game_name,
+    #                                  description,
+    #                                  platform,
+    #                                  genre,
+    #                                  price_to_rent,
+    #                                  total_stocks,
+    #                                  cover_image_path)
+    #                                  )
+    #
+    #             conn.commit()
+    #             return True
+    #     except sqlite3.Error as err:
+    #         print(err)
+    #         return False
 
 
 

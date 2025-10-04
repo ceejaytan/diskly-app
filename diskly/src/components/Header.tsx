@@ -105,6 +105,14 @@ export default function Header() {
                 </button>
               </li>
 
+<<<<<<< HEAD
+          <li><a href="/home">Home</a></li>
+          <li><a href="/games-list">Catalog</a></li>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="/Terms">T&C</a></li>
+        </>
+      )}
+=======
               <li>
                 <a href="/home">Home</a>
               </li>
@@ -119,6 +127,7 @@ export default function Header() {
               </li>
             </>
           )}
+>>>>>>> main
 
           {!session && (
             <li>
