@@ -1,13 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../App.css";
 
-type HomeContentProps = {
-  navigateToTerms: () => void;
-};
+import Home from "../components/Home/Home";
 
-export default function HomeContent({ navigateToTerms }: HomeContentProps) {
+import checkLoginSession from "../components/Login/CheckLoginSession";
+
+type SessionType = { username: string; } | null;
+
+export default function HomeContent() {
+
+  const [session, setSession] = useState<SessionType>(null);
+
+  useEffect(() => {
+    (async () => {
+      const userdata = await checkLoginSession();
+      if (userdata && userdata.logged_in) {
+        setSession({ username: userdata.username });
+      } else {
+        setSession(null);
+      }
+    })();
+  }, []);
+
+
   const images = [
     "/images/f124.png",
     "/images/fom.png",
@@ -26,9 +43,19 @@ export default function HomeContent({ navigateToTerms }: HomeContentProps) {
 
   return (
     <div className="app-container">
-      <Header onTermsClick={navigateToTerms} />
 
-      <main className="main-content">
+
+  {session && (
+  <>
+    <Home></Home>
+  </>
+  )}
+
+
+  {!session && (
+  <>
+    <Header></Header>
+      <main className="main-content main-content-img">
         <h1>Borrow the game,</h1>
         <h1><i>Keep the glory.</i></h1>
         <p>
@@ -40,7 +67,7 @@ export default function HomeContent({ navigateToTerms }: HomeContentProps) {
           </i>
         </p>
         <div className="buttons">
-          <button className="rent-now-btn" onClick={handleRentNow}>Rent Now</button>
+          <button className="rent-now-btn" onClick={() => window.location.href = "/games-list"}>Rent Now</button>
           <button className="how-it-works-btn" onClick={handleHowItWorks}>How It Works</button>
         </div>
       </main>
@@ -111,6 +138,8 @@ export default function HomeContent({ navigateToTerms }: HomeContentProps) {
       </div>
 
       <Footer />
+    </>
+    )}
     </div>
   );
 }

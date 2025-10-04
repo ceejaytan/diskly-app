@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import LoginForm from "../components/Login/Login_Form";
 import RegisterForm from "../components/Register/Register_Form";
 import "../Css/AuthPage.css";
 import { checkBackendStatus } from "../API/config";
 
-const AuthPage: React.FC = () => {
+function AuthPage() {
   const [form_type, setForm_type] = useState("login");
 
 
@@ -23,7 +23,6 @@ const params = new URLSearchParams(window.location.search);
     setForm_type("register");
   } else {
     setForm_type("login");
-    // update the URL if it's missing or wrong
     if (type !== "login") {
       params.set("type", "login");
       window.history.replaceState({}, "", `${window.location.pathname}?${params}`);

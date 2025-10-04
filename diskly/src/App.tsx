@@ -1,4 +1,4 @@
-import React from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -12,13 +12,18 @@ import Home from "./Routes/Home";
 import GamesPage from "./Routes/Games_List";
 import NotFound from "./Routes/NotFound";
 
+
+
 const App: React.FC = () => {
+
+
+
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<HomeWrapper />} />
+        <Route path="/" element={<HomeContent />} />
         <Route path="/Terms" element={<TermsWrapper />} />
-        <Route path="/AuthPage" element={<AuthWrapper />} />
+        <Route path="/AuthPage" element={<AuthPage />} />
 
         <Route path="/home" element={<Home />} />
         <Route path="/games-list" element={<GamesPage />} />
@@ -28,19 +33,11 @@ const App: React.FC = () => {
   );
 };
 
-const HomeWrapper: React.FC = () => {
-  const navigate = useNavigate();
-  return <HomeContent navigateToTerms={() => navigate("/terms")} />;
-};
 
 const TermsWrapper: React.FC = () => {
   const navigate = useNavigate();
   return <TermsPage navigateBack={() => navigate(-1)} />;
 };
 
-const AuthWrapper: React.FC = () => {
-  const navigate = useNavigate();
-  return <AuthPage />;
-};
 
 export default App;

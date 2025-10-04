@@ -21,7 +21,9 @@ export function logout_session(){
   })
   .then( res => {
     if (res.ok){
+        console.log("logged out successfully");
         window.location.href = "/"
+      }else {console.log("failed to logout");
       }
     })
 }

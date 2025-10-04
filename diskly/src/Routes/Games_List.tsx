@@ -1,24 +1,45 @@
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import { API_URL } from "../API/config";
+import { useNavigate } from "react-router-dom";
+
+import checkLoginSession from "../components/Login/CheckLoginSession";
+
+import "../Css/Games_List.css"
 
 export default function GamesPage() {
 
-type Game = {
-  id: number;
-  name: string;
-  cover_path: string;
-};
+  const [session, setSession] = useState<SessionType>(null);
+  type SessionType = { username: string; } | null;
+
+  type Game = {
+    id: number;
+    name: string;
+    cover_path: string;
+  };
 
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    (async () => {
+      const userdata = await checkLoginSession();
+      if (userdata && userdata.logged_in) {
+        setSession({ username: userdata.username });
+      } else {
+        setSession(null);
+      }
+    })();
+  }, []);
 
   const param = new URLSearchParams(window.location.search).get("search") || "";
 
+
   const fetchGames = async () => {
     try {
-const response = await fetch(`${API_URL}/games?game_name_search=${encodeURIComponent(param)}`);
+  const response = await fetch(`${API_URL}/games?game_name_search=${encodeURIComponent(param)}`);
       if (!response.ok) throw new Error("Failed to fetch games");
       const data: Game[] = await response.json();
       setGames(data);
@@ -33,52 +54,50 @@ const response = await fetch(`${API_URL}/games?game_name_search=${encodeURICompo
     fetchGames()
   }, [window.location.search])
 
-  if (loading) return <p>Loading games...</p>;
-  if (error) return <p>Error: {error}</p>;
+
+  function login_to_rent(){
+    navigate(`/AuthPage?type=login&redirect=${encodeURIComponent(location.pathname)}`);
+  }
+
+  if (loading) return(
+    <>
+    <Header></Header>
+      <div className="loading-error">
+      <div className="spinner"></div>
+      <p>Loading games...</p>
+    </div>
+    </>
+  )
+
+  if (error) return(
+    <>
+    <Header></Header>
+      <div className="loading-error">
+    <p>Server is not running</p>
+    </div>
+   </>
+  )
 
   return (
     <>
     <Header></Header>
-    <div style={{ padding: "20px" }}>
-      <h1>Available Games to Rent</h1>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
-          gap: "20px",
-          marginTop: "20px",
-        }}
-      >
+    <div className="container-games">
+      <h2>Available Games to Rent</h2>
+      <div className="games-list">
         {games.map((game) => (
-          <div
-            key={game.id}
-            style={{
-              border: "1px solid #ccc",
-              borderRadius: "8px",
-              padding: "10px",
-              textAlign: "center",
-            }}
-          >
-            <img
-              src={`${API_URL}/${ game.cover_path }`}
-              alt={game.name}
-              style={{ width: "100%", borderRadius: "4px" }}
-            />
+          <div className="games-box" key={game.id}>
+            <img className="game-cover" src={`${API_URL}/${ game.cover_path }`}alt={game.name}/>
             <h3>{game.name}</h3>
-            <button
-              style={{
-                padding: "5px 10px",
-                marginTop: "5px",
-                cursor: "pointer",
-                borderRadius: "4px",
-                border: "none",
-                backgroundColor: "#63D6DD",
-                color: "#171F21",
-              }}
-              onClick={() => alert(`Renting ${game.name}`)}
-            >
-              Rent
-            </button>
+
+
+            {session && (
+            <button className="rent-btn">Rent</button>
+            )}
+
+            {!session && (
+            <button className="rent-btn not-loggedin" onClick={login_to_rent}>Login to rent</button>
+            )}
+
           </div>
         ))}
       </div>
