@@ -3,6 +3,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from .Sql import SqlAccounts
+
+
 from .Routes.AccountsValidation import router as accounts_router
 from .Routes.GamediskAPI import router as GamediskAPI
 from .Routes.Admin import router as Admin

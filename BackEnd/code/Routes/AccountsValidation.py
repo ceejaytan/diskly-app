@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, Response, Form, Cookie
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Response, Form, Cookie
 import secrets
 import re
 from ..Sql import Accounts, SqlAccounts
+
 
 router = APIRouter()
 
@@ -127,4 +128,10 @@ def logout(response: Response):
         **cookie_setting
             )
     return {"message": "successfully logged out!"}
+
+@router.post("/forget-password")
+def forget_password(background_task: BackgroundTasks, email: str):
+    print("forget password")
+    background_task.add_task(Accounts.send_reset_pass, email)
+    return {}
 
