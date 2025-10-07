@@ -182,17 +182,17 @@ class SqlGameCatalog_API:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    SELECT ID, game_name, cover_image_path from game_catalog
+                    SELECT ID, game_name, cover_image_path, price_to_rent from game_catalog
                                """)
 
                 row = cursor.fetchall()
 
                 for i in range(len(row)):
-                    print(row[i])
                     row[i] = {
                         "id": row[i][0],
                         "name": row[i][1],
-                        "cover_path": row[i][2]
+                        "cover_path": row[i][2],
+                        "price_to_rent": row[i][3]
                     }
 
                 return row
@@ -205,22 +205,23 @@ class SqlGameCatalog_API:
 
     @staticmethod
     def game_search(game_name: str) -> list:
+        search_format = f"%{game_name}%"
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    SELECT ID, game_name, cover_image_path from game_catalog
-                    WHERE game_name LIKE '%' || ? || '%' COLLATE NOCASE
-                               """, (game_name, ))
+                    SELECT ID, game_name, cover_image_path, price_to_rent from game_catalog
+                    WHERE game_name LIKE ? COLLATE NOCASE
+                               """, (search_format, ))
 
                 row = cursor.fetchall()
 
                 for i in range(len(row)):
-                    print(row[i])
                     row[i] = {
                         "id": row[i][0],
                         "name": row[i][1],
-                        "cover_path": row[i][2]
+                        "cover_path": row[i][2],
+                        "price_to_rent": row[i][3]
                     }
 
                 return row

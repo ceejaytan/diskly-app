@@ -6,44 +6,21 @@ import Header from "../Header"
 import Footer from "../Footer"
 
 
-export default function Home(){
-  const [loginSession, setLoginSession] = useState({
-    username: "",
-    logged_in: null
-  })
-  const [IsLoggedIn, setIsLoggedIn] = useState(false)
+type HeaderProps = {
+  userSession: {
+    username: string
+  } | null
+}
 
-
-  useEffect(() => {
-    (async () => {
-      if (!await checkBackendStatus()){
-        alert("Backend Is Not Running")
-        window.location.href = "/"
-      }
-    })();
-  }, [])
-
-
-  useEffect(() => {
-    (async () => {
-
-    const data = await checkLoginSession()
-    if (data){
-        setLoginSession(data)
-        setIsLoggedIn(true)
-    }else{
-        setIsLoggedIn(false)
-      }
-  })();
-  },[])
+export default function Home({userSession}: HeaderProps){
 
   return(
   <>
-      {IsLoggedIn && (
+      {userSession && (
         <>
-    <Header></Header>
+    <Header userSession={userSession}></Header>
       <div className="home-content-bluebox">
-            <h3>Welcome, {loginSession.username}</h3>
+            <h3>Welcome, {userSession.username}</h3>
         </div>
       <main className="main-content main-home-content">
         <h1 className="home-content-title">HELLDIVERS 2</h1>
@@ -60,7 +37,7 @@ export default function Home(){
           </>
         )}
 
-      {!IsLoggedIn && (
+      {!userSession && (
         <p>Not Logged In</p> 
       )}
 

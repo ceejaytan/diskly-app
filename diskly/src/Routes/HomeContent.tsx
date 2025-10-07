@@ -13,16 +13,16 @@ type SessionType = { username: string; } | null;
 
 export default function HomeContent() {
 
-  const [session, setSession] = useState<SessionType>(null);
+  const [userSession, setUserSession] = useState<SessionType>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       const userdata = await checkLoginSession();
       if (userdata && userdata.logged_in) {
-        setSession({ username: userdata.username });
+        setUserSession({ username: userdata.username });
       } else {
-        setSession(null);
+        setUserSession(null);
       }
       setLoading(false);
     })();
@@ -46,14 +46,14 @@ export default function HomeContent() {
 
   if (loading) { return (
   <>
-    <Header></Header>
+    <Header userSession={userSession}></Header>
       <div className="loading-error">
       <div className="spinner"></div>
     </div>
   </>
   )}
 
-  if(session?.username === "admin"){
+  if(userSession?.username === "admin"){
     window.location.href = "/Stock"
   }
 
@@ -61,16 +61,16 @@ export default function HomeContent() {
     <div className="app-container">
 
 
-  {session && (
+  {userSession && (
   <>
-    <Home></Home>
+    <Home userSession={userSession}></Home>
   </>
   )}
 
 
-  {!session && (
+  {!userSession && (
   <>
-    <Header></Header>
+    <Header userSession={userSession}></Header>
       <main className="main-content main-content-img">
         <h1>Borrow the game,</h1>
         <h1><i>Keep the glory.</i></h1>

@@ -8,8 +8,6 @@ router = APIRouter()
 @router.get("/")
 def list_games(game_name_search: Optional[str] = ""):
 
-    print("hello games list")
-    print(game_name_search)
 
     # list_games = [
     #     {"id": "1", "name": "Overcooked 2", "cover_path": "images/gamecover/Overcooked 2.png"},
@@ -28,7 +26,6 @@ def list_games(game_name_search: Optional[str] = ""):
 
     # db_games.extend(list_games)
 
-    print(db_games)
     return db_games
 
 

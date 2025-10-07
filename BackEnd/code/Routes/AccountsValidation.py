@@ -21,7 +21,6 @@ def login(
     response: Response,
     request: Accounts.LoginRequest = Form(...)
     ):
-    print(request)
 
     if request.username == "admin" and request.password == "admin":
 
@@ -35,7 +34,6 @@ def login(
         return {"status": "success"}
 
     elif SqlAccounts.login(request.username, request.password):
-        print(response)
         session_token = secrets.token_hex(32)
         response.set_cookie(
             key="logged_in",
@@ -54,7 +52,6 @@ def register(
     response: Response,
     request: Accounts.RegisterRequest = Form(...)
     ):
-    print(request)
 
     if not re.match(Accounts.USERNAME_REGEX, request.username) or \
         not re.match(Accounts.EMAIL_REGEX, request.email) or \
@@ -66,7 +63,6 @@ def register(
         raise HTTPException(status_code=400, detail="Invalid Input")
 
     print("register valid")
-    print(response)
     if SqlAccounts.register(request.username.strip(), request.password, request.email.strip()):
         session_token = secrets.token_hex(16)
         response.set_cookie(
@@ -97,7 +93,7 @@ def check_email(email: str):
 
 @router.get("/check-session-logged-in")
 def check_session(logged_in: str = Cookie(None)):
-    print(logged_in)
+    print(logged_in, end=": ")
 
     if not logged_in:
         print("not logged in")
@@ -128,6 +124,7 @@ def logout(response: Response):
         **cookie_setting
             )
     return {"message": "successfully logged out!"}
+
 
 @router.post("/forget-password")
 def forget_password(background_task: BackgroundTasks, email: str):
