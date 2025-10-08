@@ -86,10 +86,17 @@
   margin-top: 10px;
   cursor: pointer;
   border-radius: 20px;
-  border: none;
   background-color: #63D6DD;
   color: #171F21;
   font-weight: 700;
+  transition: transform 0.15s;
+}
+
+
+.rent-btn:hover {
+  transform: translateY(-2px);
+  background-color: #418d91;
+  color: white
 }
 
 

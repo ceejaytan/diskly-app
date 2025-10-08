@@ -3,12 +3,13 @@ import Header_for_GameSearch from "../components/Header_for_GameSearch";
 import { API_URL } from "../API/config";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import checkLoginSession from "../components/Login/CheckLoginSession";
 import Rental_form from "../components/Rental_Form/Rental_Form";
+import checkLoginSession from "../components/Login/CheckLoginSession";
 
 import "../Css/Games_List.css"
 
 type game_rent_info = {
+  game_id: number,
   game_title: string,
   console: string,
   total_stocks: number,
@@ -32,7 +33,7 @@ enum platform{
 
 export default function GamesPage() {
 
-  type SessionType = { username: string; } | null;
+  type SessionType = { userid: number; username: string; } | null;
   const [session, setSession] = useState<SessionType>(null);
 
 
@@ -44,8 +45,8 @@ export default function GamesPage() {
   useEffect(() => {
     (async () => {
       const userdata = await checkLoginSession();
-      if (userdata && userdata.logged_in) {
-        setSession({ username: userdata.username });
+      if (userdata ) {
+        setSession({ userid: userdata.user_id, username: userdata.username });
       } else {
         setSession(null);
       }
@@ -54,8 +55,9 @@ export default function GamesPage() {
 
 
   const [game_platform, setGame_Platform] = useState<platform>(platform.Full_Catalog);
-  const[showRentalForm, setShowRentalForm] = useState(false);
-  const[gameRentInfo, setGameRentInfo] = useState<game_rent_info>(null);
+
+  const [showRentalForm, setShowRentalForm] = useState(false);
+  const [gameRentInfo, setGameRentInfo] = useState<game_rent_info>(null);
 
   function openRentForm(){
 
@@ -74,8 +76,12 @@ export default function GamesPage() {
   const param = new URLSearchParams(location.search).get("search") || "";
 
   const fetchGames = async () => {
+    let console = game_platform.toString();
+    if (console === "Full_Catalog"){
+      console = "";
+    }
     try {
-  const response = await fetch(`${API_URL}/games/?game_name_search=${encodeURIComponent(param)}`);
+  const response = await fetch(`${API_URL}/games/?game_name_search=${encodeURIComponent(param)}&platform=${console}`);
       if (!response.ok) throw new Error("Failed to fetch games");
       const data: Game[] = await response.json();
       setGames(data);
@@ -88,7 +94,7 @@ export default function GamesPage() {
 
   useEffect(() => {
     fetchGames()
-  }, [location.search])
+  }, [location.search, game_platform])
 
 
 
@@ -182,7 +188,11 @@ export default function GamesPage() {
 
 
             {session && (
-            <button className="rent-btn" onClick={() => { openRentForm(); fetch_game_info(game.name) }}>Rent Now</button>
+            <button  onClick={() => { openRentForm(); fetch_game_info(game.name) }}
+            className="
+                  rent-btn
+                  "
+                >Rent Now</button>
             )}
 
             {!session && (
@@ -193,7 +203,7 @@ export default function GamesPage() {
         ))}
       </div>
       {showRentalForm && (
-      <Rental_form info={gameRentInfo} cancelbtn={() => openRentForm()}></Rental_form>
+      <Rental_form userinfo={session} info={gameRentInfo} cancelbtn={() => openRentForm()}></Rental_form>
       )}
     </div>
 

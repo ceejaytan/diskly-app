@@ -98,21 +98,27 @@ def check_session(logged_in: str = Cookie(None)):
     if not logged_in:
         print("not logged in")
         return {
+                "user_id": None,
                 "username": None,
-                "logged_in": 0}
+                "logged_in": 0
+                }
 
-    username = SqlAccounts.get_username_from_session(logged_in)
+    userinfo = SqlAccounts.get_username_from_session(logged_in)
 
-    if username is None:
+    if userinfo is None:
         print("not logged in")
         return {
+                "user_id": None,
                 "username": None,
-                "logged_in": 0}
+                "logged_in": 0
+                }
 
-    print(f"User {username} is logged in")
+    print(f"User {userinfo} is logged in")
     return {
-            "username": username,
-            "logged_in": 1}
+            "user_id": userinfo[0],
+            "username": userinfo[1],
+            "logged_in": 1
+            }
 
 
 @router.get("/logout")

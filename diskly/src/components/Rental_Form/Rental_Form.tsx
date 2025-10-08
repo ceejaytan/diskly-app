@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Rental_Form.css";
+import Submit_Rental_Form from "./Rental_Form_Submit";
+
 
 type game_rent_info = {
+  game_id: number,
   game_title: string,
   console: string,
   total_stocks: number,
@@ -9,18 +12,90 @@ type game_rent_info = {
   rental_start_date: Date
 }
 
+type userinfo = {
+  userid: number,
+  username: string,
+}
+
 type more_boilerplate_because_reactjs_moment = {
+  userinfo: userinfo | null;
   info: game_rent_info | null;
   cancelbtn: () => void;
 }
 
-export default function Rental_form({ info, cancelbtn }: more_boilerplate_because_reactjs_moment) {
+export default function Rental_form({userinfo, info, cancelbtn }: more_boilerplate_because_reactjs_moment) {
 
-  const [Quantity, setQuantity] = useState(1);
+  const [Return_Date, setReturn_Date] = useState("");
+  const [returnDateValid, setReturnDateValid] = useState(false);
+  const [Return_Date_Message, setReturn_Date_Message] = useState("");
+  const [Quantity, setQuantity] = useState("1");
+  const [quantityValid, setQuantityValid] = useState(true);
+  const [rentTotal, setRentTotal] = useState(info?.total ?? 1);
 
+  useEffect(() => {
+    if (!Return_Date || !info?.rental_start_date) {
+      setReturnDateValid(false);
+      setReturn_Date_Message("")
+      return;
+    }
+
+    const rentalStart = new Date(info.rental_start_date);
+    rentalStart.setHours(0, 0, 0, 0);
+
+    const selectedDate = new Date(Return_Date);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    if (selectedDate < rentalStart) {
+      setReturnDateValid(false);
+      setReturn_Date_Message("Cannot be in the past")
+    } else {
+      setReturnDateValid(true);
+      setReturn_Date_Message("")
+    }
+  }, [Return_Date, info?.rental_start_date]);
+
+useEffect(() => {
+  if (!info) return;
+
+  const qty = Number(Quantity) || 0;
+  setRentTotal(qty * info.total);
+}, [Quantity, info]);
+
+
+  function digits_only(e: any){
+    const val = e.target.value
+    if (val === ""){
+      setQuantity(val);
+      setQuantityValid(false);
+      return;
+    }
+    const numval = Number(val);
+    if (/^\d*$/.test(val) && numval <= ( info?.total_stocks ?? 0) && numval > -1 && val !== "0") {
+      setQuantity(val)
+      setQuantityValid(true);
+    }
+  }
 
   const [agree_TermsCondition, setAgree_TermsCondition] = useState(false);
   const [agree_Late_Fee, setAgree_Late_Fee] = useState(false);
+
+
+function submitForm(e:any) {
+    e.preventDefault()
+  if (!info || !userinfo) return;
+
+  Submit_Rental_Form({
+    userid: userinfo.userid,
+    username: userinfo.username,
+    game_id: info.game_id,
+    game_title: info.game_title,
+    rental_start_date: new Date(info.rental_start_date),
+    return_date: new Date(Return_Date),
+    console: info.console,
+    quantity: Number(Quantity),
+    total_cost: rentTotal,
+  });
+}
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/80  z-50 p-4" onClick={cancelbtn}>
@@ -81,18 +156,23 @@ export default function Rental_form({ info, cancelbtn }: more_boilerplate_becaus
                 Return Date
               </label>
               <input type="date"
-              className="
+                value={Return_Date}
+                onChange={(e) => setReturn_Date(e.target.value)}
+              className={`
                 bg-[#D6DCDE]
-                border
-                border-cyan-400/60
+                border-2
                 text-black
                 rounded-[13px]
                 h-[40px]
                 w-full
                 flex
                 items-center px-3
-                "
+
+              ${!returnDateValid ? "border-red-500" : "border-green-500"}
+              required
+                `}
               />
+              <small className="text-left w-[95%] text-red-500">{Return_Date_Message}</small>
             </div>
           </div>
 
@@ -119,22 +199,42 @@ export default function Rental_form({ info, cancelbtn }: more_boilerplate_becaus
               <label className="text-sm font-semibold text-cyan-300 mb-1 w-[85%] text-left">
                 Quantity
               </label>
-              <input type="number"
-              className="
+              <div className="flex w-full max-w-[100%]">
+              <input type="text"
+              className={`
                 bg-[#D6DCDE]
-                border
-                border-cyan-400/60
+                border-2
+                border-r-0
                 text-black
-                rounded-[13px]
+                rounded-l-[13px]
                 h-[40px]
                 w-full
-                flex
                 items-center px-3
-              "
-                min="1"
+
+                ${!quantityValid ? "border-red-500" : "border-green-500"}
+
+                  `}
                 value={Quantity}
-                onChange={(e) => e.target.value}
+                onChange={(e) => digits_only(e)}
+                required
               />
+              <span className={`
+                  bg-[#D6DCDE]
+                  border-2
+                  border-l-0
+                  text-black
+                  rounded-r-[13px]
+                  h-[40px]
+                  flex
+                  items-center
+                  w-[90%]
+
+                ${!quantityValid ? "border-red-500" : "border-green-500"}
+                `}
+                >
+                  / {info?.total_stocks ?? 0}
+                </span>
+                </div>
             </div>
             <div className="flex flex-col items-center">
               <label className="text-sm font-semibold text-cyan-300 mb-1 w-[85%] text-left">
@@ -150,7 +250,7 @@ export default function Rental_form({ info, cancelbtn }: more_boilerplate_becaus
                 flex
                 items-center
                 ">
-                ₱{info?.total || "null"}
+                ₱{rentTotal || "0"}
               </p>
             </div>
           </div>
@@ -192,7 +292,13 @@ export default function Rental_form({ info, cancelbtn }: more_boilerplate_becaus
               hover:bg-cyan-300
               disabled:opacity-50
               disabled:bg-cyan-400/20"
-              disabled={!agree_TermsCondition || !agree_Late_Fee}
+              disabled={
+                  !agree_TermsCondition ||
+                  !agree_Late_Fee ||
+                  !quantityValid ||
+                  !returnDateValid
+                }
+              onClick={(e) => submitForm(e)}
             >
               Confirm Rental
             </button>

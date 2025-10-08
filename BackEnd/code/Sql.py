@@ -1,7 +1,9 @@
-from datetime import date
+from datetime import datetime
+from zoneinfo import ZoneInfo
 import sqlite3
 
 from .Accounts import Accounts
+from .Validations import UserRentals
 
 db_path = "db/sqlite.db"
 
@@ -84,16 +86,16 @@ class SqlAccounts:
 
 
     @staticmethod
-    def get_username_from_session(session_token: str) -> str | None:
+    def get_username_from_session(session_token: str) -> list | None:
         """Get username from session token"""
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
-                cursor.execute("SELECT NAME FROM accounts WHERE session_cookie = ?", (session_token,))
+                cursor.execute("SELECT ID, NAME FROM accounts WHERE session_cookie = ?", (session_token,))
                 row = cursor.fetchone()
                 if row is None:
                     return None
-                return row[0]
+                return [ row[0], row[1] ]
         except sqlite3.Error as err:
             print(err)
             return None
@@ -178,15 +180,19 @@ class SqlGameCatalog_API:
 
 
     @staticmethod
-    def game_search(game_name: str) -> list:
+    def game_search(game_name: str = "", platform: str = "") -> list:
         search_format = f"%{game_name}%"
+        platform_format = f"%{platform}%"
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    SELECT ID, game_name, cover_image_path, price_to_rent from game_catalog
-                    WHERE game_name LIKE ? COLLATE NOCASE
-                               """, (search_format, ))
+                    SELECT ID, game_name, cover_image_path, price_to_rent, platform from game_catalog
+                    WHERE
+                    game_name LIKE ? COLLATE NOCASE
+                    AND platform LIKE ? COLLATE NOCASE
+                    AND total_stocks > 0
+                               """, (search_format, platform_format ))
 
                 row = cursor.fetchall()
 
@@ -207,23 +213,25 @@ class SqlGameCatalog_API:
 
     @staticmethod
     def game_rent_info(game_name: str):
-
+        manila_time = ZoneInfo("Asia/Manila")
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                SELECT game_name, platform, total_stocks, price_to_rent FROM game_catalog
+                SELECT ID, game_name, platform, total_stocks, price_to_rent FROM game_catalog
                 WHERE game_name = ?
                                """, (game_name,))
 
                 row = cursor.fetchone()
                 row = {
-                    "game_title": row[0],
-                    "console": row[1],
-                    "total_stocks": row[2],
-                    "total": row[3],
-                    "rental_start_date": date.today()
+                    "game_id": row[0],
+                    "game_title": row[1],
+                    "console": row[2],
+                    "total_stocks": row[3],
+                    "total": row[4],
+                    "rental_start_date": datetime.now(manila_time)
                 }
+                print(row["rental_start_date"].isoformat())
 
                 return row
         except sqlite3.Error as err:
@@ -231,5 +239,19 @@ class SqlGameCatalog_API:
             return None
 
 
+    @staticmethod
+    def save_rental_info(info: UserRentals.RentalFormModel):
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                INSERT INTO rentals(user_id, user_name, game_id, game_name, rented_on, quantity, total_price, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                               """,
+                (info.userid, info.username, info.game_id, info.game_title, info.rental_start_date, info.quantity, info.total_cost, "Pending"))
+                conn.commit()
+                print(f"Created New Rental from {info.username}")
 
+        except sqlite3.Error as err:
+            print(err)
 
