@@ -49,3 +49,9 @@
   animation: spin 1s linear infinite;
   margin-bottom: 20px;
 }
+
+@media (max-width: 700px) {
+  .home-content-title {
+    font-size: 3rem !important;
+  }
+}

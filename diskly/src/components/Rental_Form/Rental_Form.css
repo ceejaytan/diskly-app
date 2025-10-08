@@ -1,0 +1,32 @@
+.rent-form-container{
+  padding: 30px;
+}
+
+.rent-form p, .rent-form input{
+  padding: 0 10px 0 20px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  font-size: 1rem !important;
+}
+
+.rent-form input[type=number] {
+    appearance: textfield;
+}
+
+.rent-form-submitrentalbtn{
+  background-color: #5BE0E5;
+  color: black;
+  font-weight: 800;
+}
+
+
+.rent-form-submitrentalbtn:disabled{
+  cursor: not-allowed;
+}
+
+.rent-form-cancelbtn{
+  background-color: transparent;
+  border: 2px solid #5BE0E5;
+}
+
+

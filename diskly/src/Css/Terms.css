@@ -1,13 +1,3 @@
-
-html, body, #root {
-  height: 100%;
-  padding: 0;
-  background-color: #171F21; 
-  color: #ffffff; 
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
-
-
 .terms-container {
   max-width: 900px;
   margin: 50px auto;

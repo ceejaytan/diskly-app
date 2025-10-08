@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import { API_URL, logout_session } from "../API/config";
 import "../Css/Header.css";
@@ -31,13 +32,22 @@ export default function Header_for_GameSearch({userSession}: HeaderProps) {
 
 
 
-  const [searchParam, setSearchParam] = useState("");
+  // ↓↓↓ do not touch this ↓↓↓
+  // its for search while typing
 
-  function HandleSearchGame(e: React.FormEvent<HTMLFormElement>){
-    e.preventDefault();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-    window.location.href = `/games-list?search=${encodeURIComponent(searchParam)}`
+  const searchValue = searchParams.get("search") || "";
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const newValue = e.target.value;
+
+    setSearchParams({ search: newValue });
   }
+
+
+  // ↑↑↑ do not touch this ↑↑↑
+  // reactjs is ****
 
   return (
     <header className="header">
@@ -50,15 +60,14 @@ export default function Header_for_GameSearch({userSession}: HeaderProps) {
         />
       </div>
 
-      <form className="search-bar" onSubmit={HandleSearchGame}>
+      <form className="search-bar" onSubmit={(e) => {e.preventDefault()}}>
         <input
           type="text"
           placeholder="Search games..."
-          value={ searchParam }
-          onChange={(e) => {setSearchParam( e.target.value )}}
+          value={searchValue}
+          onChange={handleChange}
         />
         <button type="submit">🔍︎</button>
-
       </form>
 
 

@@ -1,3 +1,4 @@
+from datetime import date
 import sqlite3
 
 from .Accounts import Accounts
@@ -177,54 +178,58 @@ class SqlGameCatalog_API:
 
 
     @staticmethod
-    def game_catalog_list() -> list:
+    def game_search(game_name: str) -> list:
+        search_format = f"%{game_name}%"
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    SELECT ID, game_name, cover_image_path from game_catalog
-                               """)
+                    SELECT ID, game_name, cover_image_path, price_to_rent from game_catalog
+                    WHERE game_name LIKE ? COLLATE NOCASE
+                               """, (search_format, ))
 
                 row = cursor.fetchall()
 
                 for i in range(len(row)):
-                    print(row[i])
                     row[i] = {
                         "id": row[i][0],
                         "name": row[i][1],
-                        "cover_path": row[i][2]
+                        "cover_path": row[i][2],
+                        "price_to_rent": row[i][3]
                     }
 
                 return row
         except sqlite3.Error as err:
             print(err)
             return []
-
 
 
 
     @staticmethod
-    def game_search(game_name: str) -> list:
+    def game_rent_info(game_name: str):
+
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    SELECT ID, game_name, cover_image_path from game_catalog
-                    WHERE game_name LIKE '%' || ? || '%' COLLATE NOCASE
-                               """, (game_name, ))
+                SELECT game_name, platform, total_stocks, price_to_rent FROM game_catalog
+                WHERE game_name = ?
+                               """, (game_name,))
 
-                row = cursor.fetchall()
-
-                for i in range(len(row)):
-                    print(row[i])
-                    row[i] = {
-                        "id": row[i][0],
-                        "name": row[i][1],
-                        "cover_path": row[i][2]
-                    }
+                row = cursor.fetchone()
+                row = {
+                    "game_title": row[0],
+                    "console": row[1],
+                    "total_stocks": row[2],
+                    "total": row[3],
+                    "rental_start_date": date.today()
+                }
 
                 return row
         except sqlite3.Error as err:
             print(err)
-            return []
+            return None
+
+
+
 

@@ -8,6 +8,19 @@
   background-color: #f0faff;
 }
 
+.menu-toggle {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #63D6DD;
+  cursor: pointer;
+  margin-right: 20px;
+  padding: 2px;
+  padding-left: 10px;
+  padding-right: 10px;
+  font-weight: bold;
+}
+
 .profile-avatar {
   width: 35px;
   height: 35px;
@@ -140,5 +153,8 @@
 
   .logo img{
     height: 30px;
+  }
+  .menu-toggle {
+    font-size: 1rem;
   }
 }

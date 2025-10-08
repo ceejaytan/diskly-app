@@ -4,13 +4,11 @@ import { checkBackendStatus } from "../API/config"
 
 import Header from "../components/Header"
 
-export default function Home(){
-  const [loginSession, setLoginSession] = useState({
-    username: "",
-    logged_in: null
-  })
-  const [IsLoggedIn, setIsLoggedIn] = useState(false)
 
+type SessionType = { username: string; } | null;
+
+export default function Home(){
+  const [userSession, setUserSession] = useState<SessionType>(null);
 
   useEffect(() => {
     (async () => {
@@ -27,25 +25,24 @@ export default function Home(){
 
     const data = await checkLoginSession()
     if (data){
-        setLoginSession(data)
-        setIsLoggedIn(true)
+        setUserSession(data)
     }else{
-        setIsLoggedIn(false)
+        setUserSession(null)
       }
   })();
   },[])
 
   return(
   <>
-      {IsLoggedIn && (
+      {userSession && (
         <>
-        <Header></Header>
+        <Header userSession={userSession}></Header>
 
-          <p>Logged In as: {loginSession.username}</p> 
+          <p>Logged In as: {userSession.username}</p> 
           </>
         )}
 
-      {!IsLoggedIn && (
+      {!userSession && (
         <p>Not Logged In</p> 
       )}
 

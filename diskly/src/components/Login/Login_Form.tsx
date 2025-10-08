@@ -37,11 +37,20 @@ const LoginForm: React.FC<LoginFormProps> = ({ toggleForm }) => {
 
   return (
     <form onSubmit={handleSubmit}>
+
+      <div className="flex justify-center">
+        <img
+          src="/images/disklogo.png"
+          alt="Diskly Logo"
+          className="w-20 h-20 object-contain cursor-pointer"
+          onClick={() => {window.location.href = "/"}}
+        />
+      </div>
       <h2>Sign In</h2>
 
 
       {loginMessage &&(
-        <small>{ loginMessage }</small>
+        <small className="text-red-500">{ loginMessage }</small>
       )}
       <div className="form-group">
         <label>Username</label>
@@ -50,6 +59,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ toggleForm }) => {
           value={username}
           onChange={(e) => { setUsername(e.target.value); setLoginMessage(""); }}
           required
+          className="
+          border-cyan-400 border-2 rounded-[10px]
+          bg-[#D6DCDE]
+          text-black
+          "
         />
       </div>
 
@@ -60,6 +74,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ toggleForm }) => {
           value={password}
           onChange={(e) => {setPassword(e.target.value); setLoginMessage("")}}
           required
+          className="
+          border-cyan-400 border-2 rounded-[10px]
+          bg-[#D6DCDE]
+          text-black
+          "
         />
       </div>
 
