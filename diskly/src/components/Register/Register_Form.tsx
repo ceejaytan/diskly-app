@@ -249,7 +249,16 @@ useEffect(() => {
 
   return (
     <form onSubmit={handleSubmit}>
+      <div className="flex justify-center">
+        <img
+          src="/images/disklogo.png"
+          alt="Diskly Logo"
+          className="w-20 h-20 object-contain cursor-pointer"
+          onClick={() => {window.location.href = "/"}}
+        />
+      </div>
       <h2>Register</h2>
+
 
       <div className="form-group">
         <label>Full Name</label>
@@ -258,13 +267,19 @@ useEffect(() => {
           value={fullname}
           onChange={(e) => setFullName(e.target.value)}
           required
-          className={
-            fullname === ""
-            ? ""
-            : fullnameValid
-              ? "Inputvalid"
-              : "Inputinvalid"
+          className=
+          {` 
+          border- border-2 rounded-[10px]
+          bg-[#D6DCDE]
+          text-black
+          ${
+          fullname === ""
+          ? ""
+          : fullnameValid
+          ? "Inputvalid"
+          : "Inputinvalid"
           }
+          `}
         />
           {fullname && (
               <small>
@@ -281,13 +296,18 @@ useEffect(() => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
-            className={
-                username === ""
-                  ? ""
-                  : usernameValid
-                  ? "Inputvalid"
-                  : "Inputinvalid"
-              }
+            className={`
+            border-cyan-400 border-2 rounded-[10px]
+            bg-[#D6DCDE]
+            text-black
+            ${
+            username === ""
+            ? ""
+            : usernameValid
+            ? "Inputvalid"
+            : "Inputinvalid"
+            }
+              `}
           />
           {username && (
               <small className={usernameValid ? "message-valid" : "message-invalid"}>
@@ -302,13 +322,16 @@ useEffect(() => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className={
-                email === ""
-                  ? ""
-                  : emailValid
-                  ? "Inputvalid"
-                  : "Inputinvalid"
-              }
+            className={`
+            border-cyan-400 border-2 rounded-[10px]
+            bg-[#D6DCDE]
+            text-black
+            ${ email === ""
+            ? ""
+            : emailValid
+            ? "Inputvalid"
+            : "Inputinvalid" }
+              `}
           />
           {email && (
               <small>
@@ -326,13 +349,18 @@ useEffect(() => {
             value={birthday}
             onChange={(e) => setBirthday(e.target.value)}
             required
-            className={
-              birthday === ""
-              ? ""
-              : birthdayValid
-                ? "Inputvalid"
-                : "Inputinvalid"
+            className={`
+            border-cyan-400 border-2 rounded-[10px]
+            bg-[#D6DCDE]
+            text-black
+            ${
+            birthday === ""
+            ? ""
+            : birthdayValid
+            ? "Inputvalid"
+            : "Inputinvalid"
             }
+            `}
           />
           {birthday && (
               <small>
@@ -349,13 +377,18 @@ useEffect(() => {
             value={contact}
             onChange={(e) => setContact(e.target.value)}
             required
-            className={
-              contact === ""
-              ? ""
-              : contactValid
-                ? "Inputvalid"
-                : "Inputinvalid"
+            className={`
+            border-cyan-400 border-2 rounded-[10px]
+            bg-[#D6DCDE]
+            text-black
+            ${
+            contact === ""
+            ? ""
+            : contactValid
+            ? "Inputvalid"
+            : "Inputinvalid"
             }
+            `}
           />
           {contact && (
               <small>
@@ -374,13 +407,18 @@ useEffect(() => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className={
-                password === ""
-                  ? ""
-                  : passwordValid
-                  ? "Inputvalid"
-                  : "Inputinvalid"
-              }
+            className={`
+            border-cyan-400 border-2 rounded-[10px]
+            bg-[#D6DCDE]
+            text-black
+            ${
+            password === ""
+            ? ""
+            : passwordValid
+            ? "Inputvalid"
+            : "Inputinvalid"
+            }
+              `}
           />
 
           <button
@@ -409,12 +447,17 @@ useEffect(() => {
             value={confirmpassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
-            className={
-              confirmpassword === "" ? "" :
-              confirmpasswordValid
-                ? "Inputvalid"
-                : "Inputinvalid"
+            className={`
+            border-cyan-400 border-2 rounded-[10px]
+            bg-[#D6DCDE]
+            text-black
+            ${
+            confirmpassword === "" ? "" :
+            confirmpasswordValid
+            ? "Inputvalid"
+            : "Inputinvalid"
             }
+            `}
           />
 
           <button
@@ -450,7 +493,7 @@ useEffect(() => {
 
       <div className="button-stack">
         <button type="submit" className="btn btn-primary"
-        disabled={!usernameValid || !emailValid || password.length < 6 || password !== confirmpassword}>
+        disabled={!usernameValid || !emailValid || password.length < 6 || password !== confirmpassword || !contactValid}>
           Register
         </button>
 

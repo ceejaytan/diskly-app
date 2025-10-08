@@ -65,8 +65,15 @@
   padding: 50px;
 }
 
-.container-games h2, .container-games h4 {
+.container-games h2 {
   color: #63D6DD;
+  font-size: 1.5rem;
+}
+
+.games-box h4 {
+  color: #63D6DD;
+  font-size: 1rem;
+  max-width: 100%;
 }
 
 .container-games p {

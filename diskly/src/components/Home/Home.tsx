@@ -1,7 +1,3 @@
-import { useEffect, useState } from "react"
-import checkLoginSession from "../Login/CheckLoginSession"
-import { checkBackendStatus } from "../../API/config"
-
 import Header from "../Header"
 import Footer from "../Footer"
 

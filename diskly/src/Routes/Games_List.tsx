@@ -4,20 +4,38 @@ import { API_URL } from "../API/config";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import checkLoginSession from "../components/Login/CheckLoginSession";
+import Rental_form from "../components/Rental_Form/Rental_Form";
 
 import "../Css/Games_List.css"
+
+type game_rent_info = {
+  game_title: string,
+  rental_start_date: Date,
+  return_date: Date,
+  console: string,
+  quantity: number,
+  total: number
+} | null;
+
+type Game = {
+  id: number;
+  name: string;
+  cover_path: string;
+  price_to_rent: number;
+};
+
+enum platform{
+  Full_Catalog = "Full_Catalog",
+  Xbox = "Xbox",
+  PlayStation = "PlayStation",
+  PC = "PC"
+}
 
 export default function GamesPage() {
 
   type SessionType = { username: string; } | null;
   const [session, setSession] = useState<SessionType>(null);
 
-  type Game = {
-    id: number;
-    name: string;
-    cover_path: string;
-    price_to_rent: number;
-  };
 
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,15 +53,16 @@ export default function GamesPage() {
     })();
   }, []);
 
-  enum platform{
-    Full_Catalog = "Full_Catalog",
-    Xbox = "Xbox",
-    PlayStation = "PlayStation",
-    PC = "PC"
-  }
+
 
 
   const [game_platform, setGame_Platform] = useState<platform>(platform.Full_Catalog);
+  const[showRentalForm, setShowRentalForm] = useState(false);
+  const[gameRentInfo, setGameRentInfo] = useState<game_rent_info>(null);
+
+  function openRentForm(){
+    setShowRentalForm(!showRentalForm);
+  }
 
 
   const location = useLocation();
@@ -153,12 +172,12 @@ export default function GamesPage() {
         {games.map((game) => (
           <div className="games-box" key={game.id}>
             <img className="game-cover" src={`${API_URL}/${ game.cover_path }`}alt={game.name}/>
-            <h4>{game.name}</h4>
+            <h4 className="truncate hover:whitespace-normal">{game.name}</h4>
             <p>₱{game.price_to_rent} per day</p>
 
 
             {session && (
-            <button className="rent-btn">Rent Now</button>
+            <button className="rent-btn" onClick={() => openRentForm()}>Rent Now</button>
             )}
 
             {!session && (
@@ -168,7 +187,11 @@ export default function GamesPage() {
           </div>
         ))}
       </div>
+      {showRentalForm && (
+      <Rental_form info={gameRentInfo} cancelbtn={() => openRentForm()}></Rental_form>
+      )}
     </div>
+
     </>
   );
 }
