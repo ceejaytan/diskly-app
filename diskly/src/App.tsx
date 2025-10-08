@@ -11,7 +11,7 @@ import AuthPage from "./Routes/AuthPage";
 import Home from "./Routes/Home";
 import GamesPage from "./Routes/Games_List";
 import NotFound from "./Routes/NotFound";
-import Stock from "./Routes/Stock";
+import AdminPage from "./Routes/AdminPage";
 
 const App: React.FC = () => {
   return (
@@ -24,7 +24,7 @@ const App: React.FC = () => {
         <Route path="/home" element={<Home />} />
         <Route path="/games-list" element={<GamesPage />} />
         <Route path="*" element={<NotFound />} />
-        <Route path="/Stock" element={<Stock />} />
+        <Route path="/Stock" element={<AdminPage />} />
       </Routes>
     </Router>
   );

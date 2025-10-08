@@ -1,0 +1,39 @@
+.adminpage-sidebar {
+  padding-top: 50px;
+}
+
+.adminpage-navbar {
+  padding-top: 20px;
+}
+
+.adminpage-sidebar img {
+  padding-bottom: 50px;
+}
+
+.adminpage-buttons{
+  background-color: transparent;
+  border-radius: 0;
+  font-weight: 700;
+  padding: 7px 30px;
+}
+
+
+.adminpage-buttons:hover {
+  border-color: transparent;
+  background-color: white;
+  color: black;
+}
+
+.adminpage-logoutbtn{
+  background-color: #63D6DD;
+  color: black;
+  font-weight: 700;
+  margin-bottom: 30px;
+  padding: 5px 0;
+}
+
+.adminpage-logoutbtn:hover{
+  background-color: #274649;
+  border-color: transparent;
+  color: white;
+}
