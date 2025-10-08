@@ -29,4 +29,23 @@
   border: 2px solid #5BE0E5;
 }
 
+.rental-form-success-toast {
+  padding: 30px 0px;
+  text-align: center;
+}
 
+
+.rental-form-success-toast h1 {
+  font-weight: 700;
+  font-size: 2rem;
+  color: #5BE0E5;
+  margin: 10px;
+}
+
+
+.rental-form-success-toast button {
+  margin-top: 50px;
+  border-radius: 17px;
+  color: #5BE0E5;
+  font-weight: 900;
+}
