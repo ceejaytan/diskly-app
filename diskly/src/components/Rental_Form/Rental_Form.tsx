@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import "./Rental_Form.css";
 import Submit_Rental_Form from "./Rental_Form_Submit";
+import Rental_Form_Message_Success from "./Rental_Form_Toast";
+
 
 
 type game_rent_info = {
@@ -24,6 +26,7 @@ type more_boilerplate_because_reactjs_moment = {
 }
 
 export default function Rental_form({userinfo, info, cancelbtn }: more_boilerplate_because_reactjs_moment) {
+  const [rentalForm_submitted, setRentalForm_Submitted] = useState(false);
 
   const [Return_Date, setReturn_Date] = useState("");
   const [returnDateValid, setReturnDateValid] = useState(false);
@@ -83,6 +86,7 @@ useEffect(() => {
 function submitForm(e:any) {
     e.preventDefault()
   if (!info || !userinfo) return;
+  
 
   Submit_Rental_Form({
     userid: userinfo.userid,
@@ -95,7 +99,17 @@ function submitForm(e:any) {
     quantity: Number(Quantity),
     total_cost: rentTotal,
   });
+  setRentalForm_Submitted(true)
 }
+
+  if (rentalForm_submitted){
+    return(
+    <>
+        <Rental_Form_Message_Success cancelbtn={() => {cancelbtn(); setRentalForm_Submitted(false)}}></Rental_Form_Message_Success>
+
+    </>
+    )
+  }
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/80  z-50 p-4" onClick={cancelbtn}>
