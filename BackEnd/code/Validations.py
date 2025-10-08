@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 import re
 from fastapi import UploadFile
@@ -95,3 +96,16 @@ class AdminValidations:
             return False
 
         return True
+
+class UserRentals:
+
+    class RentalFormModel(BaseModel):
+        userid: int
+        username: str
+        game_id: int
+        game_title: str
+        rental_start_date: datetime
+        return_date: datetime
+        console: str
+        quantity: int
+        total_cost: float
