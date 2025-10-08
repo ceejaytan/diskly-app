@@ -7,14 +7,10 @@ router = APIRouter()
 
 @router.get("/")
 def list_games(game_name_search: Optional[str] = "", platform: str = ""):
+    return SqlGameCatalog_API.game_search(game_name_search
+                                          or "")
 
-    db_games = []
-
-    if game_name_search:
-        db_games = SqlGameCatalog_API.game_search(game_name_search)
-    else:
-        db_games = SqlGameCatalog_API.game_catalog_list()
-
-    return db_games
-
-
+@router.get("/rent-info")
+def rent_info(game_name: str = ""):
+    print("rent-info")
+    return SqlGameCatalog_API.game_rent_info(game_name)

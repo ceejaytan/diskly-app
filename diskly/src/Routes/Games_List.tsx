@@ -10,11 +10,10 @@ import "../Css/Games_List.css"
 
 type game_rent_info = {
   game_title: string,
-  rental_start_date: Date,
-  return_date: Date,
   console: string,
-  quantity: number,
-  total: number
+  total_stocks: number,
+  total: number,
+  rental_start_date: Date
 } | null;
 
 type Game = {
@@ -28,7 +27,7 @@ enum platform{
   Full_Catalog = "Full_Catalog",
   Xbox = "Xbox",
   PlayStation = "PlayStation",
-  PC = "PC"
+  Nintendo = "Nintendo"
 }
 
 export default function GamesPage() {
@@ -54,14 +53,20 @@ export default function GamesPage() {
   }, []);
 
 
-
-
   const [game_platform, setGame_Platform] = useState<platform>(platform.Full_Catalog);
   const[showRentalForm, setShowRentalForm] = useState(false);
   const[gameRentInfo, setGameRentInfo] = useState<game_rent_info>(null);
 
   function openRentForm(){
+
     setShowRentalForm(!showRentalForm);
+  }
+
+  async function fetch_game_info(game_name:string){
+    const res = await fetch(`${API_URL}/games/rent-info/?game_name=${game_name}`);
+    const data = await res.json();
+
+    setGameRentInfo(data)
   }
 
 
@@ -177,7 +182,7 @@ export default function GamesPage() {
 
 
             {session && (
-            <button className="rent-btn" onClick={() => openRentForm()}>Rent Now</button>
+            <button className="rent-btn" onClick={() => { openRentForm(); fetch_game_info(game.name) }}>Rent Now</button>
             )}
 
             {!session && (
