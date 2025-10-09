@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { API_URL } from "../../API/config";
 import "./Transactions.css";
 import Rentals_action from "./Rentals_Action";
-import DeleteConfirm from "./delete_confirmation";
+import DeleteConfirmTransaction from "./delete_confirmation_transactions";
 
 type Rental = {
   id: number;
@@ -44,7 +44,7 @@ export default function Trasactions_Dashboard() {
   return (
     <main className="rental-dashboard flex-1">
       <div className="flex flex-col gap-6">
-        <div>
+        <div className="adminpage-dashboard-titles">
           <h1>Rentals</h1>
           <p className="rental-p text-sm">{rentalsData?.length} Rentals found</p>
         </div>
@@ -76,7 +76,7 @@ export default function Trasactions_Dashboard() {
               font-semibold text-gray-700
             "
           >
-            <div>Username</div>
+            <div>User</div>
             <div>Title</div>
             <div>Date</div>
             <div>Price</div>
@@ -227,7 +227,7 @@ export default function Trasactions_Dashboard() {
       )}
 
       {deleteConfirm && (
-      <DeleteConfirm 
+      <DeleteConfirmTransaction 
           rental_id={rentalsData.find(r => r.id === openDropdownId)?.id ?? 0}
           cancelbtn={() => setDeleteConfirm(false)}
           refetchRentalData={() => { fetchRentals(); setOpenDropdownId(null) } }

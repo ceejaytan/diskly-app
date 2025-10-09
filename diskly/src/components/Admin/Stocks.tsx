@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { API_URL } from "../../API/config";
 import "./Stocks.css";
 
+import Add_newCD from "./Add_newCD";
+import DeleteConfirmStock from "./delete_confirmation_stocks";
+
 type GameTitles = {
   id: number;
   Title: string;
@@ -16,7 +19,10 @@ export default function Stocks_Dashboard() {
   const [GameTitleData, setGameTitleData] = useState<GameTitles[]>([]);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
 
-  async function fetchRentals() {
+  const [OpenAddNewCD, setOpenAddNewCD] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+
+  async function fetchData() {
     const res = await fetch(`${API_URL}/admin/games`, {
       method: "GET",
       credentials: "include",
@@ -27,7 +33,7 @@ export default function Stocks_Dashboard() {
   }
 
   useEffect(() => {
-    fetchRentals();
+    fetchData();
   }, []);
 
   const filteredRentals =
@@ -38,15 +44,25 @@ export default function Stocks_Dashboard() {
   return (
     <main className="stocks-dashboard flex-1">
       <div className="flex flex-col gap-6">
-        <div className="flex justify-between items-center">
+        <div className="
+          adminpage-dashboard-titles
+
+          flex
+          justify-between
+          items-center
+          ">
           <h1 className="text-2xl font-semibold">Game Titles</h1>
           <button
-            className="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg"
+            onClick={() => setOpenAddNewCD(true)}
+            className="
+            adminpage-stocks-addnewcd
+            rounded-lg
+            "
           >
             Add New CD
           </button>
         </div>
-        <p className="rental-p text-sm">{GameTitleData?.length} Titles found</p>
+        <p className="adminpage-dashboard-title-p text-sm">{GameTitleData?.length} Titles found</p>
 
         {/* Filter Buttons */}
         <div className="flex gap-3 w-full text-left xl:w-[40%]">
@@ -157,6 +173,7 @@ export default function Stocks_Dashboard() {
                         Edit
                       </button>
                       <button 
+                        onClick={() => setDeleteConfirm(true)}
                         className="
                         adminpage-rentals-delete_btn
                         w-full
@@ -185,6 +202,19 @@ export default function Stocks_Dashboard() {
           </div>
         </div>
       </div>
+
+    {OpenAddNewCD && (
+    <Add_newCD cancelbtn={() => { setOpenAddNewCD(false); fetchData() }}></Add_newCD>
+    )}
+
+      {deleteConfirm && (
+      <DeleteConfirmStock
+          id={GameTitleData.find(r => r.id === openDropdownId)?.id ?? 0}
+          cancelbtn={() => setDeleteConfirm(false)}
+          refetchData={() => { fetchData(); setOpenDropdownId(null) } }
+
+        />
+      )}
     </main>
   );
 }

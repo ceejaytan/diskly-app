@@ -6,7 +6,7 @@ type more_boilerplate_because_reactjs_moment = {
   refetchRentalData: () => void;
   }
 
-export default function DeleteConfirm({rental_id, cancelbtn, refetchRentalData}:more_boilerplate_because_reactjs_moment){
+export default function DeleteConfirmTransaction({rental_id, cancelbtn, refetchRentalData}:more_boilerplate_because_reactjs_moment){
 
 async function delete_rental(rental_id: number){
   const res = await fetch(`${API_URL}/admin/delete-rental?rental_id=${rental_id}`, {
