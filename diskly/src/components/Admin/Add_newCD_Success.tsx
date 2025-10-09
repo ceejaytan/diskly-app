@@ -1,9 +1,8 @@
-import "./Rental_Form.css"
 type more_boilerplate_because_reactjs_moment = {
   cancelbtn: () => void;
   }
 
-export default function Rental_Form_Message_Success({cancelbtn}: more_boilerplate_because_reactjs_moment){
+export default function Add_CD_Message_Success({cancelbtn}: more_boilerplate_because_reactjs_moment){
   return(
   <>
     <div className="fixed inset-0 flex items-center justify-center bg-black/80  z-50 p-4" onClick={cancelbtn}>
@@ -18,8 +17,7 @@ export default function Rental_Form_Message_Success({cancelbtn}: more_boilerplat
           </div>
           <div className="rental-form-success-toast flex flex-col gap-3 items-center">
             <h1 className=" leading-snug">
-              Rental request recorded.<br />
-              Proceed to the counter to complete the transaction.
+              GameCD Added.
             </h1>
             <button
               type="button"

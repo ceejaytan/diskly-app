@@ -37,3 +37,20 @@
   border-color: transparent;
   color: white;
 }
+
+.adminpage-selected {
+  background-color: white;
+  color: black;
+}
+
+.adminpage-main {
+  padding: 0 20px;
+}
+
+.adminpage-dashboard-titles{
+  padding-top: 20px;
+}
+
+.adminpage-dashboard-title-p{
+  margin-top: -25px;
+}

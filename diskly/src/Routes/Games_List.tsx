@@ -45,7 +45,7 @@ export default function GamesPage() {
   useEffect(() => {
     (async () => {
       const userdata = await checkLoginSession();
-      if (userdata ) {
+      if (userdata) {
         setSession({ userid: userdata.user_id, username: userdata.username });
       } else {
         setSession(null);
