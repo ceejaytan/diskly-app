@@ -37,3 +37,12 @@
   border-color: transparent;
   color: white;
 }
+
+.adminpage-selected {
+  background-color: white;
+  color: black;
+}
+
+.adminpage-main {
+  padding: 0 20px;
+}

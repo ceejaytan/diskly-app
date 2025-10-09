@@ -97,21 +97,13 @@ def check_session(logged_in: str = Cookie(None)):
 
     if not logged_in:
         print("not logged in")
-        return {
-                "user_id": None,
-                "username": None,
-                "logged_in": 0
-                }
+        return None
 
     userinfo = SqlAccounts.get_username_from_session(logged_in)
 
     if userinfo is None:
         print("not logged in")
-        return {
-                "user_id": None,
-                "username": None,
-                "logged_in": 0
-                }
+        return None
 
     print(f"User {userinfo} is logged in")
     return {

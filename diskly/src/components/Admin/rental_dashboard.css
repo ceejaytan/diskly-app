@@ -1,0 +1,54 @@
+.rental-dashboard{
+  color: black;
+}
+
+.rental-dashboard h1{
+  padding-top: 20px;
+  padding-left: 20px;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.rental-dashboard p{
+  padding-left: 20px;
+}
+
+.adminpage-rental-filter {
+  flex: 1;
+  text-align: center;
+  padding: 5px 0;
+  font-weight: 800;
+  background: transparent;
+}
+
+
+.adminpage-rental-headers{
+  background: transparent;
+  padding: 0 10px;
+}
+
+.adminpage-rental-headers-fix{
+  padding-left: 30px;
+  padding-right: 15px;
+}
+
+
+.adminpage-rentals-rowslist{
+  border-radius: 20px;
+  padding: 10px 0 10px 15px;
+}
+
+.adminpage-rentals-individual-rows{
+  padding: 10px 0 10px 15px;
+}
+
+
+.adminpage-rentals-rowslist button{
+  color: black;
+  background: transparent;
+}
+
+.adminpage-rentals-active{
+  background-color: black;
+  color: #63D6DD;
+}

@@ -125,6 +125,35 @@ class SqlAccounts:
 
 class SqlAdmin:
 
+    @staticmethod
+    def view_rentals():
+        """view rentals for admin dashboard rentals page"""
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                SELECT ID, user_name, game_name, rented_on, total_price, status FROM rentals
+                """)
+                row = cursor.fetchall()
+
+                if row is None:
+                    return []
+            rentals = []
+            for row in row:
+                rentals.append({
+                    "id": row[0],
+                    "name": row[1],
+                    "title": row[2],
+                    "date": row[3],
+                    "price": row[4],
+                    "status": row[5],
+                })
+
+            return rentals
+        except sqlite3.Error as err:
+            print(err)
+            return None
+
 
     @staticmethod
     def add_game(game_name: str, cover_image_path: str) -> bool:
