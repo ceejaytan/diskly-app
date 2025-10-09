@@ -132,7 +132,7 @@ class SqlAdmin:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                SELECT ID, user_name, game_name, rented_on, total_price, status FROM rentals
+                SELECT ID, user_name, game_name, rented_on, return_on, total_price, status FROM rentals
                 """)
                 row = cursor.fetchall()
 
@@ -144,15 +144,59 @@ class SqlAdmin:
                     "id": row[0],
                     "name": row[1],
                     "title": row[2],
-                    "date": row[3],
-                    "price": row[4],
-                    "status": row[5],
+                    "rented_on": row[3],
+                    "return_on": row[4],
+                    "price": row[5],
+                    "status": row[6],
                 })
 
             return rentals
         except sqlite3.Error as err:
             print(err)
             return None
+
+
+    @staticmethod
+    def view_games():
+        """view game titles for admin dashboard stock page"""
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                SELECT ID, game_name, date_added, total_stocks FROM game_catalog
+                """)
+                row = cursor.fetchall()
+
+                if row is None:
+                    return []
+            gametitles = []
+            for row in row:
+                gametitles.append({
+                    "id": row[0],
+                    "Title": row[1],
+                    "Date_Added": row[2],
+                    "Quantity": row[3],
+                    "status": "Available" if row[3] > 0 else "Out of Stock"
+                })
+
+            return gametitles
+        except sqlite3.Error as err:
+            print(err)
+            return None
+
+    @staticmethod
+    def delete_rental(id: int):
+        """Admin delete rental record from table rentals"""
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                DELETE FROM rentals
+                WHERE ID = ?
+                """,(id, ))
+            conn.commit()
+        except sqlite3.Error as err:
+            print(err)
 
 
     @staticmethod
@@ -274,10 +318,10 @@ class SqlGameCatalog_API:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                INSERT INTO rentals(user_id, user_name, game_id, game_name, rented_on, quantity, total_price, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO rentals(user_id, user_name, game_id, game_name, rented_on, quantity, total_price, status, return_on)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                                """,
-                (info.userid, info.username, info.game_id, info.game_title, info.rental_start_date, info.quantity, info.total_cost, "Pending"))
+                (info.userid, info.username, info.game_id, info.game_title, info.rental_start_date, info.quantity, info.total_cost, "Pending", info.return_date))
                 conn.commit()
                 print(f"Created New Rental from {info.username}")
 

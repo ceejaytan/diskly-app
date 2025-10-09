@@ -1,6 +1,7 @@
 import re
 from typing import Optional
 from fastapi import APIRouter, Cookie, File, Form, HTTPException, UploadFile
+from fastapi.responses import JSONResponse
 from ..Sql import SqlAdmin
 from ..Validations import AdminValidations
 
@@ -15,12 +16,31 @@ def view_rentals(
     logged_in: str = Cookie(None)
 ):
     print("viewing rentals")
-    # if not logged_in or logged_in != "0f32c0fe13ad509e1a2fadbe72d5ad8f7fae769c332d0e34c9ef0fba0cebacb9":
-    #     print("not an admin")
-    #     raise HTTPException(status_code=400, detail="Your not an admin")
+    if not logged_in or logged_in != "0f32c0fe13ad509e1a2fadbe72d5ad8f7fae769c332d0e34c9ef0fba0cebacb9":
+        print("not an admin")
+        raise HTTPException(status_code=400, detail="Your not an admin")
 
     return SqlAdmin.view_rentals()
 
+@router.post("/delete-rental")
+def delete_rental(
+    logged_in: str = Cookie(None),
+    rental_id: int = 0
+):
+
+    if not logged_in or logged_in != "0f32c0fe13ad509e1a2fadbe72d5ad8f7fae769c332d0e34c9ef0fba0cebacb9":
+        print("not an admin")
+        raise HTTPException(status_code=400, detail="Your not an admin")
+    print("deleting a rental...")
+    SqlAdmin.delete_rental(rental_id)
+    return JSONResponse(status_code=200, content="deleted succesfully")
+
+
+
+@router.get("/games")
+def view_games():
+    print("Viewing Games...")
+    return SqlAdmin.view_games()
 
 
 
