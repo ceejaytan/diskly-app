@@ -69,7 +69,7 @@ async def add_game(
 
         cover_image_path = await AdminValidations.image_valid(image, request.game_name)
         if cover_image_path == "":
-            raise HTTPException(status_code=400, detail="Invalid Image")
+            raise HTTPException(status_code=400, detail="Invalid Image, Image size must be less than 2MB")
 
     # if not re.match(game_name_regex, game_name):
     #     raise HTTPException(status_code=400, detail="Invalid Name")

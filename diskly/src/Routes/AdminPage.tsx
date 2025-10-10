@@ -41,7 +41,6 @@ export default function AdminPage() {
 
   function handleLogout(){
     logout_session();
-    navigate("/");
   };
 
   return (

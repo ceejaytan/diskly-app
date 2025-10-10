@@ -26,6 +26,7 @@ export default function Add_newCD({cancelbtn}:more_boilerplate_because_reactjs_m
 
   const [addCDFailed, setAddCDFailed] = useState("");
   const [addCDSuccess, setAddCDSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -70,9 +71,12 @@ export default function Add_newCD({cancelbtn}:more_boilerplate_because_reactjs_m
 
 async function submit_saveCD(e: any){
     e.preventDefault();
+    setLoading(true);
+
     setAddCDFailed("");
     if(!imageFile){
     setAddCDFailed("No Image Selected");
+    setLoading(false);
       return;
     }
 
@@ -88,18 +92,30 @@ async function submit_saveCD(e: any){
       credentials: "include",
       body: formdata
     });
+  const data = await res.json();
   if (res.ok){
       setAddCDSuccess(true);
     }else{
-      const data = await res.json();
-      setAddCDFailed(data)
+      setAddCDFailed(data.detail)
 
     }
+    setLoading(false);
 }
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/80 z-50 p-4" onClick={cancelbtn}>
       <div className="rent-form-container bg-[#0b0e13] border-2 border-cyan-400 rounded-2xl w-full max-w-xl p-8 text-cyan-100" onClick={(e) => e.stopPropagation()}>
+
+      {/* 🔄 Loading overlay */}
+      {loading && (
+        <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center rounded-2xl z-50">
+          <div className="w-14 h-14 border-4 border-cyan-300 border-t-transparent rounded-full animate-spin"></div>
+          <p className="mt-4 text-cyan-300 text-lg font-semibold">
+            Uploading...
+          </p>
+        </div>
+      )}
+
         <form className="rent-form flex flex-col gap-6" onSubmit={(e) => submit_saveCD(e)}>
           <h2 className="text-[40px] font-bold text-cyan-400 text-center mb-2">
             Add New CD
@@ -250,27 +266,28 @@ async function submit_saveCD(e: any){
 
           </div>
 
-          {addCDFailed && (
-          <p>{addCDFailed}</p>
-          )}
-          {/* Buttons */}
-          <div className="flex flex-col gap-3">
-            <button
-              type="submit"
-              className="rent-form-submitrentalbtn hover:bg-cyan-300 disabled:opacity-50 disabled:bg-cyan-400/20"
-              disabled={!QuantityValid || !PriceValid || !GameTitle || !imageFile}
-            >
-              Save New CD
-            </button>
-            <button
-              type="button"
-              className="rent-form-cancelbtn hover:bg-cyan-400/10"
-              onClick={cancelbtn}
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+        {addCDFailed && (
+          <p className="text-red-500 text-center">{addCDFailed}</p>
+        )}
+
+        <div className="flex flex-col gap-3">
+          <button
+            type="submit"
+            className="rent-form-submitrentalbtn hover:bg-cyan-300 disabled:opacity-50 disabled:bg-cyan-400/20"
+            disabled={!QuantityValid || !PriceValid || !GameTitle || !imageFile || loading}
+          >
+            {loading ? "Saving..." : "Save New CD"}
+          </button>
+          <button
+            type="button"
+            className="rent-form-cancelbtn hover:bg-cyan-400/10"
+            onClick={cancelbtn}
+            disabled={loading}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
       </div>
       {addCDSuccess && (
       <Add_CD_Message_Success cancelbtn={() => {setAddCDSuccess(false); cancelbtn(); }}/>
