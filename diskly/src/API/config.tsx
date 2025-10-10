@@ -13,8 +13,8 @@ export async function checkBackendStatus() {
   }
 }
 
-export function logout_session() {
-  fetch(`${API_URL}/accounts/logout`, {
+export async function logout_session() {
+  await fetch(`${API_URL}/accounts/logout`, {
     method: "GET",
     credentials: "include",
   }).then((res) => {

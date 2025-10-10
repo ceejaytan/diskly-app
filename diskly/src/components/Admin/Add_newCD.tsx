@@ -88,11 +88,11 @@ async function submit_saveCD(e: any){
       credentials: "include",
       body: formdata
     });
+  const data = await res.json();
   if (res.ok){
       setAddCDSuccess(true);
     }else{
-      const data = await res.json();
-      setAddCDFailed(data)
+      setAddCDFailed(data.detail)
 
     }
 }
@@ -251,7 +251,7 @@ async function submit_saveCD(e: any){
           </div>
 
           {addCDFailed && (
-          <p>{addCDFailed}</p>
+          <p className="text-red-500">{addCDFailed}</p>
           )}
           {/* Buttons */}
           <div className="flex flex-col gap-3">
