@@ -16,7 +16,7 @@ export default function ConfirmReturned({id, cd_name, game_id, cancelbtn, refetc
 
 
 async function confirm_return(id: number){
-  const res = await fetch(`${API_URL}//?id=${id}`, {
+  const res = await fetch(`${API_URL}/admin/confirm-return-rental?id=${id}`, {
     method: "POST",
     credentials: "include"
   });

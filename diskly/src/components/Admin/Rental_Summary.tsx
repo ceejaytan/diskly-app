@@ -8,7 +8,6 @@ type Rental = {
   rented_on: string;
   return_on: string;
   price: number;
-  status: "Pending" | "Approved" | "Denied";
   quantity: number;
   console: string;
   isOverdue: boolean;
@@ -16,10 +15,11 @@ type Rental = {
 
 type more_boilerplate_because_reactjs_moment = {
   transaction_id: number;
+  rental_status: string;
   cancelbtn: () => void;
   }
 
-export default function Rental_Summary({transaction_id, cancelbtn}:more_boilerplate_because_reactjs_moment){
+export default function Rental_Summary({transaction_id, rental_status, cancelbtn}:more_boilerplate_because_reactjs_moment){
   const [rentalsData, setRentalsData] = useState<Rental| null>(null);
 
   async function fetchData(){
@@ -99,16 +99,15 @@ export default function Rental_Summary({transaction_id, cancelbtn}:more_boilerpl
               </p>
             </div>
             <div className="flex flex-col items-center">
-                {!rentalsData?.isOverdue &&(
-              <label className="text-sm font-semibold text-cyan-300 mb-1 w-[85%] text-left">
-                Return Date 
-              </label>
-                )}
-                {rentalsData?.isOverdue && (
+                {rentalsData?.isOverdue && rental_status !== "Returned" ? (
               <label className="text-sm font-semibold text-red-500 mb-1 w-[85%] text-left">
                 ( Already past the return date )
                 </label>
-                )}
+                ): 
+              <label className="text-sm font-semibold text-cyan-300 mb-1 w-[85%] text-left">
+                Return Date 
+              </label>
+                }
               <p
               className={`
                 bg-[#D6DCDE]

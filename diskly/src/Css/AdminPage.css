@@ -44,12 +44,12 @@
 }
 
 .adminpage-main {
-  height: 100vh;          /* Fill screen height */
-  overflow-y: auto;       /* Scroll vertically */
-  overflow-x: hidden;     /* Prevent sideways scroll */
+  height: 100vh;      
+  overflow-y: auto;   
+  overflow-x: auto;   
   padding: 0 20px;
-  background-color: #f3f4f6; /* match gray-100 */
-  scroll-behavior: smooth;   /* optional */
+  background-color: #f3f4f6;
+  scroll-behavior: smooth;  
 }
 
 .adminpage-dashboard-titles{
@@ -158,14 +158,6 @@
 
 /* -------------------- Responsive Dashboard Scaling -------------------- */
 
-/* Wrap wide content (like tables or grids) in a scroll container */
-.adminpage-rental-headers,
-.adminpage-rentals-rowslist {
-  overflow-x: auto;  /* allow horizontal scroll */
-  scrollbar-width: thin; /* slimmer scrollbar for Firefox */
-}
-
-/* Ensure wide grids don't break layout */
 .adminpage-rental-headers-fix,
 .adminpage-rentals-individual-rows {
   min-width: 600px; /* prevents columns from squishing too early */
@@ -195,7 +187,6 @@
   }
 }
 
-/* Even smaller screens (mobile portrait) */
 @media (max-width: 600px) {
   .rental-dashboard h1 {
     font-size: 1.2rem;
@@ -210,10 +201,4 @@
     font-size: 0.8rem;
     padding: 3px 0;
   }
-
-  /* allow side scrolling for entire rental section */
-  .rental-dashboard {
-    overflow-x: auto;
-  }
 }
-

@@ -100,6 +100,7 @@ export default function Stocks_Dashboard() {
           <div
             key={Games.id}
             className="
+          adminpage-rental-headers-fix
               adminpage-Games-individual-rows
               grid grid-cols-[3fr_2fr_1fr_1fr_auto]
               items-center rounded-[17px] border bg-white relative

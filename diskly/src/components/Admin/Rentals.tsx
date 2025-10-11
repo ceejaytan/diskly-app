@@ -48,7 +48,7 @@ export default function Rentals_Dashboard() {
       : rentalsData.filter((r) => r.status === activeTab);
 
   return (
-    <main className="rental-dashboard flex-1">
+    <main className="stocks-dashboard rental-dashboard flex-1">
       <div className="flex flex-col gap-6">
         <div className="adminpage-dashboard-titles">
           <h1>Rentals</h1>
@@ -164,6 +164,7 @@ export default function Rentals_Dashboard() {
                       z-10
                       ">
 
+                      {rental.status !== "Returned" &&(
                       <button
                         onClick={() => {setConfirmReturned(true)}}
                         className="
@@ -175,6 +176,8 @@ export default function Rentals_Dashboard() {
                         ">
                         Confirm Returned
                       </button>
+                      )}
+
                       <button 
                         onClick={() => setDeleteConfirm(true)}
                         className="
@@ -229,6 +232,7 @@ export default function Rentals_Dashboard() {
       {rental_Summary &&  openDropdownId !== null &&(
       <Rental_Summary
           transaction_id={rentalsData.find(r => r.id === openDropdownId)?.transaction_id ?? 0}
+          rental_status={rentalsData.find(r => r.id === openDropdownId)?.status ?? ''}
           cancelbtn={() => {setRental_Summary(false)}}/>
       )}
 
