@@ -1,22 +1,33 @@
-import { API_URL } from "../../API/config";
+import { API_URL } from "../../../API/config";
+
+type game_cd_info = {
+  
+}
 
 type more_boilerplate_because_reactjs_moment = {
   id: number;
+  cd_name: string;
+  game_id: number;
   cancelbtn: () => void;
   refetchRentalData: () => void;
   }
 
-export default function DeleteConfirmTransaction({id, cancelbtn, refetchRentalData}:more_boilerplate_because_reactjs_moment){
+export default function ConfirmReturned({id, cd_name, game_id, cancelbtn, refetchRentalData}:more_boilerplate_because_reactjs_moment){
 
-async function delete_rental(id: number){
-  const res = await fetch(`${API_URL}/admin/delete-transaction?id=${id}`, {
+async function confirm_return(id: number){
+  const res = await fetch(`${API_URL}/admin/?id=${id}`, {
     method: "POST",
     credentials: "include"
   });
-  if (!res.ok){ console.log("failed to delete")}
+  if (!res.ok){ console.log("failed to approve")}
   refetchRentalData()
   cancelbtn()
 }
+
+async function fetch_gamecd(){
+    const res = await fetch(`${API_URL}/games/rent-info?game_id=${game_id}`);
+    const data = await res.json();
+  }
   return(
   <>
     <div className="fixed inset-0 flex items-center justify-center bg-black/80  z-50 p-4" onClick={cancelbtn}>
@@ -31,15 +42,17 @@ async function delete_rental(id: number){
           </div>
           <div className="rental-form-success-toast flex flex-col gap-3 items-center">
             <h1 className="leading-snug text-center">
-              Are you sure you want to delete this record?
+              Confirm that the CD has been returned?
             </h1>
+            <p>{game_id}. {cd_name}</p>
+            <img src=""/>
 
             <div className="flex gap-4 w-full justify-center">
               <button
                 type="button"
                 className="rent-form-cancelbtn hover:bg-cyan-400/10 flex-1"
                 onClick={async () => {
-                  await delete_rental(id);
+                  await confirm_return(id);
 
                 }}
               >

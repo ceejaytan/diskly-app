@@ -6,8 +6,6 @@ from email.mime.text import MIMEText
 
 class Accounts:
 
-
-
     class LoginRequest(BaseModel):
         username: str
         password: str
@@ -59,5 +57,3 @@ class Accounts:
             server.send_message(msg)
 
         return code
-
-

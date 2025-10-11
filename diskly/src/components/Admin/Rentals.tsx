@@ -1,72 +1,64 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "../../API/config";
-import "./Stocks.css";
+import "./Transactions.css";
+import Rental_Summary from "./Rental_Summary";
+import ConfirmReturned from "./confirmations/returned_confirm_rental";
 
-import Add_newCD from "./Add_newCD";
-import DeleteConfirmStock from "./delete_confirmation_stocks";
+import DeleteConfirmRental from "./confirmations/delete_confirm_rental";
 
-type GameTitles = {
+type Rental = {
   id: number;
-  Title: string;
-  Date_Added: string;
-  Quantity: string;
-  status: "Available" | "Out of Stock";
+  name: string;
+  title: string;
+  rented_on: string;
+  return_on: string;
+  price: number;
+  status: "Ongoing" | "Returned" | "Overdue";
+  transaction_id: number;
+  quantity: number;
+  console: string;
+  game_id: number;
 };
 
 
-export default function Stocks_Dashboard() {
-  const [activeTab, setActiveTab] = useState<"All Titles" | "Available" | "Out of Stock">("All Titles");
-  const [GameTitleData, setGameTitleData] = useState<GameTitles[]>([]);
+export default function Rentals_Dashboard() {
+  const [activeTab, setActiveTab] = useState<"All Rentals" | "Ongoing" | "Returned" | "Overdue">("All Rentals");
+  const [rentalsData, setRentalsData] = useState<Rental[]>([]);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
-
-  const [OpenAddNewCD, setOpenAddNewCD] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [rental_Summary, setRental_Summary] = useState(false);
+  const [confirmReturned, setConfirmReturned] = useState(false);
 
-  async function fetchData() {
-    const res = await fetch(`${API_URL}/admin/games`, {
+  async function fetchRentals() {
+    const res = await fetch(`${API_URL}/admin/rentals`, {
       method: "GET",
       credentials: "include",
     });
     if (!res.ok) return;
     const data = await res.json();
-    setGameTitleData(data);
+    setRentalsData(data);
   }
 
   useEffect(() => {
-    fetchData();
+    fetchRentals();
   }, []);
 
   const filteredRentals =
-    activeTab === "All Titles"
-      ? GameTitleData
-      : GameTitleData.filter((r) => r.status === activeTab);
+    activeTab === "All Rentals"
+      ? rentalsData
+      : rentalsData.filter((r) => r.status === activeTab);
 
   return (
-    <main className="stocks-dashboard flex-1">
+    <main className="rental-dashboard flex-1">
       <div className="flex flex-col gap-6">
-        <div className="
-          adminpage-dashboard-titles
-
-          flex
-          justify-between
-          items-center
-          ">
-          <h1 className="text-2xl font-semibold">Game Titles</h1>
-          <button
-            onClick={() => setOpenAddNewCD(true)}
-            className="
-            adminpage-stocks-addnewcd
-            rounded-lg
-            "
-          >
-            Add New CD
-          </button>
+        <div className="adminpage-dashboard-titles">
+          <h1>Rentals</h1>
+          <p className="rental-p text-sm">{rentalsData?.length} Rentals found</p>
         </div>
-        <p className="adminpage-dashboard-title-p text-sm">{GameTitleData?.length} Titles found</p>
 
         {/* Filter Buttons */}
         <div className="flex gap-3 w-full text-left xl:w-[40%]">
-          {(["All Titles", "Available", "Out of Stock"] as const).map((tab) => (
+          {(["All Rentals", "Ongoing", "Returned", "Overdue"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -87,36 +79,43 @@ export default function Stocks_Dashboard() {
           <div
             className="
               adminpage-rental-headers-fix
-              grid grid-cols-[3fr_2fr_1fr_1fr_auto]
+              grid grid-cols-[2fr_2fr_1fr_1fr_1fr_auto]
               font-semibold text-gray-700
             "
           >
+            <div>User</div>
             <div>Title</div>
-            <div>Date Added</div>
-            <div>Quantity</div>
+            <div>Date</div>
+            <div>Price</div>
             <div>Status</div>
             <div>Action</div>
           </div>
 
           <div className="adminpage-rentals-rowslist flex flex-col gap-5 relative">
-            {filteredRentals.map((Games) => (
+            {filteredRentals.map((rental) => (
               <div
-                key={Games.id}
+                key={rental.id}
                 className="
-                  adminpage-Games.-individual-rows
-                  grid grid-cols-[3fr_2fr_1fr_1fr_auto]
+                  adminpage-rentals-individual-rows
+                  grid grid-cols-[2fr_2fr_1fr_1fr_1fr_auto]
                   items-center rounded-[17px] border bg-white relative
                 "
               >
                 {/* Name */}
                 <div className="flex items-center gap-3">
-                  <p className="font-medium">{Games.Title}</p>
+                  <img
+                    src={`${API_URL}/images/DEFAULT_PIC.png`}
+                    className="rounded-full w-[40px] h-[40px] object-cover"
+                    alt="Avatar"
+                  />
+                  <p className="font-medium">{rental.name}</p>
                 </div>
 
+                <div className="truncate">{rental.title}</div>
 
                 <div>
                   {
-                    new Date(Games.Date_Added).toLocaleDateString("en-GB", {
+                    new Date(rental.rented_on).toLocaleDateString("en-GB", {
                     month: "short",
                     day: "2-digit",
                     year: "numeric",
@@ -124,16 +123,18 @@ export default function Stocks_Dashboard() {
                   }
                 </div>
 
-                <div>{Games.Quantity}</div>
+                <div>₱{rental.price}</div>
 
                 <div
                   className={
-                    Games.status === "Available"
+                    rental.status === "Ongoing"
+                      ? "text-yellow-500"
+                      : rental.status === "Returned"
                       ? "text-green-600"
                       : "text-red-600"
                   }
                 >
-                  {Games.status}
+                  {rental.status}
                 </div>
 
                 {/* Dropdown */}
@@ -142,7 +143,7 @@ export default function Stocks_Dashboard() {
                   <button
                     onClick={() =>
                       setOpenDropdownId((prev) =>
-                        prev === Games.id ? null : Games.id
+                        prev === rental.id ? null : rental.id
                       )
                     }
                     className="border rounded-md px-3 py-1 bg-gray-50 hover:bg-gray-100 transition"
@@ -150,7 +151,7 @@ export default function Stocks_Dashboard() {
                     ▼
                   </button>
 
-                  {openDropdownId === Games.id && (
+                  {openDropdownId === rental.id && (
                     <div 
                       onClick={(e) => e.stopPropagation()}
                       className="
@@ -163,14 +164,17 @@ export default function Stocks_Dashboard() {
                       shadow-md
                       z-10
                       ">
+
                       <button
+                        onClick={() => {setConfirmReturned(true)}}
                         className="
                         block
                         w-full
                         text-left
                         hover:bg-gray-100
+                        adminpage-rentals-green-txt
                         ">
-                        Edit
+                        Confirm Returned
                       </button>
                       <button 
                         onClick={() => setDeleteConfirm(true)}
@@ -180,6 +184,16 @@ export default function Stocks_Dashboard() {
                         text-left
                         ">
                         Delete
+                      </button>
+                      <button
+                        onClick={() => setRental_Summary(true)}
+                        className="
+                        block
+                        w-full
+                        text-left
+                        hover:bg-gray-100
+                        ">
+                        View more
                       </button>
                     </div>
                   )}
@@ -203,18 +217,30 @@ export default function Stocks_Dashboard() {
         </div>
       </div>
 
-    {OpenAddNewCD && (
-    <Add_newCD cancelbtn={() => { setOpenAddNewCD(false); fetchData() }}></Add_newCD>
-    )}
-
-      {deleteConfirm && (
-      <DeleteConfirmStock
-          id={GameTitleData.find(r => r.id === openDropdownId)?.id ?? 0}
-          cancelbtn={() => setDeleteConfirm(false)}
-          refetchData={() => { fetchData(); setOpenDropdownId(null) } }
-
+      {confirmReturned && (
+      <ConfirmReturned
+          id={rentalsData.find(r => r.id === openDropdownId)?.id ?? 0}
+          cd_name={rentalsData.find(r => r.id === openDropdownId)?.title ?? "Loading.."}
+          game_id={rentalsData.find(r => r.id === openDropdownId)?.game_id ?? 0}
+          cancelbtn={() => setConfirmReturned(false)}
+          refetchRentalData={() => { fetchRentals(); setOpenDropdownId(null) } }
         />
       )}
+
+      {rental_Summary &&  openDropdownId !== null &&(
+      <Rental_Summary
+          transaction_id={rentalsData.find(r => r.id === openDropdownId)?.transaction_id ?? 0}
+          cancelbtn={() => {setRental_Summary(false)}}/>
+      )}
+
+      {deleteConfirm && (
+      <DeleteConfirmRental
+          id={rentalsData.find(r => r.id === openDropdownId)?.id ?? 0}
+          cancelbtn={() => setDeleteConfirm(false)}
+          refetchRentalData={() => { fetchRentals(); setOpenDropdownId(null) } }
+        />
+      )}
+
     </main>
   );
 }

@@ -64,8 +64,8 @@ export default function GamesPage() {
     setShowRentalForm(!showRentalForm);
   }
 
-  async function fetch_game_info(game_name:string){
-    const res = await fetch(`${API_URL}/games/rent-info/?game_name=${game_name}`);
+  async function fetch_game_info(game_id: number){
+    const res = await fetch(`${API_URL}/games/rent-info/?game_id=${game_id}`);
     const data = await res.json();
 
     setGameRentInfo(data)
@@ -146,7 +146,7 @@ export default function GamesPage() {
       <h2>No Result</h2>
       <p>We couldn’t find anything matching your search.</p>
       <p>:(</p>
-      <button className="browse-btn" onClick={() => navigate("/games-list")}>
+      <button className="browse-btn" onClick={() => { navigate("/games-list"); setGame_Platform(platform.Full_Catalog) }}>
         Browse All Games
       </button>
     </div>
@@ -188,7 +188,7 @@ export default function GamesPage() {
 
 
             {session && (
-            <button  onClick={() => { openRentForm(); fetch_game_info(game.name) }}
+            <button  onClick={() => { openRentForm(); fetch_game_info(game.id) }}
             className="
                   rent-btn
                   "

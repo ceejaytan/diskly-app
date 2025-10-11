@@ -5,7 +5,9 @@ type editdata = {
   rented_on: string;
   return_on: string;
   price: number;
-  status: "Pending" | "Completed" | "Denied";
+  status: "Pending" | "Approved" | "Denied";
+  quantity: number;
+  console: string;
 }
 
 type more_boilerplate_because_reactjs_moment = {
@@ -13,7 +15,7 @@ type more_boilerplate_because_reactjs_moment = {
   cancelbtn: () => void;
   }
 
-export default function Rentals_action({editdata, cancelbtn}:more_boilerplate_because_reactjs_moment){
+export default function Transaction_action({editdata, cancelbtn}:more_boilerplate_because_reactjs_moment){
 
   return(
   <>
@@ -90,7 +92,7 @@ export default function Rentals_action({editdata, cancelbtn}:more_boilerplate_be
 
               required
                 `}
-  value={new Date(editdata.return_on).toISOString().split("T")[0]} // ✅ correct format
+  value={new Date(editdata.return_on).toISOString().split("T")[0]}
               />
             </div>
           </div>
@@ -111,6 +113,7 @@ export default function Rentals_action({editdata, cancelbtn}:more_boilerplate_be
                 flex
                 items-center
                 ">
+                  {editdata.console}
               </p>
             </div>
             <div className="flex flex-col items-center">
@@ -128,9 +131,8 @@ export default function Rentals_action({editdata, cancelbtn}:more_boilerplate_be
                 h-[40px]
                 w-full
                 items-center px-3
-
-
                   `}
+                    value={editdata?.quantity.toString()}
               />
               <span className={`
                   bg-[#D6DCDE]
@@ -162,6 +164,7 @@ export default function Rentals_action({editdata, cancelbtn}:more_boilerplate_be
                 flex
                 items-center
                 ">
+                  {editdata.price}
               </p>
             </div>
           </div>
@@ -176,8 +179,9 @@ export default function Rentals_action({editdata, cancelbtn}:more_boilerplate_be
               hover:bg-cyan-300
               disabled:opacity-50
               disabled:bg-cyan-400/20"
+              disabled={ true }
             >
-              Update 
+              Update ( doesnt work yet )
             </button>
             <button
               type="button"

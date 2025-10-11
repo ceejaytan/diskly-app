@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from zoneinfo import ZoneInfo
 import sqlite3
 
@@ -127,21 +127,186 @@ class SqlAccounts:
 class SqlAdmin:
 
     @staticmethod
-    def view_rentals():
-        """view rentals for admin dashboard rentals page"""
+    def view_rental_detail(id: int):
+        manila_time = ZoneInfo("Asia/Manila")
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                SELECT ID, user_name, game_name, rented_on, return_on, total_price, status FROM rentals
+                SELECT ID, user_name, game_name, rented_on, return_on, total_price, status, quantity, game_console FROM transactions
+                WHERE ID = ?
+                """,(id,))
+                row = cursor.fetchone()
+
+                isOverdue = datetime.fromisoformat(row[4]) < datetime.now(manila_time)
+                row = {
+                    "id" : row[0],
+                    "name" : row[1],
+                    "title" : row[2],
+                    "rented_on" : row[3],
+                    "return_on" : row[4],
+                    "price" : row[5],
+                    "status" : row[6],
+                    "quantity" : row[7],
+                    "console" : row[8],
+                    "isOverdue" : isOverdue
+                }
+                return row
+
+        except sqlite3.Error as err:
+            print(err)
+            return None
+
+    @staticmethod
+    def view_rentals():
+        """View rentals for admin dashboard rentals page.
+        Automatically mark overdue rentals if past return_on time.
+        """
+        manila_time = ZoneInfo("Asia/Manila")
+
+        try:
+            with sqlite3.connect(db_path) as conn:
+                conn.row_factory = sqlite3.Row
+                cursor = conn.cursor()
+
+                cursor.execute("""
+                    SELECT ID, user_name, game_name, rented_on, return_on, total_price, status
+                    FROM rentals
+                """)
+                rows = cursor.fetchall()
+
+                if not rows:
+                    return []
+
+                now_ph = datetime.now(manila_time)
+
+                for row in rows:
+                    return_on = row["return_on"]
+                    if not return_on:
+                        continue
+
+                    try:
+                        return_on_dt = datetime.fromisoformat(return_on)
+                    except Exception:
+                        continue
+
+                    if return_on_dt < now_ph and row["status"] == "Ongoing":
+                        cursor.execute(
+                            "UPDATE rentals SET status = 'Overdue' WHERE ID = ?",
+                            (row["ID"],)
+                        )
+
+                conn.commit()
+
+                cursor.execute("""
+                    SELECT ID, user_name, game_name, rented_on, return_on, total_price, status, transaction_id, game_id
+                    FROM rentals
+                """)
+                updated_rows = cursor.fetchall()
+
+                rentals = [
+                    {
+                        "id": r["ID"],
+                        "name": r["user_name"],
+                        "title": r["game_name"],
+                        "rented_on": r["rented_on"],
+                        "return_on": r["return_on"],
+                        "price": r["total_price"],
+                        "status": r["status"],
+                        "transaction_id": r["transaction_id"],
+                        "game_id": r["game_id"],
+                    }
+                    for r in updated_rows
+                ]
+
+                return rentals
+
+        except sqlite3.Error as err:
+            print(err)
+            return None
+
+    @staticmethod
+    def approve_transaction(id: int):
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                UPDATE transactions
+                SET status = 'Approved'
+                WHERE ID = ?
+                """, (id,))
+                conn.commit()
+        except sqlite3.Error as err:
+            print(err)
+
+
+    @staticmethod
+    def insertinto_rentals(id: int):
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT INTO rentals (
+                        user_id,
+                        user_name,
+                        game_id,
+                        game_name,
+                        rented_on,
+                        quantity,
+                        total_price,
+                        status,
+                        return_on,
+                        transaction_id
+                    )
+                    SELECT
+                        user_id,
+                        user_name,
+                        game_id,
+                        game_name,
+                        rented_on,
+                        quantity,
+                        total_price,
+                        'Ongoing',
+                        return_on,
+                        ID
+                    FROM transactions
+                    WHERE ID = ?
+                """, (id,))
+
+            # Update currently_rented in game_catalog
+            cursor.execute("""
+                UPDATE game_catalog
+                SET currently_rented = 
+                    COALESCE(currently_rented, 0) + (
+                        SELECT quantity FROM transactions WHERE ID = ?
+                    )
+                WHERE ID = (
+                    SELECT game_id FROM transactions WHERE ID = ?
+                )
+            """, (id, id))
+
+            conn.commit()
+        except sqlite3.Error as err:
+            print(err)
+
+
+    @staticmethod
+    def view_transactions():
+        """view transactions for admin dashboard transactions page"""
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                SELECT ID, user_name, game_name, rented_on, return_on, total_price, status, quantity, game_console FROM transactions
+                ORDER BY ID desc
                 """)
                 row = cursor.fetchall()
 
                 if row is None:
                     return []
-            rentals = []
+            transactions = []
             for row in row:
-                rentals.append({
+                transactions.append({
                     "id": row[0],
                     "name": row[1],
                     "title": row[2],
@@ -149,9 +314,11 @@ class SqlAdmin:
                     "return_on": row[4],
                     "price": row[5],
                     "status": row[6],
+                    "quantity": row[7],
+                    "console": row[8]
                 })
 
-            return rentals
+            return transactions
         except sqlite3.Error as err:
             print(err)
             return None
@@ -159,40 +326,69 @@ class SqlAdmin:
 
     @staticmethod
     def view_games():
-        """view game titles for admin dashboard stock page"""
+        """View game titles for admin dashboard stock page"""
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
+            # what the f is this??
+            # its pretty good tho
                 cursor.execute("""
-                SELECT ID, game_name, date_added, total_stocks FROM game_catalog
+                    SELECT
+                        g.ID,
+                        g.game_name,
+                        g.date_added,
+                        g.total_stocks,
+                        IFNULL(SUM(r.quantity), 0) AS rented_quantity
+                    FROM game_catalog g
+                    LEFT JOIN rentals r
+                        ON g.ID = r.game_id
+                        AND ( r.status = 'Ongoing' OR r.status = 'Overdue' )
+                    GROUP BY g.ID
                 """)
-                row = cursor.fetchall()
 
-                if row is None:
-                    return []
-            gametitles = []
-            for row in row:
-                gametitles.append({
-                    "id": row[0],
-                    "Title": row[1],
-                    "Date_Added": row[2],
-                    "Quantity": row[3],
-                    "status": "Available" if row[3] > 0 else "Out of Stock"
-                })
+                rows = cursor.fetchall()
 
-            return gametitles
+                gametitles = []
+                for row in rows:
+                    game_id, name, date_added, total, rented = row
+                    remaining = max(total - rented, 0)
+                    gametitles.append({
+                        "id": game_id,
+                        "Title": name,
+                        "Date_Added": date_added,
+                        "Quantity": f"{remaining}/{total}",
+                        "status": "Available" if remaining > 0 else "Out of Stock"
+                    })
+
+                return gametitles
+
         except sqlite3.Error as err:
-            print(err)
+            print("Database error:", err)
             return None
+
 
     @staticmethod
     def delete_rental(id: int):
-        """Admin delete rental record from table rentals"""
+        """Admin delete rental record from table transactions"""
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
                 DELETE FROM rentals
+                WHERE ID = ?
+                """,(id, ))
+            conn.commit()
+        except sqlite3.Error as err:
+            print(err)
+
+    @staticmethod
+    def delete_transaction(id: int):
+        """Admin delete transaction record from table transactions"""
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                DELETE FROM transactions
                 WHERE ID = ?
                 """,(id, ))
             conn.commit()
@@ -256,7 +452,7 @@ class SqlGameCatalog_API:
                     WHERE
                     game_name LIKE ? COLLATE NOCASE
                     AND platform LIKE ? COLLATE NOCASE
-                    AND total_stocks > 0
+                    AND ( total_stocks - IFNULL( currently_rented, 0 ) ) > 0
                                """, (search_format, platform_format ))
 
                 row = cursor.fetchall()
@@ -277,22 +473,34 @@ class SqlGameCatalog_API:
 
 
     @staticmethod
-    def game_rent_info(game_name: str):
+    def game_rent_info(game_id: int):
         manila_time = ZoneInfo("Asia/Manila")
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                SELECT ID, game_name, platform, total_stocks, price_to_rent FROM game_catalog
-                WHERE game_name = ?
-                               """, (game_name,))
+                    SELECT
+                        g.ID,
+                        g.game_name,
+                        g.platform,
+                        g.total_stocks,
+                        g.price_to_rent,
+                        IFNULL(SUM(r.quantity), 0) AS rented_quantity
+                    FROM game_catalog g
+                    LEFT JOIN rentals r
+                        ON g.ID = r.game_id
+                        AND ( r.status = 'Ongoing' OR r.status = 'Overdue' )
+                    WHERE g.ID = ?
+                    GROUP BY g.ID
+                """, (game_id,))
 
                 row = cursor.fetchone()
+                remaining_stocks = max(row[3] - row[5], 0)
                 row = {
                     "game_id": row[0],
                     "game_title": row[1],
                     "console": row[2],
-                    "total_stocks": row[3],
+                    "total_stocks": remaining_stocks,
                     "total": row[4],
                     "rental_start_date": datetime.now(manila_time)
                 }
@@ -305,15 +513,15 @@ class SqlGameCatalog_API:
 
 
     @staticmethod
-    def save_rental_info(info: UserRentals.RentalFormModel):
+    def save_transcation_info(info: UserRentals.RentalFormModel):
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                INSERT INTO rentals(user_id, user_name, game_id, game_name, rented_on, quantity, total_price, status, return_on)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO transactions(user_id, user_name, game_id, game_name, rented_on, quantity, total_price, status, return_on, game_console)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                                """,
-                (info.userid, info.username, info.game_id, info.game_title, info.rental_start_date, info.quantity, info.total_cost, "Pending", info.return_date))
+                (info.userid, info.username, info.game_id, info.game_title, info.rental_start_date, info.quantity, info.total_cost, "Pending", info.return_date, info.console))
                 conn.commit()
                 print(f"Created New Rental from {info.username}")
 

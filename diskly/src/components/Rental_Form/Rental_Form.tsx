@@ -3,8 +3,6 @@ import "./Rental_Form.css";
 import Submit_Rental_Form from "./Rental_Form_Submit";
 import Rental_Form_Message_Success from "./Rental_Form_Toast";
 
-
-
 type game_rent_info = {
   game_id: number,
   game_title: string,

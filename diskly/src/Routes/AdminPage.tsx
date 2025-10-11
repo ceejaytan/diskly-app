@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { logout_session } from "../API/config";
 import checkLoginSession from "../components/Login/CheckLoginSession";
 
+import Rentals_Dashboard from "../components/Admin/Rentals";
 import Transaction_Dashboard from "../components/Admin/Transactions";
 import Stocks_Dashboard from "../components/Admin/Stocks";
 import "../Css/AdminPage.css"
@@ -125,6 +126,7 @@ export default function AdminPage() {
 
       {/* Main Content */}
       <main className="adminpage-main flex-1 overflow-auto lg:ml-64">
+        {admin_dashboard_type === admin_dashboard.Rentals && <Rentals_Dashboard />}
         {admin_dashboard_type === admin_dashboard.Transactions && <Transaction_Dashboard />}
         {admin_dashboard_type === admin_dashboard.Stock && <Stocks_Dashboard />}
       </main>

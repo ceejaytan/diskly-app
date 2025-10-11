@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "../../API/config";
 import "./Transactions.css";
-import Rentals_action from "./Rentals_Action";
+import Transaction_action from "./Transaction_Action";
 import DeleteConfirmTransaction from "./delete_confirmation_transactions";
+import ApproveConfirmTransaction from "./confirmations/approve_confirm_transaction";
 
 type Rental = {
   id: number;
@@ -11,19 +12,23 @@ type Rental = {
   rented_on: string;
   return_on: string;
   price: number;
-  status: "Pending" | "Completed" | "Denied";
+  status: "Pending" | "Approved" | "Denied";
+  quantity: number;
+  console: string;
 };
 
 
 export default function Trasactions_Dashboard() {
-  const [activeTab, setActiveTab] = useState<"All Trasactions" | "Pending" | "Completed">("All Trasactions");
+  const [activeTab, setActiveTab] = useState<"All Trasactions" | "Pending" | "Approved">("All Trasactions");
   const [rentalsData, setRentalsData] = useState<Rental[]>([]);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
+
   const [rentalEdit, setRentalEdit] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [approveConfirm, setApproveConfirm] = useState(false);
 
   async function fetchRentals() {
-    const res = await fetch(`${API_URL}/admin/rentals`, {
+    const res = await fetch(`${API_URL}/admin/transactions`, {
       method: "GET",
       credentials: "include",
     });
@@ -45,13 +50,13 @@ export default function Trasactions_Dashboard() {
     <main className="rental-dashboard flex-1">
       <div className="flex flex-col gap-6">
         <div className="adminpage-dashboard-titles">
-          <h1>Rentals</h1>
+          <h1>Trasactions</h1>
           <p className="rental-p text-sm">{rentalsData?.length} Rentals found</p>
         </div>
 
         {/* Filter Buttons */}
         <div className="flex gap-3 w-full text-left xl:w-[40%]">
-          {(["All Trasactions", "Pending", "Completed"] as const).map((tab) => (
+          {(["All Trasactions", "Pending", "Approved"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -122,7 +127,7 @@ export default function Trasactions_Dashboard() {
                   className={
                     rental.status === "Pending"
                       ? "text-yellow-500"
-                      : rental.status === "Completed"
+                      : rental.status === "Approved"
                       ? "text-green-600"
                       : "text-red-600"
                   }
@@ -158,16 +163,24 @@ export default function Trasactions_Dashboard() {
                       z-10
                       ">
 
+                      {/* {rental.status === "Approved" &&( */}
+                      {/* <button */}
+                      {/*   onClick={() => setUnApproveConfirm(true)} */}
+                      {/*   className="block w-full text-left hover:bg-gray-100" */}
+                      {/*   > */}
+                      {/*   Unapprove */}
+                      {/* </button> */}
+                      {/* )} */}
+                      {rental.status === "Pending" &&(
+                        <>
                       <button
-                        onClick={() => {}}
-                        className="
-                        block
-                        w-full
-                        text-left
-                        hover:bg-gray-100
-                        ">
-                        Set Complete
+                        onClick={() => setApproveConfirm(true)}
+                        className="adminpage-rentals-green-txt
+                        block w-full text-left hover:bg-gray-100"
+                        >
+                        Approve
                       </button>
+
                       <button
                         onClick={() => {}}
                         className="
@@ -179,16 +192,10 @@ export default function Trasactions_Dashboard() {
                         ">
                         Deny
                       </button>
-                      <button
-                        onClick={() => setRentalEdit(true)}
-                        className="
-                        block
-                        w-full
-                        text-left
-                        hover:bg-gray-100
-                        ">
-                        Edit
-                      </button>
+                      </>
+                      )}
+
+
                       <button 
                         onClick={() => setDeleteConfirm(true)}
                         className="
@@ -197,6 +204,17 @@ export default function Trasactions_Dashboard() {
                         text-left
                         ">
                         Delete
+                      </button>
+
+                      <button
+                        onClick={() => setRentalEdit(true)}
+                        className="
+                        block
+                        w-full
+                        text-left
+                        hover:bg-gray-100
+                        ">
+                        View more
                       </button>
                     </div>
                   )}
@@ -221,17 +239,25 @@ export default function Trasactions_Dashboard() {
       </div>
 
       {rentalEdit && (
-      <Rentals_action
+      <Transaction_action
           editdata={rentalsData.find(r => r.id === openDropdownId)!}
           cancelbtn={() => {setRentalEdit(!rentalEdit)}}/>
       )}
 
       {deleteConfirm && (
       <DeleteConfirmTransaction 
-          rental_id={rentalsData.find(r => r.id === openDropdownId)?.id ?? 0}
+          id={rentalsData.find(r => r.id === openDropdownId)?.id ?? 0}
           cancelbtn={() => setDeleteConfirm(false)}
           refetchRentalData={() => { fetchRentals(); setOpenDropdownId(null) } }
+        />
+      )}
 
+      {approveConfirm && (
+      <ApproveConfirmTransaction
+          id={rentalsData.find(r => r.id === openDropdownId)?.id ?? 0}
+          total_cost={rentalsData.find(r => r.id === openDropdownId)?.price ?? 0}
+          cancelbtn={() => setApproveConfirm(false)}
+          refetchRentalData={() => { fetchRentals(); setOpenDropdownId(null) } }
         />
       )}
 
