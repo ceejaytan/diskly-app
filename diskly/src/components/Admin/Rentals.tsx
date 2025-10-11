@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "../../API/config";
-import "./Transactions.css";
 import Rental_Summary from "./Rental_Summary";
 import ConfirmReturned from "./confirmations/returned_confirm_rental";
 

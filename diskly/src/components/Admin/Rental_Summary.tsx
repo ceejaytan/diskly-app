@@ -198,7 +198,7 @@ export default function Rental_Summary({transaction_id, cancelbtn}:more_boilerpl
               className="rent-form-cancelbtn hover:bg-cyan-400/10"
               onClick={cancelbtn}
             >
-              Cancel
+              Back
             </button>
           </div>
         </div>

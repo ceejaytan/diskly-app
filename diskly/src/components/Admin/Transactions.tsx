@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "../../API/config";
-import "./Transactions.css";
 import Transaction_action from "./Transaction_Action";
 import DeleteConfirmTransaction from "./delete_confirmation_transactions";
 import ApproveConfirmTransaction from "./confirmations/approve_confirm_transaction";

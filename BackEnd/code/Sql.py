@@ -225,6 +225,21 @@ class SqlAdmin:
             print(err)
             return None
 
+
+    @staticmethod
+    def confirm_return(id: int):
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                UPDATE rentals
+                SET status = 'Returned'
+                WHERE ID = ?
+                """, (id,))
+                conn.commit()
+        except sqlite3.Error as err:
+            print(err)
+
     @staticmethod
     def approve_transaction(id: int):
         try:
@@ -485,7 +500,8 @@ class SqlGameCatalog_API:
                         g.platform,
                         g.total_stocks,
                         g.price_to_rent,
-                        IFNULL(SUM(r.quantity), 0) AS rented_quantity
+                        IFNULL(SUM(r.quantity), 0) AS rented_quantity,
+                        g.cover_image_path
                     FROM game_catalog g
                     LEFT JOIN rentals r
                         ON g.ID = r.game_id
@@ -495,6 +511,9 @@ class SqlGameCatalog_API:
                 """, (game_id,))
 
                 row = cursor.fetchone()
+                if row is None:
+                    print(f"[WARN] No game found with ID={game_id}")
+                    return None
                 remaining_stocks = max(row[3] - row[5], 0)
                 row = {
                     "game_id": row[0],
@@ -502,7 +521,8 @@ class SqlGameCatalog_API:
                     "console": row[2],
                     "total_stocks": remaining_stocks,
                     "total": row[4],
-                    "rental_start_date": datetime.now(manila_time)
+                    "rental_start_date": datetime.now(manila_time),
+                    "cover_image_path": row[6],
                 }
                 print(row["rental_start_date"].isoformat())
 

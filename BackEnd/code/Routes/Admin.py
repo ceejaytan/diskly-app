@@ -144,3 +144,10 @@ def Transactions_more_info(id: int):
     print()
 
 
+@router.post("/confirm-return-rental")
+def return_rental(
+        logged_in: str = Cookie(None),
+        id: int = 0
+):
+    SqlAdmin.confirm_return(id)
+    return {"returned"}

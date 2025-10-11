@@ -44,7 +44,12 @@
 }
 
 .adminpage-main {
+  height: 100vh;          /* Fill screen height */
+  overflow-y: auto;       /* Scroll vertically */
+  overflow-x: hidden;     /* Prevent sideways scroll */
   padding: 0 20px;
+  background-color: #f3f4f6; /* match gray-100 */
+  scroll-behavior: smooth;   /* optional */
 }
 
 .adminpage-dashboard-titles{
@@ -54,3 +59,161 @@
 .adminpage-dashboard-title-p{
   margin-top: -25px;
 }
+
+/* ---------------------------- */
+
+.rental-dashboard{
+  color: black;
+}
+
+.rental-dashboard h1{
+  padding-top: 20px;
+  padding-left: 20px;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.rental-dashboard p{
+  padding-left: 20px;
+}
+
+.adminpage-rental-filter {
+  flex: 1;
+  text-align: center;
+  padding: 5px 0;
+  font-weight: 800;
+  background: transparent;
+}
+
+
+.adminpage-rental-headers{
+  background: transparent;
+  padding: 0 10px;
+}
+
+.adminpage-rental-headers-fix{
+  padding-left: 30px;
+  padding-right: 15px;
+}
+
+
+.adminpage-rentals-rowslist{
+  border-radius: 20px;
+  padding: 10px 0 10px 15px;
+}
+
+.adminpage-rentals-individual-rows{
+  padding: 10px 0 10px 15px;
+}
+
+
+.adminpage-rentals-rowslist button{
+  color: black;
+  background: transparent;
+}
+
+.adminpage-rentals-active{
+  background-color: black;
+  color: #63D6DD;
+}
+
+
+/* allow popouts to overflow parent boxes */
+.adminpage-rental-headers,
+.adminpage-rentals-rowslist,
+.adminpage-rentals-individual-rows {
+  overflow: visible !important;
+}
+
+/* style the menu */
+.admin-dropdown {
+  position: absolute;
+  right: 0;
+  margin-top: 0.5rem;
+  z-index: 9999;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+}
+
+.adminpage-rentals-delete_btn{
+  color: red !important;
+}
+
+.adminpage-rentals-green-txt{
+  color: green !important;
+}
+
+
+
+@media (max-width: 700px){
+  .adminpage-main, .adminpage-rental-headers, .adminpage-rentals-rowslist{
+    padding: 0;
+  }
+
+
+}
+
+
+/* -------------------- Responsive Dashboard Scaling -------------------- */
+
+/* Wrap wide content (like tables or grids) in a scroll container */
+.adminpage-rental-headers,
+.adminpage-rentals-rowslist {
+  overflow-x: auto;  /* allow horizontal scroll */
+  scrollbar-width: thin; /* slimmer scrollbar for Firefox */
+}
+
+/* Ensure wide grids don't break layout */
+.adminpage-rental-headers-fix,
+.adminpage-rentals-individual-rows {
+  min-width: 600px; /* prevents columns from squishing too early */
+}
+
+/* Global scaling when below 900px */
+@media (max-width: 900px) {
+  .rental-dashboard h1 {
+    font-size: 1.4rem;
+  }
+
+  .rental-dashboard p,
+  .adminpage-rental-headers-fix,
+  .adminpage-rentals-individual-rows,
+  .adminpage-rentals-rowslist {
+    font-size: 0.85rem;
+  }
+
+  .adminpage-rental-filter {
+    padding: 4px 0;
+    font-size: 0.85rem;
+  }
+
+  .adminpage-rentals-individual-rows img {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* Even smaller screens (mobile portrait) */
+@media (max-width: 600px) {
+  .rental-dashboard h1 {
+    font-size: 1.2rem;
+  }
+
+  .rental-dashboard p,
+  .adminpage-rentals-rowslist {
+    font-size: 0.8rem;
+  }
+
+  .adminpage-rental-filter {
+    font-size: 0.8rem;
+    padding: 3px 0;
+  }
+
+  /* allow side scrolling for entire rental section */
+  .rental-dashboard {
+    overflow-x: auto;
+  }
+}
+
