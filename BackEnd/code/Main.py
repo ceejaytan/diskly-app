@@ -2,7 +2,6 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from .Sql import SqlAccounts
 
 
 from .Routes.AccountsValidation import router as accounts_router
@@ -14,9 +13,7 @@ from .Routes.Admin import router as Admin
 async def lifespan(app: FastAPI):
     print(f"""
     {app.title}
-    creating table Accounts if not exists
           """)
-    SqlAccounts.create_table()
     yield
     print("closing...")
 

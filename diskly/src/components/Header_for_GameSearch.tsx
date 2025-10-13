@@ -99,7 +99,7 @@ export default function Header_for_GameSearch({userSession}: HeaderProps) {
                 <a href="/home">Home</a>
               </li>
               <li>
-                <a href="#">Catalog</a>
+                <a href="/games-list">Catalog</a>
               </li>
               <li>
                 <a href="#">Contact Us</a>

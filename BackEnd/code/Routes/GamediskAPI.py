@@ -12,9 +12,9 @@ def list_games(game_name_search: Optional[str] = "", platform: str = ""):
 
 
 @router.get("/rent-info")
-def rent_info(game_name: str = ""):
+def rent_info(game_id: int = 0):
     print("rent-info")
-    return SqlGameCatalog_API.game_rent_info(game_name)
+    return SqlGameCatalog_API.game_rent_info(game_id)
 
 
 @router.post("/submit-rent-form")
@@ -25,5 +25,6 @@ def submit_rent_form(
 
     print("renting...")
     print(request)
-    SqlGameCatalog_API.save_rental_info(request)
+    SqlGameCatalog_API.save_transcation_info(request)
     return {"message": "success"}
+

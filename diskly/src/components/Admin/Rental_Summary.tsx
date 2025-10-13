@@ -1,25 +1,48 @@
-type editdata = {
+import { useEffect, useState } from "react";
+import { API_URL } from "../../API/config";
+
+type Rental = {
   id: number;
   name: string;
   title: string;
   rented_on: string;
   return_on: string;
   price: number;
-  status: "Pending" | "Completed" | "Denied";
-}
+  quantity: number;
+  console: string;
+  isOverdue: boolean;
+};
 
 type more_boilerplate_because_reactjs_moment = {
-  editdata: editdata;
+  transaction_id: number;
+  rental_status: string;
   cancelbtn: () => void;
   }
 
-export default function Rentals_action({editdata, cancelbtn}:more_boilerplate_because_reactjs_moment){
+export default function Rental_Summary({transaction_id, rental_status, cancelbtn}:more_boilerplate_because_reactjs_moment){
+  const [rentalsData, setRentalsData] = useState<Rental| null>(null);
+
+  async function fetchData(){
+    const res = await fetch(`${API_URL}/admin/view-rental-detail?id=${transaction_id}`, {
+      method: "GET",
+      credentials: "include",
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    setRentalsData(data);
+  }
+
+  useEffect(() => {
+    (async () => {
+      fetchData();
+    })();
+  }, [])
 
   return(
   <>
     <div className="fixed inset-0 flex items-center justify-center bg-black/80  z-50 p-4" onClick={cancelbtn} >
       <div className="rent-form-container bg-[#0b0e13] border-2 border-cyan-400 rounded-2xl w-full max-w-xl p-8 text-cyan-100" onClick={(e) => e.stopPropagation()}>
-        <form className="rent-form flex flex-col gap-6">
+        <div className="rent-form flex flex-col gap-6">
           <h2 className="text-2xl font-bold text-cyan-400 text-center mb-2">
             Diskly Rental Summary
           </h2>
@@ -46,7 +69,7 @@ export default function Rentals_action({editdata, cancelbtn}:more_boilerplate_be
               flex
               items-center
               ">
-                { editdata.title }
+                { rentalsData?.title ?? "Loading..." }
             </p>
           </div>
 
@@ -66,18 +89,26 @@ export default function Rentals_action({editdata, cancelbtn}:more_boilerplate_be
                 flex
                 items-center
                 ">
-                  {new Date(editdata.rented_on).toLocaleDateString("en-US", {
+                  {rentalsData
+                    ? new Date(rentalsData?.rented_on).toLocaleDateString("en-US", {
                     month: "short",
                     day: "2-digit",
                     year: "numeric",
-                  })}
+                  })
+                  : "Loading..."}
               </p>
             </div>
             <div className="flex flex-col items-center">
+                {rentalsData?.isOverdue && rental_status !== "Returned" ? (
+              <label className="text-sm font-semibold text-red-500 mb-1 w-[85%] text-left">
+                ( Already past the return date )
+                </label>
+                ): 
               <label className="text-sm font-semibold text-cyan-300 mb-1 w-[85%] text-left">
-                Return Date
+                Return Date 
               </label>
-              <input type="date"
+                }
+              <p
               className={`
                 bg-[#D6DCDE]
                 border-2
@@ -90,8 +121,16 @@ export default function Rentals_action({editdata, cancelbtn}:more_boilerplate_be
 
               required
                 `}
-  value={new Date(editdata.return_on).toISOString().split("T")[0]} // ✅ correct format
-              />
+
+              >
+                  {rentalsData
+                    ? new Date(rentalsData?.return_on).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "2-digit",
+                    year: "numeric",
+                  })
+                  : "Loading..."}
+                </p>
             </div>
           </div>
 
@@ -111,42 +150,25 @@ export default function Rentals_action({editdata, cancelbtn}:more_boilerplate_be
                 flex
                 items-center
                 ">
+                  {rentalsData?.console}
               </p>
             </div>
             <div className="flex flex-col items-center">
               <label className="text-sm font-semibold text-cyan-300 mb-1 w-[85%] text-left">
                 Quantity
               </label>
-              <div className="flex w-full max-w-[100%]">
-              <input type="text"
+              <p
               className={`
                 bg-[#D6DCDE]
-                border-2
-                border-r-0
-                text-black
-                rounded-l-[13px]
-                h-[40px]
-                w-full
-                items-center px-3
-
-
+                border
+                border-cyan-400/60
+                text-black 
+                rounded-[13px]
+                h-[40px] w-[100%]
+                flex
+                items-center
                   `}
-              />
-              <span className={`
-                  bg-[#D6DCDE]
-                  border-2
-                  border-l-0
-                  text-black
-                  rounded-r-[13px]
-                  h-[40px]
-                  flex
-                  items-center
-                  w-[90%]
-
-                `}
-                >
-                </span>
-                </div>
+              >{rentalsData?.quantity}</p>
             </div>
             <div className="flex flex-col items-center">
               <label className="text-sm font-semibold text-cyan-300 mb-1 w-[85%] text-left">
@@ -162,6 +184,7 @@ export default function Rentals_action({editdata, cancelbtn}:more_boilerplate_be
                 flex
                 items-center
                 ">
+                  ₱{rentalsData?.price}
               </p>
             </div>
           </div>
@@ -170,24 +193,14 @@ export default function Rentals_action({editdata, cancelbtn}:more_boilerplate_be
           {/* Buttons */}
           <div className="flex flex-col gap-3">
             <button
-              type="submit"
-              className="
-              rent-form-submitrentalbtn
-              hover:bg-cyan-300
-              disabled:opacity-50
-              disabled:bg-cyan-400/20"
-            >
-              Update 
-            </button>
-            <button
               type="button"
               className="rent-form-cancelbtn hover:bg-cyan-400/10"
               onClick={cancelbtn}
             >
-              Cancel
+              Back
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   </>

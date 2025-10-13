@@ -1,4 +1,4 @@
-import { API_URL } from "../../API/config";
+import { API_URL } from "../../../API/config";
 
 type more_boilerplate_because_reactjs_moment = {
   id: number;
@@ -6,10 +6,10 @@ type more_boilerplate_because_reactjs_moment = {
   refetchRentalData: () => void;
   }
 
-export default function DeleteConfirmTransaction({id, cancelbtn, refetchRentalData}:more_boilerplate_because_reactjs_moment){
+export default function DeleteConfirmRental({id, cancelbtn, refetchRentalData}:more_boilerplate_because_reactjs_moment){
 
 async function delete_rental(id: number){
-  const res = await fetch(`${API_URL}/admin/delete-transaction?id=${id}`, {
+  const res = await fetch(`${API_URL}/admin/delete-rental?id=${id}`, {
     method: "POST",
     credentials: "include"
   });
@@ -21,6 +21,7 @@ async function delete_rental(id: number){
   <>
     <div className="fixed inset-0 flex items-center justify-center bg-black/80  z-50 p-4" onClick={cancelbtn}>
       <div className="rent-form-container bg-[#0b0e13] border-2 border-cyan-400 rounded-2xl w-full max-w-xl p-8 text-cyan-100" onClick={(e) => e.stopPropagation()}>
+          <h1>{id}</h1>
 
           <div className="flex justify-center">
             <img

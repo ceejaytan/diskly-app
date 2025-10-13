@@ -1,22 +1,41 @@
-import { API_URL } from "../../API/config";
+import { useEffect, useState } from "react";
+import { API_URL } from "../../../API/config";
+
 
 type more_boilerplate_because_reactjs_moment = {
   id: number;
+  cd_name: string;
+  game_id: number;
   cancelbtn: () => void;
   refetchRentalData: () => void;
   }
 
-export default function DeleteConfirmTransaction({id, cancelbtn, refetchRentalData}:more_boilerplate_because_reactjs_moment){
+export default function ConfirmReturned({id, cd_name, game_id, cancelbtn, refetchRentalData}:more_boilerplate_because_reactjs_moment){
 
-async function delete_rental(id: number){
-  const res = await fetch(`${API_URL}/admin/delete-transaction?id=${id}`, {
+  const [gamecd_info, setGamecd_Info] = useState("")
+
+
+async function confirm_return(id: number){
+  const res = await fetch(`${API_URL}/admin/confirm-return-rental?id=${id}`, {
     method: "POST",
     credentials: "include"
   });
-  if (!res.ok){ console.log("failed to delete")}
+  if (!res.ok){ console.log("failed to approve")}
   refetchRentalData()
   cancelbtn()
 }
+
+async function fetch_gamecd(){
+    const res = await fetch(`${API_URL}/games/rent-info?game_id=${game_id}`);
+    const data = await res.json();
+    setGamecd_Info(data.cover_image_path);
+  }
+
+  useEffect(() => {
+    (async () => {
+      fetch_gamecd();
+    })();
+  }, [])
   return(
   <>
     <div className="fixed inset-0 flex items-center justify-center bg-black/80  z-50 p-4" onClick={cancelbtn}>
@@ -31,16 +50,17 @@ async function delete_rental(id: number){
           </div>
           <div className="rental-form-success-toast flex flex-col gap-3 items-center">
             <h1 className="leading-snug text-center">
-              Are you sure you want to delete this record?
+              Confirm that the CD has been returned?
             </h1>
+            <p>{game_id}. {cd_name}</p>
+            <img className="w-[300px] border-2 border-cyan-400 rounded-2xl" src={` ${ API_URL }/${ gamecd_info } `}/>
 
             <div className="flex gap-4 w-full justify-center">
               <button
                 type="button"
                 className="rent-form-cancelbtn hover:bg-cyan-400/10 flex-1"
                 onClick={async () => {
-                  await delete_rental(id);
-
+                  await confirm_return(id);
                 }}
               >
                 Yes

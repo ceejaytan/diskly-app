@@ -40,55 +40,108 @@ class AdminValidations:
 
 
     @staticmethod
-    async def image_valid(image: UploadFile, image_file_name: str) -> str:
+    async def image_valid(
+        image: UploadFile, 
+        image_file_name: str, 
+        old_image_path: str | None = None
+    ) -> str:
+        """
+        Validates, saves, and optionally replaces an existing game cover image.
 
+        image_file_name: base name (usually the game title)
+        old_image_path: previous cover path to delete if a new file replaces it
+        Returns the new image path or "" if invalid.
+        """
         if image.filename is None:
             return ""
 
         image_contents = await image.read()
-        print("file size = %.2f MB"%((len(image_contents) / (1024 * 1024))))
-        try: 
+        print("file size = %.2f MB" % (len(image_contents) / (1024 * 1024)))
+
+        try:
             file_extension = AdminValidations.validate_image(image_contents)
         except ValueError as err:
             print(err)
             return ""
-        print(file_extension)
-        file_name = f"{image_file_name}.{file_extension}"
-        file_name_without_extension = os.path.splitext(image.filename)[0]
+
+        safe_name = "".join(c for c in image_file_name if c.isalnum() or c in (" ", "-", "_")).strip()
+        safe_name = safe_name.replace(" ", "_")
+        file_name = f"{safe_name}.{file_extension}"
+        image_dir = "images/gamecover"
+        os.makedirs(image_dir, exist_ok=True)
+        image_path = os.path.join(image_dir, file_name)
+
         counter = 1
-
-        while os.path.isfile(f"images/gamecover/{file_name}"):
-            print("file already exists.")
-            file_name = f"{file_name_without_extension}_copy{counter}.{file_extension}"
+        while os.path.isfile(image_path):
+            image_path = os.path.join(image_dir, f"{safe_name}_copy{counter}.{file_extension}")
             counter += 1
-            print(f"new file name: {file_name}")
-
-        image_path = f"images/gamecover/{file_name}"
 
         try:
             with open(image_path, "wb") as f:
                 f.write(image_contents)
-            print("uploadfile success")
+            print(f"Image saved as {image_path}")
+
+            if old_image_path and os.path.exists(old_image_path):
+                if "DEFAULT_PIC.png" not in old_image_path:
+                    os.remove(old_image_path)
+                    print(f"Old image {old_image_path} removed.")
+
             return image_path
+
         except Exception as err:
-            print(err)
+            print(f"Failed to save image: {err}")
             return ""
 
 
+    # @staticmethod
+    # async def image_valid(image: UploadFile, image_file_name: str) -> str:
+    #     if image.filename is None:
+    #         return ""
+    #
+    #     image_contents = await image.read()
+    #     print("file size = %.2f MB"%((len(image_contents) / (1024 * 1024))))
+    #     try: 
+    #         file_extension = AdminValidations.validate_image(image_contents)
+    #     except ValueError as err:
+    #         print(err)
+    #         return ""
+    #     print(file_extension)
+    #     file_name = f"{image_file_name}.{file_extension}"
+    #     file_name_without_extension = os.path.splitext(image.filename)[0]
+    #     counter = 1
+    #
+    #     while os.path.isfile(f"images/gamecover/{file_name}"):
+    #         print("file already exists.")
+    #         file_name = f"{file_name_without_extension}_copy{counter}.{file_extension}"
+    #         counter += 1
+    #         print(f"new file name: {file_name}")
+    #
+    #     image_path = f"images/gamecover/{file_name}"
+    #
+    #     try:
+    #         with open(image_path, "wb") as f:
+    #             f.write(image_contents)
+    #         print("uploadfile success")
+    #         return image_path
+    #     except Exception as err:
+    #         print(err)
+    #         return ""
 
-    @staticmethod
-    def Add_games_valid(request: add_games_model) -> bool:
-        print(request)
 
-        # game_name_regex = r"^[\w\s\-'!]{2,100}$"
-        # platform_regex = r"^[\w\s]{2,50}$"
-        # genre_regex = r"^[\w\s]{2,50}$"
-        #
-        # if not re.match(game_name_regex, request.game_name) or \
-        #     not re.match(platform_regex, request.platform):
-        #     return False
 
-        return True
+    # @staticmethod
+    # def Add_games_valid(request: add_games_model) -> bool:
+    #     print(request)
+    #
+    #     game_name_regex = r"^[\w\s\-'!]{2,100}$"
+    #     platform_regex = r"^[\w\s]{2,50}$"
+    #     genre_regex = r"^[\w\s]{2,50}$"
+    #
+    #     if not re.match(game_name_regex, request.game_name) or \
+    #         not re.match(platform_regex, request.platform):
+    #         return False
+    #
+    #     return True
 
 class UserRentals:
 

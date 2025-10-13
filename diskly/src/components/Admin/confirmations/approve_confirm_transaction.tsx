@@ -1,19 +1,20 @@
-import { API_URL } from "../../API/config";
+import { API_URL } from "../../../API/config";
 
 type more_boilerplate_because_reactjs_moment = {
   id: number;
+  total_cost: number;
   cancelbtn: () => void;
   refetchRentalData: () => void;
   }
 
-export default function DeleteConfirmTransaction({id, cancelbtn, refetchRentalData}:more_boilerplate_because_reactjs_moment){
+export default function ApproveConfirmTransaction({id, total_cost, cancelbtn, refetchRentalData}:more_boilerplate_because_reactjs_moment){
 
-async function delete_rental(id: number){
-  const res = await fetch(`${API_URL}/admin/delete-transaction?id=${id}`, {
+async function approve_rental(id: number){
+  const res = await fetch(`${API_URL}/admin/approve-transaction?id=${id}`, {
     method: "POST",
     credentials: "include"
   });
-  if (!res.ok){ console.log("failed to delete")}
+  if (!res.ok){ console.log("failed to approve")}
   refetchRentalData()
   cancelbtn()
 }
@@ -31,15 +32,16 @@ async function delete_rental(id: number){
           </div>
           <div className="rental-form-success-toast flex flex-col gap-3 items-center">
             <h1 className="leading-snug text-center">
-              Are you sure you want to delete this record?
+              Approve this transaction?
             </h1>
+            <p>Make sure user has paid the following ₱{total_cost}</p>
 
             <div className="flex gap-4 w-full justify-center">
               <button
                 type="button"
                 className="rent-form-cancelbtn hover:bg-cyan-400/10 flex-1"
                 onClick={async () => {
-                  await delete_rental(id);
+                  await approve_rental(id);
 
                 }}
               >

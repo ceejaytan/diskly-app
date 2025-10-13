@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "../../API/config";
-import Transaction_action from "./Transaction_Action";
-import DeleteConfirmTransaction from "./delete_confirmation_transactions";
-import ApproveConfirmTransaction from "./confirmations/approve_confirm_transaction";
+import Rental_Summary from "./Rental_Summary";
+import ConfirmReturned from "./confirmations/returned_confirm_rental";
+
+import DeleteConfirmRental from "./confirmations/delete_confirm_rental";
 
 type Rental = {
   id: number;
@@ -11,23 +12,24 @@ type Rental = {
   rented_on: string;
   return_on: string;
   price: number;
-  status: "Pending" | "Approved" | "Denied";
+  status: "Ongoing" | "Returned" | "Overdue";
+  transaction_id: number;
   quantity: number;
   console: string;
+  game_id: number;
 };
 
 
-export default function Trasactions_Dashboard() {
-  const [activeTab, setActiveTab] = useState<"All Trasactions" | "Pending" | "Approved">("All Trasactions");
+export default function Rentals_Dashboard() {
+  const [activeTab, setActiveTab] = useState<"All Rentals" | "Ongoing" | "Returned" | "Overdue">("All Rentals");
   const [rentalsData, setRentalsData] = useState<Rental[]>([]);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
-
-  const [rentalEdit, setRentalEdit] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
-  const [approveConfirm, setApproveConfirm] = useState(false);
+  const [rental_Summary, setRental_Summary] = useState(false);
+  const [confirmReturned, setConfirmReturned] = useState(false);
 
   async function fetchRentals() {
-    const res = await fetch(`${API_URL}/admin/transactions`, {
+    const res = await fetch(`${API_URL}/admin/rentals`, {
       method: "GET",
       credentials: "include",
     });
@@ -41,21 +43,21 @@ export default function Trasactions_Dashboard() {
   }, []);
 
   const filteredRentals =
-    activeTab === "All Trasactions"
+    activeTab === "All Rentals"
       ? rentalsData
       : rentalsData.filter((r) => r.status === activeTab);
 
   return (
-    <main className="rental-dashboard flex-1">
+    <main className="stocks-dashboard rental-dashboard flex-1">
       <div className="flex flex-col gap-6">
         <div className="adminpage-dashboard-titles">
-          <h1>Trasactions</h1>
+          <h1>Rentals</h1>
           <p className="rental-p text-sm">{rentalsData?.length} Rentals found</p>
         </div>
 
         {/* Filter Buttons */}
         <div className="flex gap-3 w-full text-left xl:w-[40%]">
-          {(["All Trasactions", "Pending", "Approved"] as const).map((tab) => (
+          {(["All Rentals", "Ongoing", "Returned", "Overdue"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -124,9 +126,9 @@ export default function Trasactions_Dashboard() {
 
                 <div
                   className={
-                    rental.status === "Pending"
+                    rental.status === "Ongoing"
                       ? "text-yellow-500"
-                      : rental.status === "Approved"
+                      : rental.status === "Returned"
                       ? "text-green-600"
                       : "text-red-600"
                   }
@@ -162,38 +164,19 @@ export default function Trasactions_Dashboard() {
                       z-10
                       ">
 
-                      {/* {rental.status === "Approved" &&( */}
-                      {/* <button */}
-                      {/*   onClick={() => setUnApproveConfirm(true)} */}
-                      {/*   className="block w-full text-left hover:bg-gray-100" */}
-                      {/*   > */}
-                      {/*   Unapprove */}
-                      {/* </button> */}
-                      {/* )} */}
-                      {rental.status === "Pending" &&(
-                        <>
+                      {rental.status !== "Returned" &&(
                       <button
-                        onClick={() => setApproveConfirm(true)}
-                        className="adminpage-rentals-green-txt
-                        block w-full text-left hover:bg-gray-100"
-                        >
-                        Approve
-                      </button>
-
-                      <button
-                        onClick={() => {}}
+                        onClick={() => {setConfirmReturned(true)}}
                         className="
-                        adminpage-rentals-delete_btn
                         block
                         w-full
                         text-left
                         hover:bg-gray-100
+                        adminpage-rentals-green-txt
                         ">
-                        Deny
+                        Confirm Returned
                       </button>
-                      </>
                       )}
-
 
                       <button 
                         onClick={() => setDeleteConfirm(true)}
@@ -204,9 +187,8 @@ export default function Trasactions_Dashboard() {
                         ">
                         Delete
                       </button>
-
                       <button
-                        onClick={() => setRentalEdit(true)}
+                        onClick={() => setRental_Summary(true)}
                         className="
                         block
                         w-full
@@ -237,25 +219,27 @@ export default function Trasactions_Dashboard() {
         </div>
       </div>
 
-      {rentalEdit && (
-      <Transaction_action
-          editdata={rentalsData.find(r => r.id === openDropdownId)!}
-          cancelbtn={() => {setRentalEdit(!rentalEdit)}}/>
-      )}
-
-      {deleteConfirm && (
-      <DeleteConfirmTransaction 
+      {confirmReturned && (
+      <ConfirmReturned
           id={rentalsData.find(r => r.id === openDropdownId)?.id ?? 0}
-          cancelbtn={() => setDeleteConfirm(false)}
+          cd_name={rentalsData.find(r => r.id === openDropdownId)?.title ?? "Loading.."}
+          game_id={rentalsData.find(r => r.id === openDropdownId)?.game_id ?? 0}
+          cancelbtn={() => setConfirmReturned(false)}
           refetchRentalData={() => { fetchRentals(); setOpenDropdownId(null) } }
         />
       )}
 
-      {approveConfirm && (
-      <ApproveConfirmTransaction
+      {rental_Summary &&  openDropdownId !== null &&(
+      <Rental_Summary
+          transaction_id={rentalsData.find(r => r.id === openDropdownId)?.transaction_id ?? 0}
+          rental_status={rentalsData.find(r => r.id === openDropdownId)?.status ?? ''}
+          cancelbtn={() => {setRental_Summary(false)}}/>
+      )}
+
+      {deleteConfirm && (
+      <DeleteConfirmRental
           id={rentalsData.find(r => r.id === openDropdownId)?.id ?? 0}
-          total_cost={rentalsData.find(r => r.id === openDropdownId)?.price ?? 0}
-          cancelbtn={() => setApproveConfirm(false)}
+          cancelbtn={() => setDeleteConfirm(false)}
           refetchRentalData={() => { fetchRentals(); setOpenDropdownId(null) } }
         />
       )}

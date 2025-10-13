@@ -9,8 +9,17 @@ interface RegisterFormProps {
   toggleForm: () => void;
 }
 
-const RegisterForm: React.FC<RegisterFormProps> = ({ toggleForm }) => {
-  const [fullname, setFullName] = useState("");
+export default function RegisterForm({ toggleForm }: RegisterFormProps){
+  const [firstname, setFirstName] = useState("");
+  const [firstnamemessage, setFirstNameMessage] = useState("");
+  const [firstnameValid, setFirstNameValid] = useState(false);
+
+
+  const [lastname, setLastName] = useState("");
+  const [lastnamemessage, setLastNameMessage] = useState("");
+  const [lastnameValid, setLastNameValid] = useState(false);
+
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [birthday, setBirthday] = useState("");
@@ -35,8 +44,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ toggleForm }) => {
   const [contactMessage, setContactMessage] = useState("");
   const [contactValid, setContactValid] = useState(false);
 
-  const [fullnameMessage, setFullNameMessage] = useState("");
-  const [fullnameValid, setFullNameValid] = useState(false);
 
   const [birthdayMessage, setBirthdayMessage] = useState("");
   const [birthdayValid, setBirthdayValid] = useState(true);
@@ -56,25 +63,40 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ toggleForm }) => {
   const navigate = useNavigate();
 
 
-  const fullnameRegex = /^(?:[A-Za-z]\.|[A-Za-z][A-Za-z'\-]*)(?: (?:[A-Za-z]\.|[A-Za-z][A-Za-z'\-]*)){1,3}$/
+  const firstNameRegex = /^[A-Za-z ]{2,}$/;
+  const lastNameRegex = /^[A-Za-z ]{2,}$/;
   const usernameRegex = /^(?=[A-Za-z0-9_]{3,20}$)(?!.*_$)(?!.*__)(?=(?:.*[A-Za-z]){3,})[A-Za-z][A-Za-z0-9_]{2,20}$/;
   const emailRegex = /^[A-Za-z0-9._+-]{3,20}@[^\s@]+\.[A-Za-z]{2,}$/;
-  const contactRegex = /^(?:\+639|09)\d{9}$/
+  const contactRegex = /^(?:\9)\d{9}$/
 
 
 useEffect(() => {
-    if (!fullname) {
-      setFullNameMessage("");
-      setFullNameValid(false);
+    if (!firstname) {
+      setFirstNameMessage("");
+      setFirstNameValid(false);
     }
-    if (!fullnameRegex.test(fullname)){
-      setFullNameMessage("Invalid Full Name ( e.g John F. Doe )");
-      setFullNameValid(false);
+    if (!firstNameRegex.test(firstname)){
+      setFirstNameMessage("Invalid First Name");
+      setFirstNameValid(false);
     }else {
-      setFullNameMessage("");
-      setFullNameValid(true);
+      setFirstNameMessage("");
+      setFirstNameValid(true);
     }
-  })
+  }, [firstname])
+
+useEffect(() => {
+    if (!lastname) {
+      setLastNameMessage("");
+      setLastNameValid(false);
+    }
+    if (!lastNameRegex.test(lastname)){
+      setLastNameMessage("Invalid Last Name");
+      setLastNameValid(false);
+    }else {
+      setLastNameMessage("");
+      setLastNameValid(true);
+    }
+  }, [lastname])
 
 
 useEffect(() => {
@@ -160,7 +182,7 @@ useEffect(() => {
       setContactValid(false);
     }
     if(!contactRegex.test(contact)) {
-      setContactMessage("Invalid Contact! example: 09232404697")
+      setContactMessage("Invalid Contact! example: 9232404697")
       setContactValid(false)
     } else {
       setContactMessage("")
@@ -225,7 +247,8 @@ useEffect(() => {
     }
 
     const ok = await SendRegister({
-      fullname,
+      firstname,
+      lastname,
       username,
       email,
       birthday,
@@ -237,15 +260,6 @@ useEffect(() => {
     if (ok) navigate("/");
   };
 
-  const handleCancel = () => {
-    setFullName("");
-    setUsername("");
-    setEmail("");
-    setBirthday("");
-    setContact("");
-    setPassword("");
-    setConfirmPassword("");
-  };
 
   return (
     <form onSubmit={handleSubmit}>
@@ -260,33 +274,53 @@ useEffect(() => {
       <h2>Register</h2>
 
 
-      <div className="form-group">
-        <label>Full Name</label>
-        <input
-          type="text"
-          value={fullname}
-          onChange={(e) => setFullName(e.target.value)}
-          required
-          className=
-          {` 
-          border- border-2 rounded-[10px]
-          bg-[#D6DCDE]
-          text-black
-          ${
-          fullname === ""
-          ? ""
-          : fullnameValid
-          ? "Inputvalid"
-          : "Inputinvalid"
-          }
-          `}
-        />
-          {fullname && (
-              <small>
-                {fullnameMessage}
-              </small>
-            )}
-      </div>
+<div className="form-row">
+  <div className="form-group">
+    <label>First Name</label>
+    <input
+      type="text"
+      value={firstname}
+      onChange={(e) => setFirstName(e.target.value.toUpperCase())}
+      required
+      className={`
+        border-cyan-400 border-2 rounded-[10px]
+        bg-[#D6DCDE]
+        text-black
+        ${
+          firstname === ""
+            ? ""
+            : firstnameValid
+            ? "Inputvalid"
+            : "Inputinvalid"
+        }
+      `}
+    />
+    {firstname && <small>{firstnamemessage}</small>}
+  </div>
+
+  <div className="form-group">
+    <label>Last Name</label>
+    <input
+      type="text"
+      value={lastname}
+      onChange={(e) => setLastName(e.target.value.toUpperCase())}
+      required
+      className={`
+        border-cyan-400 border-2 rounded-[10px]
+        bg-[#D6DCDE]
+        text-black
+        ${
+          lastname === ""
+            ? ""
+            : lastnameValid
+            ? "Inputvalid"
+            : "Inputinvalid"
+        }
+      `}
+    />
+    {lastname && <small>{lastnamemessage}</small>}
+  </div>
+</div>
 
       <div className="form-row">
         <div className="form-group">
@@ -370,32 +404,34 @@ useEffect(() => {
 
         </div>
 
-        <div className="form-group">
-          <label>Contact Number ( PH )</label>
-          <input
-            type="tel"
-            value={contact}
-            onChange={(e) => setContact(e.target.value)}
-            required
-            className={`
-            border-cyan-400 border-2 rounded-[10px]
-            bg-[#D6DCDE]
-            text-black
-            ${
-            contact === ""
-            ? ""
-            : contactValid
-            ? "Inputvalid"
-            : "Inputinvalid"
-            }
-            `}
-          />
-          {contact && (
-              <small>
-                {contactMessage}
-              </small>
-            )}
-        </div>
+<div className="form-group">
+  <label>Contact Number ( PH )</label>
+  <div className="flex items-center border-cyan-400 border-2 rounded-[10px] bg-[#D6DCDE]">
+    <span className="pl-3 pr-2 text-gray-700 select-none">+63</span>
+    <input
+      type="tel"
+      value={contact}
+      onChange={(e) => setContact(e.target.value)}
+      required
+      className={`
+        flex-1
+        bg-transparent
+        focus:outline-none
+        text-black
+        rounded-r-[10px]
+        py-2
+        ${
+          contact === ""
+          ? ""
+          : contactValid
+          ? "Inputvalid"
+          : "Inputinvalid"
+        }
+      `}
+    />
+  </div>
+  {contact && <small>{contactMessage}</small>}
+</div>
       </div>
 
       <div className="form-row">
@@ -498,15 +534,13 @@ useEffect(() => {
         </button>
 
         <div className="button-row">
-          <button type="button" className="btn btn-clear" onClick={handleCancel}>
-            Clear
-          </button>
           <button type="button" className="btn btn-back" onClick={() => navigate(-1)}>
             Go Back
           </button>
         </div>
       </div>
 
+      <hr/>
       <p className="toggle-text">
         Already have an account?{" "}
         <button type="button" className="btn btn-toggle" onClick={toggleForm}>
@@ -516,5 +550,3 @@ useEffect(() => {
     </form>
   );
 };
-
-export default RegisterForm;

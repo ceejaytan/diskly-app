@@ -6,15 +6,14 @@ from email.mime.text import MIMEText
 
 class Accounts:
 
-
-
     class LoginRequest(BaseModel):
         username: str
         password: str
 
 
     class RegisterRequest(BaseModel):
-        fullname: str
+        firstname: str
+        lastname: str
         username: str
         email: str
         birthday: str
@@ -46,8 +45,7 @@ class Accounts:
 
 
     @staticmethod
-    def send_reset_pass(email: str):
-        code = str(random.randint(100000, 999999))
+    def send_reset_pass(email: str, code: str) -> str:
         msg = MIMEText(f"Your password reset code is: {code}")
         msg["Subject"] = "Password Reset"
         msg["From"] = Accounts.forget_pass_email
@@ -59,5 +57,3 @@ class Accounts:
             server.send_message(msg)
 
         return code
-
-
