@@ -6,6 +6,7 @@ import checkLoginSession from "../components/Login/CheckLoginSession";
 import Rentals_Dashboard from "../components/Admin/Rentals";
 import Transaction_Dashboard from "../components/Admin/Transactions";
 import Stocks_Dashboard from "../components/Admin/Stocks";
+import Customer_Dashboard from "../components/Admin/customer/customers";
 import "../Css/AdminPage.css"
 
 type SessionType = { username: string } | null;
@@ -129,6 +130,7 @@ export default function AdminPage() {
         {admin_dashboard_type === admin_dashboard.Rentals && <Rentals_Dashboard />}
         {admin_dashboard_type === admin_dashboard.Transactions && <Transaction_Dashboard />}
         {admin_dashboard_type === admin_dashboard.Stock && <Stocks_Dashboard />}
+        {admin_dashboard_type === admin_dashboard.Customers && <Customer_Dashboard />}
       </main>
     </div>
   );

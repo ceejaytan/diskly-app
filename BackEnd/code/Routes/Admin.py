@@ -78,6 +78,10 @@ def delete_transaction(
     return JSONResponse(status_code=200, content="deleted succesfully")
 
 
+@router.get("/view-game-detail")
+def view_game_detail(id: int = 0):
+    return SqlAdmin.view_game_detail(id)
+
 
 
 
@@ -103,25 +107,45 @@ async def add_game(
         price=price,
         quantity=quantity
     )
-
     print(request)
-
     cover_image_path = "images/gamecover/DEFAULT_PIC.png"
-    game_name_regex = r"^[A-Za-z0-9\s\-'!]{2,100}$"
 
     if image:
-
         cover_image_path = await AdminValidations.image_valid(image, request.game_name)
         if cover_image_path == "":
             raise HTTPException(status_code=400, detail="Invalid Image, Image size must be less than 2MB")
 
-    # if not re.match(game_name_regex, game_name):
-    #     raise HTTPException(status_code=400, detail="Invalid Name")
-
-    # if not AdminValidations.Add_games_valid(request):
-    #     raise HTTPException(status_code=400, detail="Invalid Request")
-
     SqlAdmin.add_game(request, cover_image_path)
+
+
+@router.post("/update-game")
+async def update_game(
+    game_id: int = Form(...),
+    game_name: str = Form(...),
+    platform: str = Form(...),
+    price: float = Form(...),
+    quantity: int = Form(...),
+    image: Optional[UploadFile] = File(None)
+):
+    request = AdminValidations.add_games_model(
+        game_name=game_name,
+        platform=platform,
+        price=price,
+        quantity=quantity
+    )
+    print( request )
+    if image is None:
+        SqlAdmin.update_game_no_image(game_id, request)
+    else:
+        old_image_path = SqlAdmin.get_gamecd_cover(game_id)
+        cover_image_path = await AdminValidations.image_valid(image, request.game_name, old_image_path)
+        if cover_image_path == "":
+            raise HTTPException(status_code=400, detail="Invalid Image, Image size must be less than 2MB")
+        SqlAdmin.update_game_w_image(game_id, request, cover_image_path)
+    return JSONResponse(status_code=200, content="Updated game CD")
+
+
+
 
 
 @router.post("/delete_game")

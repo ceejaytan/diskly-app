@@ -1,7 +1,8 @@
 import { API_URL } from "../../API/config";
 
 export async function SendRegister(userData: {
-  fullname: string;
+  firstname: string;
+  lastname: string;
   username: string;
   email: string;
   birthday: string;
@@ -12,7 +13,8 @@ export async function SendRegister(userData: {
 
 
   const formdata = new FormData();
-  formdata.append("fullname", userData.fullname);
+  formdata.append("firstname", userData.firstname);
+  formdata.append("lastname", userData.lastname);
   formdata.append("username", userData.username);
   formdata.append("email", userData.email);
   formdata.append("birthday", userData.birthday);

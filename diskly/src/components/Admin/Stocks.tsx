@@ -4,6 +4,7 @@ import "./Stocks.css";
 
 import Add_newCD from "./Add_newCD";
 import DeleteConfirmStock from "./delete_confirmation_stocks";
+import Edit_CD from "./edit_stocks/edit_box";
 
 type GameTitles = {
   id: number;
@@ -21,6 +22,7 @@ export default function Stocks_Dashboard() {
 
   const [OpenAddNewCD, setOpenAddNewCD] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [OpenEditCD, setOpenEditCD] = useState(false);
 
   async function fetchData() {
     const res = await fetch(`${API_URL}/admin/games`, {
@@ -154,7 +156,14 @@ export default function Stocks_Dashboard() {
                     z-20
                   "
                 >
-                  <button className="block w-full text-left hover:bg-gray-100 px-3 py-2">
+                  <button
+                    onClick={() => setOpenEditCD(true)}
+                    className="
+                      block
+                      w-full
+                      text-left
+                      hover:bg-gray-100
+                        ">
                     Edit
                   </button>
                   <button
@@ -193,6 +202,16 @@ export default function Stocks_Dashboard() {
     <Add_newCD
       cancelbtn={() => {
         setOpenAddNewCD(false);
+        fetchData();
+      }}
+    />
+  )}
+
+  {OpenEditCD && (
+  <Edit_CD
+      game_id={GameTitleData.find((r) => r.id === openDropdownId)?.id ?? 0}
+      cancelbtn={() => {
+        setOpenEditCD(false);
         fetchData();
       }}
     />

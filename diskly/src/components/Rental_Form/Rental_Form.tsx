@@ -33,34 +33,56 @@ export default function Rental_form({userinfo, info, cancelbtn }: more_boilerpla
   const [quantityValid, setQuantityValid] = useState(true);
   const [rentTotal, setRentTotal] = useState(info?.total ?? 1);
 
-  useEffect(() => {
-    if (!Return_Date || !info?.rental_start_date) {
-      setReturnDateValid(false);
-      setReturn_Date_Message("")
-      return;
-    }
+useEffect(() => {
+  if (!Return_Date || !info?.rental_start_date) {
+    setReturnDateValid(false);
+    setReturn_Date_Message("");
+    return;
+  }
 
-    const rentalStart = new Date(info.rental_start_date);
-    rentalStart.setHours(0, 0, 0, 0);
+  const rentalStart = new Date(info.rental_start_date);
+  rentalStart.setHours(0, 0, 0, 0);
 
-    const selectedDate = new Date(Return_Date);
-    selectedDate.setHours(0, 0, 0, 0);
+  const selectedDate = new Date(Return_Date);
+  selectedDate.setHours(0, 0, 0, 0);
 
-    if (selectedDate < rentalStart) {
-      setReturnDateValid(false);
-      setReturn_Date_Message("Cannot be in the past")
-    } else {
-      setReturnDateValid(true);
-      setReturn_Date_Message("")
-    }
-  }, [Return_Date, info?.rental_start_date]);
+  const diffTime = selectedDate.getTime() - rentalStart.getTime();
+  const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+  if (selectedDate <= rentalStart) {
+    setReturnDateValid(false);
+    setReturn_Date_Message(
+      selectedDate < rentalStart
+        ? "Cannot be in the past"
+        : "Cannot be the same day"
+    );
+  } else if (diffDays > 90) {
+    setReturnDateValid(false);
+    setReturn_Date_Message("Maximum rental period is 90 days");
+  } else {
+    setReturnDateValid(true);
+    setReturn_Date_Message("");
+  }
+}, [Return_Date, info?.rental_start_date]);
 
 useEffect(() => {
-  if (!info) return;
+  if (!info || !Return_Date) return;
 
   const qty = Number(Quantity) || 0;
-  setRentTotal(qty * info.total);
-}, [Quantity, info]);
+
+  const start = new Date(info.rental_start_date);
+  const end = new Date(Return_Date);
+  start.setHours(0, 0, 0, 0);
+  end.setHours(0, 0, 0, 0);
+
+  const diffTime = end.getTime() - start.getTime();
+  const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  const validDays = days > 0 ? days : 0;
+
+  const total = qty * info.total * validDays;
+  setRentTotal(total);
+}, [Quantity, info, Return_Date]);
 
 
   function digits_only(e: any){
@@ -114,7 +136,7 @@ function submitForm(e:any) {
       <div className="rent-form-container bg-[#0b0e13] border-2 border-cyan-400 rounded-2xl w-full max-w-xl p-8 text-cyan-100" onClick={(e) => e.stopPropagation()}>
         <form className="rent-form flex flex-col gap-6">
           <h2 className="text-2xl font-bold text-cyan-400 text-center mb-2">
-            Diskly Rental Summary
+            Diskly CD Rental Form
           </h2>
 
           <div className="flex justify-center">

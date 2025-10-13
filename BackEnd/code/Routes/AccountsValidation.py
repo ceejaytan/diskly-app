@@ -1,6 +1,9 @@
+import random
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Response, Form, Cookie
 import secrets
 import re
+
+from fastapi.responses import JSONResponse
 from ..Sql import Accounts, SqlAccounts
 
 
@@ -63,7 +66,7 @@ def register(
         raise HTTPException(status_code=400, detail="Invalid Input")
 
     print("register valid")
-    if SqlAccounts.register(request.username.strip(), request.password, request.email.strip()):
+    if SqlAccounts.register(request):
         session_token = secrets.token_hex(16)
         response.set_cookie(
             key="logged_in",
@@ -124,9 +127,70 @@ def logout(response: Response):
     return {"message": "successfully logged out!"}
 
 
-@router.post("/forget-password")
-def forget_password(background_task: BackgroundTasks, email: str):
-    print("forget password")
-    background_task.add_task(Accounts.send_reset_pass, email)
-    return {}
+@router.post("/forget-password-sendcode")
+def forget_password_sendcode(
+    background_task: BackgroundTasks,
+    email: str,
+    credentials: Response
+):
+    print("forget password send code")
+
+
+    session_token = secrets.token_hex(16)
+    credentials.set_cookie(
+            key="reset_pass",
+            value=session_token,
+            max_age=60*60,
+            **cookie_setting
+            )
+
+    code = str(random.randint(100000, 999999))
+
+    background_task.add_task(Accounts.send_reset_pass, email, code)
+    SqlAccounts.store_reset_password(email, code, session_token)
+    return {"sent code"}
+
+@router.post("/forget-password-verify")
+def forget_password_verify(
+    credentials: Response,
+    code: str = Form(...),
+    email: str = Form(...),
+    reset_pass: str = Cookie(None),
+    verified_reset_pass: str = Cookie(None)
+):
+    print("forget password verify")
+    print(reset_pass)
+    print(verified_reset_pass)
+    
+    if SqlAccounts.verify_reset_password(code, email, reset_pass):
+        print("verified to reset")
+        credentials.set_cookie(
+            key="verified_reset_pass",
+            value=reset_pass,
+            max_age=60*60,
+            **cookie_setting
+            )
+        SqlAccounts.increase_timer_forgetpass(code, email, reset_pass)
+        return JSONResponse(status_code=200, content=1)
+    else:
+        print("not verified to reset")
+        raise HTTPException(status_code=400, detail=0)
+
+@router.post("/change-password")
+def change_password(
+        credentials: Response,
+        verify_reset_password: str = Cookie(None),
+        email: str = Form(...),
+        new_password: str = Form(...)
+    ):
+    print("change password")
+    print(verify_reset_password)
+    if SqlAccounts.change_password(email, new_password):
+        credentials.delete_cookie(key="reset_pass")
+        credentials.delete_cookie(key="verify_reset_password")
+        SqlAccounts.cleanup_forgetpass_session(email)
+        return {"detail": "successfully changed password"}
+    else:
+        raise HTTPException(status_code=400, detail="something went wrong")
+
 
