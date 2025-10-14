@@ -316,6 +316,21 @@ class SqlAdmin:
 
 
     @staticmethod
+    def deny_transaction(id: int):
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                UPDATE transactions
+                SET status = 'Denied'
+                WHERE ID = ?
+                """, (id,))
+                conn.commit()
+        except sqlite3.Error as err:
+            print(err)
+
+
+    @staticmethod
     def approve_transaction(id: int):
         try:
             with sqlite3.connect(db_path) as conn:
@@ -335,6 +350,7 @@ class SqlAdmin:
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
+
                 cursor.execute("""
                     INSERT INTO rentals (
                         user_id,
@@ -363,52 +379,86 @@ class SqlAdmin:
                     WHERE ID = ?
                 """, (id,))
 
-            # Update currently_rented in game_catalog
-            cursor.execute("""
-                UPDATE game_catalog
-                SET currently_rented = 
-                    COALESCE(currently_rented, 0) + (
-                        SELECT quantity FROM transactions WHERE ID = ?
+                cursor.execute("""
+                    UPDATE game_catalog
+                    SET currently_rented = 
+                        COALESCE(currently_rented, 0) + (
+                            SELECT quantity FROM transactions WHERE ID = ?
+                        )
+                    WHERE ID = (
+                        SELECT game_id FROM transactions WHERE ID = ?
                     )
-                WHERE ID = (
-                    SELECT game_id FROM transactions WHERE ID = ?
-                )
-            """, (id, id))
+                """, (id, id))
 
-            conn.commit()
+                cursor.execute("""
+                    SELECT total_stocks, COALESCE(currently_rented, 0)
+                    FROM game_catalog
+                    WHERE ID = (
+                        SELECT game_id FROM transactions WHERE ID = ?
+                    )
+                """, (id,))
+                total_stocks, currently_rented = cursor.fetchone()
+                remaining_stock = total_stocks - currently_rented
+
+                if remaining_stock <= 0:
+                    cursor.execute("""
+                        UPDATE transactions
+                        SET status = 'Denied'
+                        WHERE game_id = (
+                            SELECT game_id FROM transactions WHERE ID = ?
+                        )
+                        AND status = 'Pending'
+                        AND ID != ?
+                    """, (id, id))
+                else:
+                    cursor.execute("""
+                        UPDATE transactions
+                        SET status = 'Denied'
+                        WHERE game_id = (
+                            SELECT game_id FROM transactions WHERE ID = ?
+                        )
+                        AND status = 'Pending'
+                        AND quantity > ?
+                        AND ID != ?
+                    """, (id, remaining_stock, id))
+
+                conn.commit()
+
         except sqlite3.Error as err:
             print(err)
 
 
     @staticmethod
-    def view_transactions():
+    def view_transactions(page: int, status_filter: str = ""):
         """view transactions for admin dashboard transactions page"""
+        status_filter_format = f"%{status_filter}%"
         try:
+            offset = (page - 1) * 10
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                SELECT ID, user_name, game_name, rented_on, return_on, total_price, status, quantity, game_console FROM transactions
-                ORDER BY ID desc
-                """)
-                row = cursor.fetchall()
-
-                if row is None:
-                    return []
-            transactions = []
-            for row in row:
-                transactions.append({
-                    "id": row[0],
-                    "name": row[1],
-                    "title": row[2],
-                    "rented_on": row[3],
-                    "return_on": row[4],
-                    "price": row[5],
-                    "status": row[6],
-                    "quantity": row[7],
-                    "console": row[8]
-                })
-
-            return transactions
+                    SELECT ID, user_name, game_name, rented_on, return_on,
+                        total_price, status, quantity, game_console
+                    FROM transactions
+                    WHERE status LIKE ? COLLATE NOCASE
+                    ORDER BY ID DESC
+                    LIMIT 10 OFFSET ?
+                """, (status_filter_format, offset ))
+                rows = cursor.fetchall()
+            return [
+                {
+                    "id": r[0],
+                    "name": r[1],
+                    "title": r[2],
+                    "rented_on": r[3],
+                    "return_on": r[4],
+                    "price": r[5],
+                    "status": r[6],
+                    "quantity": r[7],
+                    "console": r[8],
+                }
+                for r in rows
+            ]
         except sqlite3.Error as err:
             print(err)
             return None

@@ -3,6 +3,7 @@ import { API_URL } from "../../API/config";
 import Transaction_action from "./Transaction_Action";
 import DeleteConfirmTransaction from "./delete_confirmation_transactions";
 import ApproveConfirmTransaction from "./confirmations/approve_confirm_transaction";
+import DenyTransaction from "./confirmations/deny_transaction";
 
 type Rental = {
   id: number;
@@ -25,16 +26,24 @@ export default function Trasactions_Dashboard() {
   const [rentalEdit, setRentalEdit] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [approveConfirm, setApproveConfirm] = useState(false);
+  const [denyConfirm, setDenyConfirm] = useState(false);
 
-  async function fetchRentals() {
-    const res = await fetch(`${API_URL}/admin/transactions`, {
-      method: "GET",
-      credentials: "include",
-    });
-    if (!res.ok) return;
-    const data = await res.json();
-    setRentalsData(data);
-  }
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+async function fetchRentals(p = 1, status = activeTab) {
+
+    const statusFilter = 
+      status === "All Trasactions" ? "" : status;
+
+  const res = await fetch(`${API_URL}/admin/transactions?page=${p}&filterby=${statusFilter}`, {
+    credentials: "include",
+  });
+  const data = await res.json();
+
+  setRentalsData(data);
+  setHasMore(data.length === 10);
+}
 
   useEffect(() => {
     fetchRentals();
@@ -50,26 +59,35 @@ export default function Trasactions_Dashboard() {
       <div className="flex flex-col gap-6">
         <div className="adminpage-dashboard-titles">
           <h1>Trasactions</h1>
+
+          {/* button needs styling */}
+          <button
+            className="text-white text-right rounded-full bg-transparent"
+            onClick={() => {setRentalsData([]); fetchRentals() }}>refresh</button>
           <p className="rental-p text-sm">{rentalsData?.length} Rentals found</p>
         </div>
 
         {/* Filter Buttons */}
         <div className="flex gap-3 w-full text-left xl:w-[40%]">
-          {(["All Trasactions", "Pending", "Approved"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`
-                adminpage-rental-filter
-                ${
-                  activeTab === tab
-                    ? "shadow-md adminpage-rentals-active"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-            >
-              {tab}
-            </button>
-          ))}
+{(["All Trasactions", "Pending", "Approved"] as const).map((tab) => (
+  <button
+    key={tab}
+    onClick={() => {
+      setActiveTab(tab);
+      setPage(1);
+      fetchRentals(1, tab);
+    }}
+    className={`
+      adminpage-rental-filter
+      ${
+        activeTab === tab
+          ? "shadow-md adminpage-rentals-active"
+          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+      }`}
+  >
+    {tab}
+  </button>
+))}
         </div>
 
         <div className="adminpage-rental-headers rounded-xl shadow-md relative">
@@ -181,7 +199,7 @@ export default function Trasactions_Dashboard() {
                       </button>
 
                       <button
-                        onClick={() => {}}
+                        onClick={() => {setDenyConfirm(true)}}
                         className="
                         adminpage-rentals-delete_btn
                         block
@@ -235,6 +253,38 @@ export default function Trasactions_Dashboard() {
             )}
           </div>
         </div>
+
+<div className="flex justify-center mt-6">
+  <button
+    className="text-white"
+    onClick={() => {
+      if (page > 1) {
+        const newPage = page - 1;
+        setPage(newPage);
+        fetchRentals(newPage, activeTab);
+      }
+    }}
+    disabled={page === 1}
+  >
+    Previous
+  </button>
+
+  <span className="px-3">{page}</span>
+
+  <button
+    className="text-white"
+    onClick={() => {
+      if (hasMore) {
+        const newPage = page + 1;
+        setPage(newPage);
+        fetchRentals(newPage, activeTab);
+      }
+    }}
+    disabled={!hasMore}
+  >
+    Next
+  </button>
+</div>
       </div>
 
       {rentalEdit && (
@@ -256,6 +306,14 @@ export default function Trasactions_Dashboard() {
           id={rentalsData.find(r => r.id === openDropdownId)?.id ?? 0}
           total_cost={rentalsData.find(r => r.id === openDropdownId)?.price ?? 0}
           cancelbtn={() => setApproveConfirm(false)}
+          refetchRentalData={() => { fetchRentals(); setOpenDropdownId(null) } }
+        />
+      )}
+
+      {denyConfirm && (
+      <DenyTransaction
+          id={rentalsData.find(r => r.id === openDropdownId)?.id ?? 0}
+          cancelbtn={() => setDenyConfirm(false)}
           refetchRentalData={() => { fetchRentals(); setOpenDropdownId(null) } }
         />
       )}

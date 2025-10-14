@@ -1,4 +1,3 @@
-import random
 import smtplib
 import bcrypt
 from pydantic import BaseModel
