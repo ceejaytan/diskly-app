@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import APIRouter, Cookie, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Cookie, File, Form, HTTPException, Query, UploadFile
 from fastapi.responses import JSONResponse
 from ..Sql import SqlAdmin
 from ..Validations import AdminValidations
@@ -41,14 +41,16 @@ def view_rental_detail(
 
 @router.get("/transactions")
 def view_transactions(
-    logged_in: str = Cookie(None)
+    logged_in: str = Cookie(None),
+    page: int = Query(1, ge=1),
+    filterby: str = ""
 ):
     print("viewing transactions")
     if not logged_in or logged_in != "0f32c0fe13ad509e1a2fadbe72d5ad8f7fae769c332d0e34c9ef0fba0cebacb9":
         print("not an admin")
         raise HTTPException(status_code=400, detail="Your not an admin")
 
-    return SqlAdmin.view_transactions()
+    return SqlAdmin.view_transactions(page, filterby)
 
 
 @router.post("/approve-transaction")
@@ -60,6 +62,14 @@ def approve_transaction(
 
     SqlAdmin.approve_transaction(id)
     SqlAdmin.insertinto_rentals(id)
+
+@router.post("/deny-transaction")
+def deny_transaction(
+    logged_in: str = Cookie(None),
+    id: int = 0
+):
+    print("denying transaction...")
+    SqlAdmin.deny_transaction(id)
 
 
 

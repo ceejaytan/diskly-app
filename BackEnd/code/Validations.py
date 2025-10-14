@@ -46,11 +46,7 @@ class AdminValidations:
         old_image_path: str | None = None
     ) -> str:
         """
-        Validates, saves, and optionally replaces an existing game cover image.
-
-        image_file_name: base name (usually the game title)
-        old_image_path: previous cover path to delete if a new file replaces it
-        Returns the new image path or "" if invalid.
+        I have no idea
         """
         if image.filename is None:
             return ""
@@ -64,16 +60,16 @@ class AdminValidations:
             print(err)
             return ""
 
-        safe_name = "".join(c for c in image_file_name if c.isalnum() or c in (" ", "-", "_")).strip()
-        safe_name = safe_name.replace(" ", "_")
-        file_name = f"{safe_name}.{file_extension}"
+        # safe_name = "".join(c for c in image_file_name if c.isalnum() or c in (" ", "-", "_")).strip()
+        # safe_name = safe_name.replace(" ", "_")
+        file_name = f"{image_file_name}.{file_extension}"
         image_dir = "images/gamecover"
         os.makedirs(image_dir, exist_ok=True)
         image_path = os.path.join(image_dir, file_name)
 
         counter = 1
         while os.path.isfile(image_path):
-            image_path = os.path.join(image_dir, f"{safe_name}_copy{counter}.{file_extension}")
+            image_path = os.path.join(image_dir, f"{image_file_name}_copy{counter}.{file_extension}")
             counter += 1
 
         try:
