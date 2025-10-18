@@ -178,15 +178,15 @@ export default function Rentals_Dashboard() {
                       </button>
                       )}
 
-                      <button 
-                        onClick={() => setDeleteConfirm(true)}
-                        className="
-                        adminpage-rentals-delete_btn
-                        w-full
-                        text-left
-                        ">
-                        Delete
-                      </button>
+                      {/* <button  */}
+                      {/*   onClick={() => setDeleteConfirm(true)} */}
+                      {/*   className=" */}
+                      {/*   adminpage-rentals-delete_btn */}
+                      {/*   w-full */}
+                      {/*   text-left */}
+                      {/*   "> */}
+                      {/*   Delete */}
+                      {/* </button> */}
                       <button
                         onClick={() => setRental_Summary(true)}
                         className="

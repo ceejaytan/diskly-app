@@ -60,6 +60,14 @@
   margin-top: -25px;
 }
 
+.adminpage-transaction-page-count{
+  padding: 0 30px;
+  justify-content: center;
+  align-items: center;
+  padding-top: 6px;
+
+}
+
 /* ---------------------------- */
 
 .rental-dashboard{
@@ -85,10 +93,15 @@
   background: transparent;
 }
 
+.adminpage-nextprev{
+  margin-bottom: 50px;
+}
+
 
 .adminpage-rental-headers{
   background: transparent;
   padding: 0 10px;
+  margin-bottom: 50px;
 }
 
 .adminpage-rental-headers-fix{

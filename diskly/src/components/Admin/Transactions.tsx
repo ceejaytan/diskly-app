@@ -54,6 +54,15 @@ async function fetchRentals(p = 1, status = activeTab) {
       ? rentalsData
       : rentalsData.filter((r) => r.status === activeTab);
 
+
+
+useEffect(() => {
+  const handleScroll = () => setOpenDropdownId(null);
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  return () => window.removeEventListener('scroll', handleScroll);
+}, []);
+
+
   return (
     <main className="rental-dashboard flex-1">
       <div className="flex flex-col gap-6">
@@ -213,15 +222,15 @@ async function fetchRentals(p = 1, status = activeTab) {
                       )}
 
 
-                      <button 
-                        onClick={() => setDeleteConfirm(true)}
-                        className="
-                        adminpage-rentals-delete_btn
-                        w-full
-                        text-left
-                        ">
-                        Delete
-                      </button>
+                      {/* <button  */}
+                      {/*   onClick={() => setDeleteConfirm(true)} */}
+                      {/*   className=" */}
+                      {/*   adminpage-rentals-delete_btn */}
+                      {/*   w-full */}
+                      {/*   text-left */}
+                      {/*   "> */}
+                      {/*   Delete */}
+                      {/* </button> */}
 
                       <button
                         onClick={() => setRentalEdit(true)}
@@ -233,13 +242,19 @@ async function fetchRentals(p = 1, status = activeTab) {
                         ">
                         View more
                       </button>
+
+                      <button
+                      onClick={() => setOpenDropdownId(null)}>
+                       Close 
+                      </button>
                     </div>
                   )}
-                  {/* drop down fix dont touch */}
+
                     {openDropdownId && (
                       <div
-                        onClick={() => setOpenDropdownId(null)}
-                        className="fixed inset-0 z-[5] bg-transparent"
+                      onTouchStart={() => setOpenDropdownId(null)}
+                      onMouseDown={() => setOpenDropdownId(null)}
+                      className="fixed inset-0 z-[5] bg-black/5"
                       />
                     )}
                 </div>
@@ -254,37 +269,37 @@ async function fetchRentals(p = 1, status = activeTab) {
           </div>
         </div>
 
-<div className="flex justify-center mt-6">
-  <button
-    className="text-white"
-    onClick={() => {
-      if (page > 1) {
-        const newPage = page - 1;
-        setPage(newPage);
-        fetchRentals(newPage, activeTab);
-      }
-    }}
-    disabled={page === 1}
-  >
-    Previous
-  </button>
+        <div className="adminpage-nextprev flex justify-center">
+          <button
+            className="text-white"
+            onClick={() => {
+              if (page > 1) {
+                const newPage = page - 1;
+                setPage(newPage);
+                fetchRentals(newPage, activeTab);
+              }
+            }}
+            disabled={page === 1}
+          >
+            { '<' }
+          </button>
 
-  <span className="px-3">{page}</span>
+          <span className="adminpage-transaction-page-count">{page}</span>
 
-  <button
-    className="text-white"
-    onClick={() => {
-      if (hasMore) {
-        const newPage = page + 1;
-        setPage(newPage);
-        fetchRentals(newPage, activeTab);
-      }
-    }}
-    disabled={!hasMore}
-  >
-    Next
-  </button>
-</div>
+          <button
+            className="text-white"
+            onClick={() => {
+              if (hasMore) {
+                const newPage = page + 1;
+                setPage(newPage);
+                fetchRentals(newPage, activeTab);
+              }
+            }}
+            disabled={!hasMore}
+          >
+            { '>' }
+          </button>
+        </div>
       </div>
 
       {rentalEdit && (
