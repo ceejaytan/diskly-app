@@ -79,7 +79,7 @@ export default function Edit_CD({game_id, cancelbtn}:more_boilerplate_because_re
       return;
     }
     const numval = Number(val);
-    if (/^\d*$/.test(val) && numval > -1 && val !== "0" && val < 2147483647) {
+    if (/^\d+(\.\d{0,2})?$/.test(val) && numval > -1 && val !== "0" && val < 2147483647) {
       setPrice(val)
       setPriceValid(true);
     }

@@ -232,7 +232,7 @@ class SqlAdmin:
 
 
     @staticmethod
-    def view_rentals():
+    def view_rentals(page: int, status_filter: str = "", searchbyname: str = "", searchbygame: str = "", searchbydate: str = ""):
         """Mark overdue rentals using SQL, then return all rows."""
         manila_time = ZoneInfo("Asia/Manila")
         now_ph = datetime.now(manila_time).isoformat()
@@ -249,11 +249,22 @@ class SqlAdmin:
                 """, (now_ph,))
                 conn.commit()
 
+
+                status_filter_format = f"%{status_filter}%"
+                searchbyname_format = f"%{searchbyname}%"
+                searchbygame_format = f"%{searchbygame}%"
+                searchbydate_format = f"%{searchbydate}%"
+                offset = (page - 1) * 10
+
                 cursor.execute("""
                     SELECT ID, user_name, game_name, rented_on, return_on, total_price, status, transaction_id, game_id
                     FROM rentals
+                    WHERE status LIKE ? COLLATE NOCASE
+                    AND ( user_name LIKE ? COLLATE NOCASE AND game_name LIKE ? COLLATE NOCASE )
+                    AND ( rented_on LIKE ? COLLATE NOCASE )
                     ORDER BY ID desc
-                """)
+                    LIMIT 10 OFFSET ?
+                """, (status_filter_format, searchbyname_format, searchbygame_format, searchbydate_format, offset))
                 rows = cursor.fetchall()
 
                 return [
@@ -429,21 +440,42 @@ class SqlAdmin:
 
 
     @staticmethod
-    def view_transactions(page: int, status_filter: str = ""):
+    def view_transactions(page: int, status_filter: str = "", searchbyname: str = "", searchbygame: str = "", searchbydate: str = ""):
         """view transactions for admin dashboard transactions page"""
+
+        manila_time = ZoneInfo("Asia/Manila")
+        now_ph = datetime.now(manila_time).isoformat()
+
         status_filter_format = f"%{status_filter}%"
+        searchbyname_format = f"%{searchbyname}%"
+        searchbygame_format = f"%{searchbygame}%"
+        searchbydate_format = f"%{searchbydate}%"
+        offset = (page - 1) * 10
         try:
-            offset = (page - 1) * 10
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
+
+                cursor.execute("""
+                    UPDATE transactions
+                    SET status = 'Denied'
+                    WHERE status = 'Pending' AND return_on < ?
+                """, (now_ph,))
+                conn.commit()
+
                 cursor.execute("""
                     SELECT ID, user_name, game_name, rented_on, return_on,
-                        total_price, status, quantity, game_console
+                               total_price, status, quantity, game_console,
+                                ( SELECT SUM(total_price)
+                                FROM transactions
+                                WHERE status LIKE ? COLLATE NOCASE
+                                ) AS total_transactions
                     FROM transactions
                     WHERE status LIKE ? COLLATE NOCASE
+                    AND ( user_name LIKE ? COLLATE NOCASE AND game_name LIKE ? COLLATE NOCASE )
+                    AND ( rented_on LIKE ? COLLATE NOCASE )
                     ORDER BY ID DESC
                     LIMIT 10 OFFSET ?
-                """, (status_filter_format, offset ))
+                """, (status_filter_format, status_filter_format, searchbyname_format, searchbygame_format, searchbydate_format, offset ))
                 rows = cursor.fetchall()
             return [
                 {
@@ -456,6 +488,7 @@ class SqlAdmin:
                     "status": r[6],
                     "quantity": r[7],
                     "console": r[8],
+                    "total_transactions": r[9],
                 }
                 for r in rows
             ]
@@ -495,37 +528,53 @@ class SqlAdmin:
 
 
     @staticmethod
-    def view_games():
-        """View game titles for admin dashboard stock page"""
+    def view_games(page: int, console_filter: str = "", searchbygame: str = "", searchbydate: str = ""):
+        """View game titles for admin dashboard stock page with filters and pagination"""
         try:
+            offset = (page - 1) * 10
+            searchbygame_format = f"%{searchbygame}%"
+            searchbydate_format = f"%{searchbydate}%"
+            console_filter_format = f"%{console_filter}%"
+
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
-            # what the f is this??
-            # its pretty good tho
+
                 cursor.execute("""
                     SELECT
                         g.ID,
                         g.game_name,
                         g.date_added,
+                        g.platform,
                         g.total_stocks,
                         IFNULL(SUM(r.quantity), 0) AS rented_quantity
                     FROM game_catalog g
                     LEFT JOIN rentals r
                         ON g.ID = r.game_id
-                        AND ( r.status = 'Ongoing' OR r.status = 'Overdue' )
+                        AND (r.status = 'Ongoing' OR r.status = 'Overdue')
+                    WHERE g.game_name LIKE ? COLLATE NOCASE
+                    AND g.date_added LIKE ? COLLATE NOCASE
+                    AND g.platform LIKE ? COLLATE NOCASE
                     GROUP BY g.ID
-                """)
+                    ORDER BY g.ID DESC
+                    LIMIT 10 OFFSET ?
+                """, (
+                    searchbygame_format,
+                    searchbydate_format,
+                    console_filter_format,
+                    offset
+                ))
 
                 rows = cursor.fetchall()
 
                 gametitles = []
                 for row in rows:
-                    game_id, name, date_added, total, rented = row
+                    game_id, name, date_added, console, total, rented = row
                     remaining = max(total - rented, 0)
                     gametitles.append({
                         "id": game_id,
                         "Title": name,
                         "Date_Added": date_added,
+                        "Console": console,
                         "Quantity": f"{remaining}/{total}",
                         "status": "Available" if remaining > 0 else "Out of Stock"
                     })
@@ -594,8 +643,8 @@ class SqlAdmin:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    INSERT INTO game_catalog (game_name, platform, price_to_rent, total_stocks, cover_image_path, date_added)
-                    VALUES ( ?, ?, ?, ?, ?, ?)
+                    INSERT INTO game_catalog (game_name, platform, price_to_rent, total_stocks, cover_image_path, date_added, currently_rented)
+                    VALUES ( ?, ?, ?, ?, ?, ?, 0)
                                """, 
                     (game_info.game_name, game_info.platform, game_info.price, game_info.quantity, cover_image_path, datetime.now(manila_time))
                                      )
@@ -673,6 +722,31 @@ class SqlAdmin:
         except sqlite3.Error as err:
             print(err)
 
+
+    @staticmethod
+    def check_if_can_delete_game(game_id: int) -> bool:
+        """Check if game can be deleted (no ongoing rentals)"""
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                SELECT 1 FROM game_catalog
+                WHERE ID = ? 
+                AND ( currently_rented = 0 OR currently_rented IS NULL )
+                """,(game_id, ))
+
+                row = cursor.fetchone()
+
+                if row is None:
+                    return False
+
+                return True
+
+        except sqlite3.Error as err:
+            print(err)
+            return False
+
+
     @staticmethod
     def delete_game(id: int) -> bool:
         """Admin delete game from table game_catalog"""
@@ -688,6 +762,59 @@ class SqlAdmin:
         except sqlite3.Error as err:
             print(err)
             return False
+
+
+    @staticmethod
+    def view_customers(
+        page: int,
+        searchbyname: str = "",
+        searchbyemail: str = "",
+        searchbycontact: str = ""
+    ):
+        """View customers for admin dashboard customers page with filters and pagination"""
+        try:
+            offset = (page - 1) * 10
+            searchbyname_format = f"%{searchbyname}%"
+            searchbyemail_format = f"%{searchbyemail}%"
+            searchbycontact_format = f"%{searchbycontact}%"
+
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT ID, NAME, EMAIL, first_name, last_name, birthday, contact
+                    FROM accounts
+                    WHERE NAME LIKE ? COLLATE NOCASE
+                    AND EMAIL LIKE ? COLLATE NOCASE
+                    AND CONTACT LIKE ? COLLATE NOCASE
+                    AND NAME != 'admin'
+                    ORDER BY ID DESC
+                    LIMIT 10 OFFSET ?
+                """, (
+                    searchbyname_format,
+                    searchbyemail_format,
+                    searchbycontact_format,
+                    offset
+                ))
+
+                rows = cursor.fetchall()
+
+                customers = []
+                for row in rows:
+                    customers.append({
+                        "id": row[0],
+                        "username": row[1],
+                        "email": row[2],
+                        "first_name": row[3],
+                        "last_name": row[4],
+                        "birthday": row[5],
+                        "contact": row[6],
+                    })
+
+                return customers
+
+        except sqlite3.Error as err:
+            print("Database error:", err)
+            return None
 
 
 
@@ -769,6 +896,34 @@ class SqlGameCatalog_API:
         except sqlite3.Error as err:
             print(err)
             return None
+
+
+    @staticmethod
+    def check_rent_info_before_transaction(game_id, quantity):
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                SELECT total_stocks, IFNULL(currently_rented, 0) FROM game_catalog
+                WHERE ID = ?
+                """, (game_id,))
+
+                row = cursor.fetchone()
+
+                if row is None:
+                    return False
+
+                total_stocks, currently_rented = row
+                available_stocks = total_stocks - currently_rented
+
+                if quantity > available_stocks:
+                    return False
+
+                return True
+
+        except sqlite3.Error as err:
+            print(err)
+            return False
 
 
     @staticmethod

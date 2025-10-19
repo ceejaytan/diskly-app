@@ -45,7 +45,26 @@ class Accounts:
 
     @staticmethod
     def send_reset_pass(email: str, code: str) -> str:
-        msg = MIMEText(f"Your password reset code is: {code}")
+        msg = MIMEText(
+        f"""
+        <html>
+        <body>
+            <p>Hello,</p>
+            <p>We received a request to reset your password.</p>
+            <p>Here is your verification code:</p>
+            <br>
+            <h1>{code}</h1>
+            <br>
+            <p>If you didn’t request this, please ignore this email.</p>
+            <br>
+            <p>------------------</p>
+            <p>This message was sent as part of a school project for educational purposes.</p>
+            <p><a href="https://diskly-mockup.web.app">https://diskly-mockup.web.app</a></p>
+        </body>
+        </html>
+        """,
+        "html"
+        )
         msg["Subject"] = "Password Reset"
         msg["From"] = Accounts.forget_pass_email
         msg["To"] = email

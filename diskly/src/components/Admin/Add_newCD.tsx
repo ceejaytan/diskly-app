@@ -63,7 +63,7 @@ export default function Add_newCD({cancelbtn}:more_boilerplate_because_reactjs_m
       return;
     }
     const numval = Number(val);
-    if (/^\d*$/.test(val) && numval > -1 && val !== "0" && val < 2147483647) {
+    if (/^\d+(\.\d{0,2})?$/.test(val) && numval > -1 && val !== "0" && val < 2147483647) {
       setPrice(val)
       setPriceValid(true);
     }

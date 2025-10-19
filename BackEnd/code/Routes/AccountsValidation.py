@@ -11,8 +11,8 @@ router = APIRouter()
 
 cookie_setting = {
     "httponly":True,
-    "secure":False,
-    "samesite":"lax",
+    "secure":True,
+    "samesite":"none",
 }
 
 @router.get("/")
@@ -135,7 +135,6 @@ def forget_password_sendcode(
 ):
     print("forget password send code")
 
-
     session_token = secrets.token_hex(16)
     credentials.set_cookie(
             key="reset_pass",
@@ -149,6 +148,7 @@ def forget_password_sendcode(
     background_task.add_task(Accounts.send_reset_pass, email, code)
     SqlAccounts.store_reset_password(email, code, session_token)
     return {"sent code"}
+
 
 @router.post("/forget-password-verify")
 def forget_password_verify(
