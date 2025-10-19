@@ -28,24 +28,55 @@ export default function Rentals_Dashboard() {
   const [rental_Summary, setRental_Summary] = useState(false);
   const [confirmReturned, setConfirmReturned] = useState(false);
 
-  async function fetchRentals() {
-    const res = await fetch(`${API_URL}/admin/rentals`, {
-      method: "GET",
+
+  const [searchByUsername, setSearchByUsername] = useState("");
+  const [searchByGame, setSearchByGame] = useState("");
+  const [searchByDate, setSearchByDate] = useState("");
+
+
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  async function fetchRentals(status = activeTab) {
+
+    const statusFilter =
+      status === "All Rentals" ? "" : status;
+
+    const res = await fetch(`${API_URL}/admin/rentals?page=${page}&filterby=${statusFilter}&searchbyname=${searchByUsername}&searchbygame=${searchByGame}&searchbydate=${searchByDate}`, {
       credentials: "include",
     });
-    if (!res.ok) return;
     const data = await res.json();
+
+  if (Array.isArray(data)) {
     setRentalsData(data);
+    setHasMore(data.length === 10);
+  } else {
+    setRentalsData([]);
+    setHasMore(false);
+  }
   }
 
   useEffect(() => {
-    fetchRentals();
-  }, []);
+    fetchRentals(activeTab);
+  }, [page, activeTab, searchByUsername, searchByGame, searchByDate]);
 
   const filteredRentals =
     activeTab === "All Rentals"
       ? rentalsData
       : rentalsData.filter((r) => r.status === activeTab);
+
+
+  function digits_only_page(e: any){
+    const val = e.target.value
+    if (val === ""){
+      setPage(0);
+      return;
+    }
+    const numval = Number(val);
+    if (/^\d+(\.\d{0,2})?$/.test(val) && numval > 0 && val < 2147483648) {
+      setPage(numval);
+    }
+  }
 
   return (
     <main className="stocks-dashboard rental-dashboard flex-1">
@@ -53,14 +84,84 @@ export default function Rentals_Dashboard() {
         <div className="adminpage-dashboard-titles">
           <h1>Rentals</h1>
           <p className="rental-p text-sm">{rentalsData?.length} Rentals found</p>
+          
+          </div>
+
+        <div className="flex gap-3 ">
+          <input
+            value={searchByUsername}
+            onChange={(e) => {
+              setSearchByUsername(e.target.value)
+              setPage(1);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setPage(1);
+              }}}
+            type="text"
+            className="
+            border-2
+            "
+            placeholder="search by username"
+          />
+          <input
+            value={searchByGame}
+            onChange={(e) => {
+              setSearchByGame(e.target.value)
+              setPage(1);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setPage(1);
+              }}}
+            type="text"
+            className="
+            border-2
+            "
+            placeholder="search by game name"
+          />
+          <input
+            value={searchByDate}
+            onChange={(e) => {
+              setSearchByDate(e.target.value)
+              setPage(1);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setPage(1);
+              }}}
+            type="date"
+            className="
+            border-2
+            "
+          />
+          <button
+            onClick={() => {
+              setSearchByUsername("");
+              setSearchByGame("");
+              setSearchByDate("");
+              setPage(1);
+            }}
+            className="text-white"
+            >
+            clear
+          </button>
+
+          <button
+            className="text-white text-right rounded-full bg-transparent"
+            onClick={() => {setRentalsData([]); fetchRentals() }}>refresh</button>
         </div>
+
 
         {/* Filter Buttons */}
         <div className="flex gap-3 w-full text-left xl:w-[40%]">
           {(["All Rentals", "Ongoing", "Returned", "Overdue"] as const).map((tab) => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => {
+                setActiveTab(tab);
+                setPage(1);
+              }}
               className={`
                 adminpage-rental-filter
                 ${
@@ -74,6 +175,10 @@ export default function Rentals_Dashboard() {
           ))}
         </div>
 
+        </div>
+
+
+
         <div className="adminpage-rental-headers rounded-xl shadow-md relative">
           <div
             className="
@@ -84,7 +189,7 @@ export default function Rentals_Dashboard() {
           >
             <div>User</div>
             <div>Title</div>
-            <div>Date</div>
+            <div>Date Rented</div>
             <div>Price</div>
             <div>Status</div>
             <div>Action</div>
@@ -94,11 +199,15 @@ export default function Rentals_Dashboard() {
             {filteredRentals.map((rental) => (
               <div
                 key={rental.id}
-                className="
+                className={`
                   adminpage-rentals-individual-rows
                   grid grid-cols-[2fr_2fr_1fr_1fr_1fr_auto]
-                  items-center rounded-[17px] border bg-white relative
-                "
+                  items-center rounded-[17px] border relative
+                  ${rental.status === "Returned"
+                    ? "bg-black/15"
+                    : "bg-white"
+                    }
+                `}
               >
                 {/* Name */}
                 <div className="flex items-center gap-3">
@@ -199,11 +308,12 @@ export default function Rentals_Dashboard() {
                       </button>
                     </div>
                   )}
-                  {/* drop down fix dont touch */}
+
                     {openDropdownId && (
                       <div
-                        onClick={() => setOpenDropdownId(null)}
-                        className="fixed inset-0 z-[5] bg-transparent"
+                      onTouchStart={() => setOpenDropdownId(null)}
+                      onMouseDown={() => setOpenDropdownId(null)}
+                      className="fixed inset-0 z-[5] bg-black/5"
                       />
                     )}
                 </div>
@@ -216,8 +326,49 @@ export default function Rentals_Dashboard() {
               </div>
             )}
           </div>
+
         </div>
-      </div>
+
+        <div className="adminpage-nextprev flex justify-center items-center gap-4">
+          <button
+            className={`text-white transition-opacity duration-200 ${
+              page === 1 ? "adminpage-nextprev-disabled" : ""
+            }`}
+            onClick={() => {
+              if (page > 1) {
+                const newPage = page - 1;
+                setPage(newPage);
+              }
+            }}
+            disabled={page === 1}
+          >
+            {"<"}
+          </button>
+
+            <input
+              value={page === 0 ? "" : page}
+              onChange={digits_only_page}
+              onBlur={() => {
+                if (page === 0) setPage(1);
+              }}
+              className="adminpage-transaction-page-count"
+            />
+
+          <button
+            className={`text-white transition-opacity duration-200 ${
+              !hasMore ? "adminpage-nextprev-disabled" : "opacity-100"
+            }`}
+            onClick={() => {
+              if (hasMore) {
+                const newPage = page + 1;
+                setPage(newPage);
+              }
+            }}
+            disabled={!hasMore}
+          >
+            {">"}
+          </button>
+        </div>
 
       {confirmReturned && (
       <ConfirmReturned

@@ -34,13 +34,16 @@ export default async function Submit_Rental_Form(
     });
     if (!res.ok){
       console.log("failed to submit rent");
+      return false;
     }
 
-  const data = await res.json();
-  console.log(data);
+    const data = await res.json();
+    console.log(data);
+    return true;
 
   } catch (error) {
     console.log(error)
+      return false;
   }
 
 }

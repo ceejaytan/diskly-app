@@ -31,7 +31,9 @@ export default function Rental_form({userinfo, info, cancelbtn }: more_boilerpla
   const [Return_Date_Message, setReturn_Date_Message] = useState("");
   const [Quantity, setQuantity] = useState("1");
   const [quantityValid, setQuantityValid] = useState(true);
-  const [rentTotal, setRentTotal] = useState(info?.total ?? 1);
+  const [rentTotal, setRentTotal] = useState(info?.total ?? 0);
+
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 useEffect(() => {
   if (!Return_Date || !info?.rental_start_date) {
@@ -102,13 +104,15 @@ useEffect(() => {
   const [agree_TermsCondition, setAgree_TermsCondition] = useState(false);
   const [agree_Late_Fee, setAgree_Late_Fee] = useState(false);
 
+  const [success, setSuccess] = useState(false);
 
-function submitForm(e:any) {
+
+async function submitForm(e:any) {
     e.preventDefault()
   if (!info || !userinfo) return;
   
 
-  Submit_Rental_Form({
+  const success = await Submit_Rental_Form({
     userid: userinfo.userid,
     username: userinfo.username,
     game_id: info.game_id,
@@ -119,14 +123,18 @@ function submitForm(e:any) {
     quantity: Number(Quantity),
     total_cost: rentTotal,
   });
-  setRentalForm_Submitted(true)
+    setSuccess(success);
+    setRentalForm_Submitted(true)
 }
 
   if (rentalForm_submitted){
     return(
     <>
-        <Rental_Form_Message_Success cancelbtn={() => {cancelbtn(); setRentalForm_Submitted(false)}}></Rental_Form_Message_Success>
-
+        <Rental_Form_Message_Success 
+          success={success}
+          cancelbtn={() => {cancelbtn(); setRentalForm_Submitted(false)}}
+          refreshbtn={() => {window.location.reload()}}
+        />
     </>
     )
   }

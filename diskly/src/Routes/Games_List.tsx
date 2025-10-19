@@ -60,8 +60,8 @@ export default function GamesPage() {
   const [gameRentInfo, setGameRentInfo] = useState<game_rent_info>(null);
 
   function openRentForm(){
-
     setShowRentalForm(!showRentalForm);
+    setGameRentInfo(null);
   }
 
   async function fetch_game_info(game_id: number){

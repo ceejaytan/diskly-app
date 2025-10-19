@@ -11,10 +11,21 @@ router = APIRouter()
 
 @router.get("/rentals")
 def view_rentals(
-    logged_in: str = Cookie(None)
+    logged_in: str = Cookie(None),
+    page: int = Query(1, ge=1),
+    filterby: str = "",
+    searchbyname: str = "",
+    searchbygame: str = "",
+    searchbydate: str = ""
 ):
     print("viewing rentals")
-    return SqlAdmin.view_rentals()
+    return SqlAdmin.view_rentals(
+        page,
+        filterby.strip(),
+        searchbyname.strip(),
+        searchbygame.strip(),
+        searchbydate.strip()
+    )
 
 
 @router.post("/delete-rental")
@@ -43,14 +54,23 @@ def view_rental_detail(
 def view_transactions(
     logged_in: str = Cookie(None),
     page: int = Query(1, ge=1),
-    filterby: str = ""
+    filterby: str = "",
+    searchbyname: str = "",
+    searchbygame: str = "",
+    searchbydate: str = "",
 ):
-    print("viewing transactions")
-    if not logged_in or logged_in != "0f32c0fe13ad509e1a2fadbe72d5ad8f7fae769c332d0e34c9ef0fba0cebacb9":
-        print("not an admin")
-        raise HTTPException(status_code=400, detail="Your not an admin")
+    # print("viewing transactions")
+    # if not logged_in or logged_in != "0f32c0fe13ad509e1a2fadbe72d5ad8f7fae769c332d0e34c9ef0fba0cebacb9":
+    #     print("not an admin")
+    #     raise HTTPException(status_code=400, detail="Your not an admin")
 
-    return SqlAdmin.view_transactions(page, filterby)
+    return SqlAdmin.view_transactions(
+        page,
+        filterby.strip(),
+        searchbyname.strip(),
+        searchbygame.strip(),
+        searchbydate.strip()
+    )
 
 
 @router.post("/approve-transaction")
@@ -96,9 +116,19 @@ def view_game_detail(id: int = 0):
 
 
 @router.get("/games")
-def view_games():
+def view_games(
+    page: int = Query(1, ge=1),
+    filterby: str = "",
+    searchbygame: str = "",
+    searchbydate: str = ""
+):
     print("Viewing Games...")
-    return SqlAdmin.view_games()
+    return SqlAdmin.view_games(
+        page,
+        filterby.strip(),
+        searchbygame.strip(),
+        searchbydate.strip()
+    )
 
 
 
@@ -164,13 +194,18 @@ def delete_game(
     game_id: int = 0
 ):
     print("deleting game...")
-
     if not logged_in or logged_in != "0f32c0fe13ad509e1a2fadbe72d5ad8f7fae769c332d0e34c9ef0fba0cebacb9":
         print("not an admin")
         raise HTTPException(status_code=400, detail="Your not an admin")
 
-    SqlAdmin.delete_game(game_id)
-    return JSONResponse(status_code=200, content="deleted succesfully")
+    if SqlAdmin.check_if_can_delete_game(game_id):
+        SqlAdmin.delete_game(game_id)
+        return JSONResponse(status_code=200, content="deleted succesfully")
+    else:
+        raise HTTPException(status_code=400, detail="Cannot delete game, there are active rentals for this game.")
+
+
+
 
 
 @router.get("/Transactions-more-info")
@@ -185,3 +220,20 @@ def return_rental(
 ):
     SqlAdmin.confirm_return(id)
     return {"returned"}
+
+
+@router.get("/customers")
+def view_customers(
+    page: int = Query(1, ge=1),
+    searchbyname: str = "",
+    searchbyemail: str = "",
+    searchbycontact: str = "",
+    searchbydate: str = ""
+):
+    print("Viewing Customers...")
+    return SqlAdmin.view_customers(
+        page,
+        searchbyname.strip(),
+        searchbyemail.strip(),
+        searchbycontact.strip(),
+    )

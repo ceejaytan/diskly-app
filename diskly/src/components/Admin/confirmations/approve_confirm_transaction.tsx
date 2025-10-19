@@ -36,6 +36,8 @@ async function approve_rental(id: number){
             </h1>
             <p>Make sure user has paid the following ₱{total_cost}</p>
 
+            <small>( Note that others "Pending" Transactions will get auto denied if there's not enough stocks. )</small>
+
             <div className="flex gap-4 w-full justify-center">
               <button
                 type="button"

@@ -15,6 +15,7 @@ type Rental = {
   status: "Pending" | "Approved" | "Denied";
   quantity: number;
   console: string;
+  total_transactions: number;
 };
 
 
@@ -28,26 +29,35 @@ export default function Trasactions_Dashboard() {
   const [approveConfirm, setApproveConfirm] = useState(false);
   const [denyConfirm, setDenyConfirm] = useState(false);
 
+  const [searchByUsername, setSearchByUsername] = useState("");
+  const [searchByGame, setSearchByGame] = useState("");
+  const [searchByDate, setSearchByDate] = useState("");
+
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-async function fetchRentals(p = 1, status = activeTab) {
+  async function fetchRentals(status = activeTab) {
 
     const statusFilter = 
       status === "All Trasactions" ? "" : status;
 
-  const res = await fetch(`${API_URL}/admin/transactions?page=${p}&filterby=${statusFilter}`, {
-    credentials: "include",
-  });
-  const data = await res.json();
+    const res = await fetch(`${API_URL}/admin/transactions?page=${page}&filterby=${statusFilter}&searchbyname=${searchByUsername}&searchbygame=${searchByGame}&searchbydate=${searchByDate}`, {
+      credentials: "include",
+    });
+    const data = await res.json();
 
-  setRentalsData(data);
-  setHasMore(data.length === 10);
-}
+  if (Array.isArray(data)) {
+    setRentalsData(data);
+    setHasMore(data.length === 10);
+  } else {
+    setRentalsData([]);
+    setHasMore(false);
+  }
+  }
 
   useEffect(() => {
-    fetchRentals();
-  }, []);
+    fetchRentals(activeTab);
+  }, [page, activeTab, searchByUsername, searchByGame, searchByDate]);
 
   const filteredRentals =
     activeTab === "All Trasactions"
@@ -63,40 +73,113 @@ useEffect(() => {
 }, []);
 
 
+  function digits_only_page(e: any){
+    const val = e.target.value
+    if (val === ""){
+      setPage(0);
+      return;
+    }
+    const numval = Number(val);
+    if (/^\d+(\.\d{0,2})?$/.test(val) && numval > 0 && val < 2147483648) {
+      setPage(numval);
+    }
+  }
+
+
   return (
     <main className="rental-dashboard flex-1">
       <div className="flex flex-col gap-6">
         <div className="adminpage-dashboard-titles">
           <h1>Trasactions</h1>
+          <p className="rental-p text-sm">{rentalsData?.length} Rentals found</p>
+          </div>
 
-          {/* button needs styling */}
+        <div className="flex gap-3 ">
+          <input
+            value={searchByUsername}
+            onChange={(e) => {
+              setSearchByUsername(e.target.value)
+              setPage(1);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setPage(1);
+              }}}
+            type="text"
+            className="
+            border-2
+            "
+            placeholder="search by username"
+          />
+          <input
+            value={searchByGame}
+            onChange={(e) => {
+              setSearchByGame(e.target.value)
+              setPage(1);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setPage(1);
+              }}}
+            type="text"
+            className="
+            border-2
+            "
+            placeholder="search by game name"
+          />
+          <input
+            value={searchByDate}
+            onChange={(e) => {
+              setSearchByDate(e.target.value)
+              setPage(1);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setPage(1);
+              }}}
+            type="date"
+            className="
+            border-2
+            "
+          />
+          <button
+            onClick={() => {
+              setSearchByUsername("");
+              setSearchByGame("");
+              setSearchByDate("");
+              setPage(1);
+            }}
+            className="text-white"
+            >
+            clear
+          </button>
+
+
           <button
             className="text-white text-right rounded-full bg-transparent"
             onClick={() => {setRentalsData([]); fetchRentals() }}>refresh</button>
-          <p className="rental-p text-sm">{rentalsData?.length} Rentals found</p>
         </div>
 
-        {/* Filter Buttons */}
+
         <div className="flex gap-3 w-full text-left xl:w-[40%]">
-{(["All Trasactions", "Pending", "Approved"] as const).map((tab) => (
-  <button
-    key={tab}
-    onClick={() => {
-      setActiveTab(tab);
-      setPage(1);
-      fetchRentals(1, tab);
-    }}
-    className={`
-      adminpage-rental-filter
-      ${
-        activeTab === tab
-          ? "shadow-md adminpage-rentals-active"
-          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-      }`}
-  >
-    {tab}
-  </button>
-))}
+          {(["All Trasactions", "Pending", "Approved"] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => {
+                setActiveTab(tab);
+                setPage(1);
+              }}
+              className={`
+                adminpage-rental-filter
+                ${
+                  activeTab === tab
+                    ? "shadow-md adminpage-rentals-active"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
 
         <div className="adminpage-rental-headers rounded-xl shadow-md relative">
@@ -109,7 +192,7 @@ useEffect(() => {
           >
             <div>User</div>
             <div>Title</div>
-            <div>Date</div>
+            <div>Date Rented</div>
             <div>Price</div>
             <div>Status</div>
             <div>Action</div>
@@ -119,11 +202,15 @@ useEffect(() => {
             {filteredRentals.map((rental) => (
               <div
                 key={rental.id}
-                className="
+                className={`
                   adminpage-rentals-individual-rows
                   grid grid-cols-[2fr_2fr_1fr_1fr_1fr_auto]
-                  items-center rounded-[17px] border bg-white relative
-                "
+                  items-center rounded-[17px] border relative
+                  ${rental.status === "Pending"
+                    ? "bg-white"
+                    : "bg-black/15"
+                    }
+                  `}
               >
                 {/* Name */}
                 <div className="flex items-center gap-3">
@@ -221,7 +308,6 @@ useEffect(() => {
                       </>
                       )}
 
-
                       {/* <button  */}
                       {/*   onClick={() => setDeleteConfirm(true)} */}
                       {/*   className=" */}
@@ -269,38 +355,49 @@ useEffect(() => {
           </div>
         </div>
 
-        <div className="adminpage-nextprev flex justify-center">
+        </div>
+        <div className="adminpage-nextprev flex justify-center items-center gap-4">
           <button
-            className="text-white"
+            className={`text-white transition-opacity duration-200 ${
+              page === 1 ? "adminpage-nextprev-disabled" : ""
+            }`}
             onClick={() => {
               if (page > 1) {
                 const newPage = page - 1;
                 setPage(newPage);
-                fetchRentals(newPage, activeTab);
               }
             }}
             disabled={page === 1}
           >
-            { '<' }
+            {"<"}
           </button>
 
-          <span className="adminpage-transaction-page-count">{page}</span>
+            <input
+              value={page === 0 ? "" : page}
+              onChange={digits_only_page}
+              onBlur={() => {
+                if (page === 0) setPage(1);
+              }}
+              className="adminpage-transaction-page-count"
+            />
 
           <button
-            className="text-white"
+            className={`text-white transition-opacity duration-200 ${
+              !hasMore ? "adminpage-nextprev-disabled" : "opacity-100"
+            }`}
             onClick={() => {
               if (hasMore) {
                 const newPage = page + 1;
                 setPage(newPage);
-                fetchRentals(newPage, activeTab);
               }
             }}
             disabled={!hasMore}
           >
-            { '>' }
+            {">"}
           </button>
-        </div>
+
       </div>
+        <p>Total Transactions Price from status {activeTab}: ₱{rentalsData[0]?.total_transactions ?? 0}</p>
 
       {rentalEdit && (
       <Transaction_action

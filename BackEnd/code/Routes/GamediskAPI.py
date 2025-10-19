@@ -1,5 +1,6 @@
 from typing import Optional
-from fastapi import APIRouter, Cookie, Form
+from fastapi import APIRouter, Cookie, Form, HTTPException
+from fastapi.responses import JSONResponse
 from ..Sql import SqlGameCatalog_API
 from ..Validations import UserRentals
 
@@ -19,12 +20,16 @@ def rent_info(game_id: int = 0):
 
 @router.post("/submit-rent-form")
 def submit_rent_form(
-        cookie: str = Cookie(None),
+        logged_in: str = Cookie(None),
         request: UserRentals.RentalFormModel = Form(...)
     ):
 
+    print(logged_in)
     print("renting...")
     print(request)
-    SqlGameCatalog_API.save_transcation_info(request)
-    return {"message": "success"}
+    if SqlGameCatalog_API.check_rent_info_before_transaction(request.game_id, request.quantity):
+        SqlGameCatalog_API.save_transcation_info(request)
+        return JSONResponse(status_code=200, content={"message": "info added"})
+    else:
+        raise HTTPException(status_code=400, detail={"message": "not enough stock"})
 

@@ -170,25 +170,24 @@ export default function Transaction_action({editdata, cancelbtn}:more_boilerplat
           </div>
 
 
-          {/* Buttons */}
           <div className="flex flex-col gap-3">
-            <button
-              type="submit"
-              className="
-              rent-form-submitrentalbtn
-              hover:bg-cyan-300
-              disabled:opacity-50
-              disabled:bg-cyan-400/20"
-              disabled={ true }
-            >
-              Update ( doesnt work yet )
-            </button>
+            {/* <button */}
+            {/*   type="submit" */}
+            {/*   className=" */}
+            {/*   rent-form-submitrentalbtn */}
+            {/*   hover:bg-cyan-300 */}
+            {/*   disabled:opacity-50 */}
+            {/*   disabled:bg-cyan-400/20" */}
+            {/*   disabled={ true } */}
+            {/* > */}
+            {/*   Update ( doesnt work yet ) */}
+            {/* </button> */}
             <button
               type="button"
               className="rent-form-cancelbtn hover:bg-cyan-400/10"
               onClick={cancelbtn}
             >
-              Cancel
+              Back
             </button>
           </div>
         </form>
