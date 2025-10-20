@@ -23,10 +23,7 @@ export default function Rental_Summary({transaction_id, rental_status, cancelbtn
   const [rentalsData, setRentalsData] = useState<Rental| null>(null);
 
   async function fetchData(){
-    const res = await fetch(`${API_URL}/admin/view-rental-detail?id=${transaction_id}`, {
-      method: "GET",
-      credentials: "include",
-    });
+    const res = await fetch(`${API_URL}/admin/view-rental-detail?id=${transaction_id}`);
     if (!res.ok) return;
     const data = await res.json();
     setRentalsData(data);

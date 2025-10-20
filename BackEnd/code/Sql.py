@@ -233,7 +233,6 @@ class SqlAdmin:
 
     @staticmethod
     def view_rentals(page: int, status_filter: str = "", searchbyname: str = "", searchbygame: str = "", searchbydate: str = ""):
-        """Mark overdue rentals using SQL, then return all rows."""
         manila_time = ZoneInfo("Asia/Manila")
         now_ph = datetime.now(manila_time).isoformat()
 
