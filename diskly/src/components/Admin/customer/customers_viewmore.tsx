@@ -21,7 +21,7 @@ export default function Customer_ViewMore({user_id, cancelbtn}:more_boilerplate_
   const [customersData, setCustomersData] = useState<Customer_Info| null>(null);
 
   async function fetchData(){
-    const res = await fetch(`${API_URL}/admin/view-rental-detail?id=${user_id}`, {
+    const res = await fetch(`${API_URL}/admin/customer-info?id=${user_id}`, {
       method: "GET",
       credentials: "include",
     });

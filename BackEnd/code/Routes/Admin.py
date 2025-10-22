@@ -236,3 +236,9 @@ def view_customers(
         searchbyemail.strip(),
         searchbycontact.strip(),
     )
+
+
+@router.get("/customer-info")
+def view_customer_info(id: int):
+    print(f"viewing userID: ${id} ")
+    return SqlAdmin.view_customer_info(id)

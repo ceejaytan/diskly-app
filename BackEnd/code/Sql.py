@@ -933,6 +933,34 @@ class SqlAdmin:
             return None
 
 
+    @staticmethod
+    def view_customer_info(id: int):
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                SELECT ID, NAME, EMAIL, first_name, last_name, birthday, contact FROM accounts
+                WHERE ID = ?
+                """, (id,))
+                row = cursor.fetchone()
+                if row is None:
+                    return None
+                row = {
+                    "id": row[0],
+                    "username": row[1],
+                    "email": row[2],
+                    "first_name": row[3],
+                    "last_name": row[4],
+                    "birthday": row[5],
+                    "contact": row[6],
+                }
+                return row
+
+        except sqlite3.Error as err:
+            print(err)
+            return None
+
+
 
 class SqlGameCatalog_API:
 
