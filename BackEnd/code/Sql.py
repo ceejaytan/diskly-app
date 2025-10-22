@@ -49,7 +49,8 @@ class InitializeTables:
                         first_name TEXT,
                         last_name TEXT,
                         birthday DATE,
-                        contact TEXT
+                        contact TEXT,
+                        created_on datetime
                     );
                 """)
 
@@ -191,11 +192,11 @@ class SqlAccounts:
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
-                cursor.execute("SELECT ID, NAME FROM accounts WHERE session_cookie = ?", (session_token,))
+                cursor.execute("SELECT ID, NAME, status FROM accounts WHERE session_cookie = ?", (session_token,))
                 row = cursor.fetchone()
                 if row is None:
                     return None
-                return [ row[0], row[1] ]
+                return [ row[0], row[1], row[2] ]
         except sqlite3.Error as err:
             print(err)
             return None
@@ -210,9 +211,17 @@ class SqlAccounts:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    INSERT INTO accounts(NAME, HASHED_PASSWORD, EMAIL, first_name, last_name, birthday, contact)
-                    VALUES( ?, ?, ?, ?, ?, ?, ? )
-                    """, (request.username.strip(), hashpw_pw, request.email.strip(), request.firstname.strip(), request.lastname.strip(), request.birthday, request.contact.strip()))
+                    INSERT INTO accounts(NAME, HASHED_PASSWORD, EMAIL, first_name, last_name, birthday, contact, created_on)
+                    VALUES( ?, ?, ?, ?, ?, ?, ?, ? )
+                    """, (request.username.strip(),
+                          hashpw_pw,
+                          request.email.strip(),
+                          request.firstname.strip(),
+                          request.lastname.strip(),
+                          request.birthday,
+                          request.contact.strip(),
+                          datetime.now(ZoneInfo("Asia/Manila"))
+                          ))
                 conn.commit()
             return True
         except sqlite3.Error:
@@ -885,7 +894,8 @@ class SqlAdmin:
         page: int,
         searchbyname: str = "",
         searchbyemail: str = "",
-        searchbycontact: str = ""
+        searchbycontact: str = "",
+        searchbystatus: str = "",
     ):
         """View customers for admin dashboard customers page with filters and pagination"""
         try:
@@ -893,22 +903,25 @@ class SqlAdmin:
             searchbyname_format = f"%{searchbyname}%"
             searchbyemail_format = f"%{searchbyemail}%"
             searchbycontact_format = f"%{searchbycontact}%"
+            searchbystatus_format = f"%{searchbystatus}%"
 
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    SELECT ID, NAME, EMAIL, first_name, last_name, birthday, contact
+                    SELECT ID, NAME, EMAIL, first_name, last_name, birthday, contact, status
                     FROM accounts
-                    WHERE NAME LIKE ? COLLATE NOCASE
-                    AND EMAIL LIKE ? COLLATE NOCASE
-                    AND CONTACT LIKE ? COLLATE NOCASE
-                    AND NAME != 'admin'
+                    WHERE ( NAME LIKE ? COLLATE NOCASE )
+                    AND ( EMAIL LIKE ? COLLATE NOCASE )
+                    AND ( CONTACT LIKE ? COLLATE NOCASE )
+                    AND ( status LIKE ? COLLATE NOCASE )
+                    AND ( NAME != 'admin' )
                     ORDER BY ID DESC
                     LIMIT 10 OFFSET ?
                 """, (
                     searchbyname_format,
                     searchbyemail_format,
                     searchbycontact_format,
+                    searchbystatus_format,
                     offset
                 ))
 
@@ -924,6 +937,7 @@ class SqlAdmin:
                         "last_name": row[4],
                         "birthday": row[5],
                         "contact": row[6],
+                        "status": row[7],
                     })
 
                 return customers
@@ -939,7 +953,7 @@ class SqlAdmin:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                SELECT ID, NAME, EMAIL, first_name, last_name, birthday, contact FROM accounts
+                SELECT ID, NAME, EMAIL, first_name, last_name, birthday, contact, created_on FROM accounts
                 WHERE ID = ?
                 """, (id,))
                 row = cursor.fetchone()
@@ -953,6 +967,7 @@ class SqlAdmin:
                     "last_name": row[4],
                     "birthday": row[5],
                     "contact": row[6],
+                    "created_on": row[7],
                 }
                 return row
 
@@ -1095,7 +1110,6 @@ class SqlUser:
     def list_user_transactions(user_id: int, page: int):
         """List user transactions with pagination"""
         try:
-            offset = (page - 1) * 10
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
@@ -1141,7 +1155,6 @@ class SqlUser:
     def list_user_rentals(user_id: int, page: int):
         """List user rentals with pagination"""
         try:
-            offset = (page - 1) * 10
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
@@ -1190,7 +1203,6 @@ class SqlUser:
     def list_user_completed(user_id: int, page: int):
         """List user completed with pagination"""
         try:
-            offset = (page - 1) * 10
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""

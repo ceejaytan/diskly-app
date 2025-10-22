@@ -227,14 +227,19 @@ def view_customers(
     searchbyname: str = "",
     searchbyemail: str = "",
     searchbycontact: str = "",
-    searchbydate: str = ""
+    searchbystatus: str = ""
 ):
     print("Viewing Customers...")
+
+    if searchbycontact.startswith("0"):
+        searchbycontact = searchbycontact[1:]
+
     return SqlAdmin.view_customers(
         page,
         searchbyname.strip(),
         searchbyemail.strip(),
         searchbycontact.strip(),
+        searchbystatus.strip()
     )
 
 

@@ -36,7 +36,7 @@ def login(
             )
         return {"status": "success"}
 
-    elif SqlAccounts.login(request.username, request.password):
+    elif SqlAccounts.login(request.username.strip(), request.password):
         session_token = secrets.token_hex(32)
         response.set_cookie(
             key="logged_in",
@@ -44,7 +44,7 @@ def login(
             max_age=7*24*60*60,
             **cookie_setting
         )
-        SqlAccounts.store_session(session_token, request.username)
+        SqlAccounts.store_session(session_token, request.username.strip())
         return {"status": "success"}
     else:
         raise HTTPException(status_code=400, detail={"status": "failed"})
@@ -117,6 +117,7 @@ def check_session(logged_in: str = Cookie(None)):
     return {
             "user_id": userinfo[0],
             "username": userinfo[1],
+            "status": userinfo[2],
             "logged_in": 1
             }
 
