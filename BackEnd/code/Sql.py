@@ -643,41 +643,30 @@ class SqlAdmin:
 
 
     @staticmethod
-    def view_games(page: int, console_filter: str = "", searchbygame: str = "", searchbydate: str = ""):
+    def view_games(page: int, searchbygame: str = "", searchbydate: str = "", filterby: str = ""):
         """View game titles for admin dashboard stock page with filters and pagination"""
         try:
             offset = (page - 1) * 10
             searchbygame_format = f"%{searchbygame}%"
             searchbydate_format = f"%{searchbydate}%"
-            console_filter_format = f"%{console_filter}%"
 
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
 
                 cursor.execute("""
                     SELECT
-                        g.ID,
-                        g.game_name,
-                        g.date_added,
-                        g.platform,
-                        g.total_stocks,
-                        IFNULL(SUM(r.quantity), 0) AS rented_quantity
-                    FROM game_catalog g
-                    LEFT JOIN rentals r
-                        ON g.ID = r.game_id
-                        AND (r.status = 'Ongoing' OR r.status = 'Overdue')
-                    WHERE g.game_name LIKE ? COLLATE NOCASE
-                    AND g.date_added LIKE ? COLLATE NOCASE
-                    AND g.platform LIKE ? COLLATE NOCASE
-                    GROUP BY g.ID
-                    ORDER BY g.ID DESC
+                        ID,
+                        game_name,
+                        date_added,
+                        platform,
+                        total_stocks,
+                        currently_rented
+                    FROM game_catalog
+                    WHERE game_name LIKE ? COLLATE NOCASE
+                    AND date_added LIKE ? COLLATE NOCASE
+                    ORDER BY ID DESC
                     LIMIT 10 OFFSET ?
-                """, (
-                    searchbygame_format,
-                    searchbydate_format,
-                    console_filter_format,
-                    offset
-                ))
+                """, (searchbygame_format, searchbydate_format, offset))
 
                 rows = cursor.fetchall()
 
@@ -685,13 +674,18 @@ class SqlAdmin:
                 for row in rows:
                     game_id, name, date_added, console, total, rented = row
                     remaining = max(total - rented, 0)
+                    status = "Available" if remaining > 0 else "Out of Stock"
+
+                    if filterby and filterby != status:
+                        continue
+
                     gametitles.append({
                         "id": game_id,
                         "Title": name,
                         "Date_Added": date_added,
                         "Console": console,
                         "Quantity": f"{remaining}/{total}",
-                        "status": "Available" if remaining > 0 else "Out of Stock"
+                        "status": status
                     })
 
                 return gametitles

@@ -124,9 +124,9 @@ def view_games(
     print("Viewing Games...")
     return SqlAdmin.view_games(
         page,
-        filterby.strip(),
         searchbygame.strip(),
-        searchbydate.strip()
+        searchbydate.strip(),
+        filterby.strip()
     )
 
 
