@@ -108,9 +108,12 @@ useEffect(() => {
   if (birthDate > today) {
     setBirthdayValid(false);
     setBirthdayMessage("Cannot be in the future")
-  } else if (adjustedAge < minAge || adjustedAge > maxAge) {
+  } else if (adjustedAge < minAge) {
     setBirthdayValid(false);
     setBirthdayMessage("Invalid Birthdate ( Must be 13+ )")
+  } else if (adjustedAge > maxAge) {
+    setBirthdayValid(false);
+    setBirthdayMessage("Invalid Birthdate ( There's no way your past 120+ )")
   } else {
     setBirthdayValid(true);
     setBirthdayMessage("")
@@ -170,7 +173,7 @@ useEffect(() => {
       setEmailMessage("Email taken");
       setEmailValid(false);
     }
-  }, 400);
+  }, 300);
 
   return () => clearTimeout(timeout);
 }, [email]);
@@ -180,15 +183,27 @@ useEffect(() => {
     if(!contact){
       setContactMessage("")
       setContactValid(false);
+      return;
     }
     if(!contactRegex.test(contact)) {
       setContactMessage("Invalid Contact! example: 9232404697")
       setContactValid(false)
-    } else {
-      setContactMessage("")
-      setContactValid(true)
-    }
+      return;
+    } 
 
+    const timeout = setTimeout(async() => {
+      const res = await fetch(`${API_URL}/accounts/check-contact?contact=${contact}`)
+      const data = await res.json()
+      if (data.Available) {
+      setContactMessage("Contact available")
+      setContactValid(true)
+      } else {
+      setContactMessage("Contact already taken")
+      setContactValid(false)
+      }
+    }, 300)
+
+  return () => clearTimeout(timeout);
   }, [contact])
 
   useEffect(() => {

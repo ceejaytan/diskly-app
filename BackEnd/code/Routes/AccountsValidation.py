@@ -93,6 +93,11 @@ def check_email(email: str):
     taken = SqlAccounts.checkString_Iftaken("EMAIL", email.strip())
     return {"Available": not taken}
 
+@router.get("/check-contact")
+def check_contact(contact: str):
+    taken = SqlAccounts.checkString_Iftaken("contact", contact.strip())
+    return {"Available": not taken}
+
 
 @router.get("/check-session-logged-in")
 def check_session(logged_in: str = Cookie(None)):
