@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "../../API/config";
-
 type Rental = {
+
   id: number;
   name: string;
   title: string;

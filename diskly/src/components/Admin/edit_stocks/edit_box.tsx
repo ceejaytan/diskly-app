@@ -131,9 +131,12 @@ export default function Edit_CD({game_id, cancelbtn}:more_boilerplate_because_re
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/80 z-50 p-4" onClick={cancelbtn}>
-      <div className="rent-form-container bg-[#0b0e13] border-2 border-cyan-400 rounded-2xl w-full max-w-xl p-8 text-cyan-100" onClick={(e) => e.stopPropagation()}>
+      <div 
+        className="rent-form-container bg-[#0b0e13] 
+        border-2 border-cyan-400 rounded-2xl w-full max-w-xl p-8 text-cyan-100
+        max-h-[100vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}>
 
-      {/* 🔄 Loading overlay */}
       {loading && (
         <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center rounded-2xl z-50">
           <div className="w-14 h-14 border-4 border-cyan-300 border-t-transparent rounded-full animate-spin"></div>

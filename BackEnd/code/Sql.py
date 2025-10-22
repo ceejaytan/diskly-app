@@ -4,12 +4,125 @@ import os
 from zoneinfo import ZoneInfo
 import sqlite3
 
+from pathlib import Path
+
+
 
 from .Accounts import Accounts
 from .Validations import UserRentals
 from .Validations import AdminValidations
 
 db_path = "db/sqlite.db"
+
+
+class InitializeTables:
+
+    @staticmethod
+    def SqliteFile_Exists():
+        return Path(db_path).is_file()
+
+
+    @staticmethod
+    def create_sqlite_file():
+        if not InitializeTables.SqliteFile_Exists():
+            open(db_path, 'a').close()
+            print("Created sqlite file at db/sqlite.db")
+
+
+    @staticmethod
+    def create_tables():
+        """
+        Create necessary tables if not exist
+        """
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+
+                #  accounts table
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS accounts (
+                        ID INTEGER PRIMARY KEY,
+                        NAME TEXT NOT NULL UNIQUE,
+                        HASHED_PASSWORD TEXT NOT NULL,
+                        EMAIL TEXT UNIQUE,
+                        session_cookie TEXT,
+                        first_name TEXT,
+                        last_name TEXT,
+                        birthday DATE,
+                        contact TEXT
+                    );
+                """)
+
+                cursor.execute("""
+                INSERT OR IGNORE INTO accounts (NAME, HASHED_PASSWORD, session_cookie)
+                VALUES ( 'admin', '$2b$12$XIwrTKqWHl6tSum5T2yjxu3Ce8Pynvc9Ie9ejblahDSwryfTXcepW', '0f32c0fe13ad509e1a2fadbe72d5ad8f7fae769c332d0e34c9ef0fba0cebacb9' );
+                """)
+
+                #  game_catalog table
+                cursor.execute("""
+                CREATE TABLE IF NOT EXISTS game_catalog (
+                    ID INTEGER PRIMARY KEY,
+                    game_name TEXT,
+                    platform TEXT,
+                    price_to_rent REAL,
+                    total_stocks INT,
+                    cover_image_path TEXT,
+                    date_added datetime,
+                    currently_rented INT
+                    );
+                """)
+
+                #  transactions table
+                cursor.execute("""
+                CREATE TABLE IF NOT EXISTS transactions (
+                ID INTEGER PRIMARY KEY,
+                user_id INTEGER,
+                user_name TEXT,
+                game_id INTEGER,
+                game_name TEXT,
+                rented_on DATETIME default CURRENT_TIMESTAMP,
+                quantity INTEGER,
+                total_price REAL,
+                status TEXT,
+                return_on DATETIME,
+                game_console TEXT
+                );
+                """)
+
+
+                #  rentals table
+                cursor.execute("""
+                CREATE TABLE IF NOT EXISTS rentals (
+                ID INTEGER PRIMARY KEY,
+                user_id INTEGER,
+                user_name TEXT,
+                game_id INTEGER,
+                game_name TEXT,
+                rented_on DATETIME DEFAULT CURRENT_TIMESTAMP,
+                quantity INTEGER,
+                total_price REAL,
+                status TEXT,
+                return_on DATETIME,
+                transaction_id INTEGER
+                );
+                """)
+
+                #  forget_password table
+                cursor.execute("""
+                CREATE TABLE IF NOT EXISTS forget_password (
+                ID INTEGER PRIMARY KEY,
+                email TEXT,
+                reset_code TEXT,
+                session_value TEXT,
+                expiration INTEGER
+                );
+                """)
+
+                conn.commit()
+        except sqlite3.Error as err:
+            print(err)
+
+
 
 class SqlAccounts:
 
@@ -287,6 +400,9 @@ class SqlAdmin:
 
     @staticmethod
     def confirm_return(id: int):
+
+        manila_time = ZoneInfo("Asia/Manila")
+        now_ph = datetime.now(manila_time).isoformat()
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
@@ -306,9 +422,9 @@ class SqlAdmin:
 
                 cursor.execute("""
                     UPDATE rentals
-                    SET status = 'Returned'
+                    SET status = 'Returned', returned_on = ?
                     WHERE ID = ?
-                """, (id,))
+                """, (now_ph, id ))
 
                 cursor.execute("""
                     UPDATE game_catalog
@@ -756,6 +872,13 @@ class SqlAdmin:
                 DELETE FROM game_catalog
                 WHERE ID = ?
                 """,(id, ))
+
+                cursor.execute("""
+                UPDATE transactions
+                SET status = 'Denied'
+                WHERE game_id = ?
+                """,(id, ))
+
             conn.commit()
             return True
         except sqlite3.Error as err:
@@ -941,3 +1064,150 @@ class SqlGameCatalog_API:
         except sqlite3.Error as err:
             print(err)
 
+
+
+class SqlUser:
+
+
+    @staticmethod
+    def list_user_transactions(user_id: int, page: int):
+        """List user transactions with pagination"""
+        try:
+            offset = (page - 1) * 10
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT 
+                        transactions.ID,
+                        transactions.game_name,
+                        transactions.game_console,
+                        transactions.quantity,
+                        transactions.rented_on,
+                        transactions.return_on,
+                        transactions.total_price,
+                        transactions.status,
+                        game_catalog.cover_image_path
+                    FROM transactions AS transactions
+                    LEFT JOIN game_catalog AS game_catalog
+                        ON transactions.game_id = game_catalog.ID
+                    WHERE transactions.user_id = ?
+                    ORDER BY transactions.ID DESC
+                """, (user_id,))
+                rows = cursor.fetchall()
+
+                return [
+                    {
+                        "id": r[0],
+                        "game_name": r[1],
+                        "console": r[2],
+                        "quantity": r[3],
+                        "rented_on": r[4],
+                        "return_on": r[5],
+                        "total_price": r[6],
+                        "status": r[7],
+                        "cover_image_path": r[8],
+                    }
+                    for r in rows
+                ]
+        except sqlite3.Error as err:
+            print(err)
+            return None
+
+
+
+    @staticmethod
+    def list_user_rentals(user_id: int, page: int):
+        """List user rentals with pagination"""
+        try:
+            offset = (page - 1) * 10
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT
+                        rentals.ID,
+                        rentals.game_name,
+                        transactions.game_console,
+                        rentals.quantity,
+                        rentals.rented_on,
+                        rentals.return_on,
+                        rentals.total_price,
+                        rentals.status,
+                        game_catalog.cover_image_path,
+                        rentals.returned_on
+                    FROM rentals AS rentals
+                    LEFT JOIN game_catalog AS game_catalog
+                        ON rentals.game_id = game_catalog.ID
+                    LEFT JOIN transactions AS transactions
+                        ON rentals.transaction_id = transactions.ID
+                    WHERE rentals.user_id = ? AND rentals.status NOT LIKE 'Returned'
+                    ORDER BY rentals.ID DESC
+                """, (user_id,))
+                rows = cursor.fetchall()
+
+                return [
+                    {
+                        "id": r[0],
+                        "game_name": r[1],
+                        "console": r[2],
+                        "quantity": r[3],
+                        "rented_on": r[4],
+                        "return_on": r[5],
+                        "total_price": r[6],
+                        "status": r[7],
+                        "cover_image_path": r[8],
+                        "returned_on": r[9],
+                    }
+                    for r in rows
+                ]
+        except sqlite3.Error as err:
+            print(err)
+            return None
+
+
+    @staticmethod
+    def list_user_completed(user_id: int, page: int):
+        """List user completed with pagination"""
+        try:
+            offset = (page - 1) * 10
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT
+                        rentals.ID,
+                        rentals.game_name,
+                        transactions.game_console,
+                        rentals.quantity,
+                        rentals.rented_on,
+                        rentals.return_on,
+                        rentals.total_price,
+                        rentals.status,
+                        game_catalog.cover_image_path,
+                        rentals.returned_on
+                    FROM rentals AS rentals
+                    LEFT JOIN game_catalog AS game_catalog
+                        ON rentals.game_id = game_catalog.ID
+                    LEFT JOIN transactions AS transactions
+                        ON rentals.transaction_id = transactions.ID
+                    WHERE rentals.user_id = ? AND rentals.status LIKE 'Returned'
+                    ORDER BY rentals.ID DESC
+                """, (user_id,))
+                rows = cursor.fetchall()
+
+                return [
+                    {
+                        "id": r[0],
+                        "game_name": r[1],
+                        "console": r[2],
+                        "quantity": r[3],
+                        "rented_on": r[4],
+                        "return_on": r[5],
+                        "total_price": r[6],
+                        "status": r[7],
+                        "cover_image_path": r[8],
+                        "returned_on": r[9],
+                    }
+                    for r in rows
+                ]
+        except sqlite3.Error as err:
+            print(err)
+            return None
