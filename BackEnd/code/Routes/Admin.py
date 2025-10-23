@@ -124,9 +124,9 @@ def view_games(
     print("Viewing Games...")
     return SqlAdmin.view_games(
         page,
-        filterby.strip(),
         searchbygame.strip(),
-        searchbydate.strip()
+        searchbydate.strip(),
+        filterby.strip()
     )
 
 
@@ -201,8 +201,8 @@ def delete_game(
         SqlAdmin.delete_game(game_id)
         return JSONResponse(status_code=200, content="deleted succesfully")
     else:
-        raise HTTPException(status_code=400, detail="Cannot delete game, there are active rentals for this game.")
 
+        raise HTTPException(status_code=400, detail="Cannot delete game, there are active rentals for this game.")
 
 
 

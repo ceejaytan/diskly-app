@@ -398,6 +398,7 @@ useEffect(() => {
 
       </div>
         <p>Total Transactions Price from status {activeTab}: ₱{rentalsData[0]?.total_transactions ?? 0}</p>
+        <p>Pending status will get auto denied if Return date has already gone past the return date the user chosed</p>
 
       {rentalEdit && (
       <Transaction_action

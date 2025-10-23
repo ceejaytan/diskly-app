@@ -9,16 +9,14 @@ interface RegisterFormProps {
   toggleForm: () => void;
 }
 
-export default function RegisterForm({ toggleForm }: RegisterFormProps){
+export default function RegisterForm({ toggleForm }: RegisterFormProps) {
   const [firstname, setFirstName] = useState("");
   const [firstnamemessage, setFirstNameMessage] = useState("");
   const [firstnameValid, setFirstNameValid] = useState(false);
 
-
   const [lastname, setLastName] = useState("");
   const [lastnamemessage, setLastNameMessage] = useState("");
   const [lastnameValid, setLastNameValid] = useState(false);
-
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -26,7 +24,6 @@ export default function RegisterForm({ toggleForm }: RegisterFormProps){
   const [contact, setContact] = useState("");
   const [password, setPassword] = useState("");
   const [confirmpassword, setConfirmPassword] = useState("");
-
 
   const [usernameMessage, setUsernameMessage] = useState("");
   const [usernameValid, setUsernameValid] = useState(false);
@@ -44,7 +41,6 @@ export default function RegisterForm({ toggleForm }: RegisterFormProps){
   const [contactMessage, setContactMessage] = useState("");
   const [contactValid, setContactValid] = useState(false);
 
-
   const [birthdayMessage, setBirthdayMessage] = useState("");
   const [birthdayValid, setBirthdayValid] = useState(true);
 
@@ -57,47 +53,51 @@ export default function RegisterForm({ toggleForm }: RegisterFormProps){
   const age = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();
   const dayDiff = today.getDate() - birthDate.getDate();
-  const adjustedAge = monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? age - 1 : age;
-
+  const adjustedAge =
+    monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? age - 1 : age;
 
   const navigate = useNavigate();
 
-
   const firstNameRegex = /^[A-Za-z ]{2,}$/;
   const lastNameRegex = /^[A-Za-z ]{2,}$/;
-  const usernameRegex = /^(?=[A-Za-z0-9_]{3,20}$)(?!.*_$)(?!.*__)(?=(?:.*[A-Za-z]){3,})[A-Za-z][A-Za-z0-9_]{2,20}$/;
+  const usernameRegex =
+    /^(?=[A-Za-z0-9_]{3,20}$)(?!.*_$)(?!.*__)(?=(?:.*[A-Za-z]){3,})[A-Za-z][A-Za-z0-9_]{2,20}$/;
   const emailRegex = /^[A-Za-z0-9._+-]{3,20}@[^\s@]+\.[A-Za-z]{2,}$/;
-  const contactRegex = /^(?:\9)\d{9}$/
+  const contactRegex = /^9\d{9}$/;
 
-
-useEffect(() => {
+  useEffect(() => {
     if (!firstname) {
       setFirstNameMessage("");
       setFirstNameValid(false);
     }
-    if (!firstNameRegex.test(firstname)){
+    if (!firstNameRegex.test(firstname)) {
       setFirstNameMessage("Invalid First Name");
       setFirstNameValid(false);
-    }else {
+    } else {
       setFirstNameMessage("");
       setFirstNameValid(true);
     }
-  }, [firstname])
+  }, [firstname]);
 
-useEffect(() => {
+  useEffect(() => {
     if (!lastname) {
       setLastNameMessage("");
       setLastNameValid(false);
     }
-    if (!lastNameRegex.test(lastname)){
+    if (!lastNameRegex.test(lastname)) {
       setLastNameMessage("Invalid Last Name");
       setLastNameValid(false);
-    }else {
+    } else {
       setLastNameMessage("");
       setLastNameValid(true);
     }
-  }, [lastname])
+  }, [lastname]);
 
+<<<<<<< HEAD
+  useEffect(() => {
+    if (!birthday) {
+      setBirthdayValid(false);
+=======
 
 useEffect(() => {
   if (!birthday) {
@@ -108,9 +108,12 @@ useEffect(() => {
   if (birthDate > today) {
     setBirthdayValid(false);
     setBirthdayMessage("Cannot be in the future")
-  } else if (adjustedAge < minAge || adjustedAge > maxAge) {
+  } else if (adjustedAge < minAge) {
     setBirthdayValid(false);
     setBirthdayMessage("Invalid Birthdate ( Must be 13+ )")
+  } else if (adjustedAge > maxAge) {
+    setBirthdayValid(false);
+    setBirthdayMessage("Invalid Birthdate ( There's no way your past 120+ )")
   } else {
     setBirthdayValid(true);
     setBirthdayMessage("")
@@ -129,38 +132,67 @@ useEffect(() => {
     if (!usernameRegex.test(username)) {
       setUsernameMessage("✘ Invalid username");
       setUsernameValid(false);
+>>>>>>> d08843dee413c9ae39586ae87c3e9cb7fc320b0a
       return;
     }
 
-    const res = await fetch(`${API_URL}/accounts/check-username?username=${username}`);
-    const data = await res.json();
-    if (data.Available) {
-      setUsernameMessage("Username available");
-      setUsernameValid(true);
+    if (birthDate > today) {
+      setBirthdayValid(false);
+      setBirthdayMessage("Cannot be in the future");
+    } else if (adjustedAge < minAge || adjustedAge > maxAge) {
+      setBirthdayValid(false);
+      setBirthdayMessage("Invalid Birthdate ( Must be 13+ )");
     } else {
-      setUsernameMessage("Username taken");
-      setUsernameValid(false);
+      setBirthdayValid(true);
+      setBirthdayMessage("");
     }
-  }, 400);
+  }, [birthday]);
 
-  return () => clearTimeout(timeout);
-}, [username]);
+  useEffect(() => {
+    if (!username) {
+      setUsernameMessage("");
+      setUsernameValid(true);
+      return;
+    }
 
+    const timeout = setTimeout(async () => {
+      if (!usernameRegex.test(username)) {
+        setUsernameMessage("✘ Invalid username");
+        setUsernameValid(false);
+        return;
+      }
 
-useEffect(() => {
-  if (!email) {
-    setEmailMessage("");
-    setEmailValid(false);
-    return;
-  }
+      const res = await fetch(
+        `${API_URL}/accounts/check-username?username=${username}`
+      );
+      const data = await res.json();
+      if (data.Available) {
+        setUsernameMessage("Username available");
+        setUsernameValid(true);
+      } else {
+        setUsernameMessage("Username taken");
+        setUsernameValid(false);
+      }
+    }, 400);
 
-  const timeout = setTimeout(async () => {
-    if (!emailRegex.test(email)) {
-      setEmailMessage("Invalid email");
+    return () => clearTimeout(timeout);
+  }, [username]);
+
+  useEffect(() => {
+    if (!email) {
+      setEmailMessage("");
       setEmailValid(false);
       return;
     }
 
+<<<<<<< HEAD
+    const timeout = setTimeout(async () => {
+      if (!emailRegex.test(email)) {
+        setEmailMessage("Invalid email");
+        setEmailValid(false);
+        return;
+      }
+=======
     const res = await fetch(`${API_URL}/accounts/check-email?email=${email}`);
     const data = await res.json();
     if (data.Available) {
@@ -170,26 +202,60 @@ useEffect(() => {
       setEmailMessage("Email taken");
       setEmailValid(false);
     }
-  }, 400);
+  }, 300);
+>>>>>>> d08843dee413c9ae39586ae87c3e9cb7fc320b0a
 
-  return () => clearTimeout(timeout);
-}, [email]);
+      const res = await fetch(`${API_URL}/accounts/check-email?email=${email}`);
+      const data = await res.json();
+      if (data.Available) {
+        setEmailMessage("Email available");
+        setEmailValid(true);
+      } else {
+        setEmailMessage("Email taken");
+        setEmailValid(false);
+      }
+    }, 400);
 
+    return () => clearTimeout(timeout);
+  }, [email]);
 
-useEffect(() => {
-    if(!contact){
-      setContactMessage("")
+  useEffect(() => {
+    if (!contact) {
+      setContactMessage("");
       setContactValid(false);
+      return;
     }
+<<<<<<< HEAD
+    if (!contactRegex.test(contact)) {
+      setContactMessage("Invalid Contact! example: 9232404697");
+      setContactValid(false);
+    } else {
+      setContactMessage("");
+      setContactValid(true);
+    }
+  }, [contact]);
+=======
     if(!contactRegex.test(contact)) {
       setContactMessage("Invalid Contact! example: 9232404697")
       setContactValid(false)
-    } else {
-      setContactMessage("")
-      setContactValid(true)
-    }
+      return;
+    } 
 
+    const timeout = setTimeout(async() => {
+      const res = await fetch(`${API_URL}/accounts/check-contact?contact=${contact}`)
+      const data = await res.json()
+      if (data.Available) {
+      setContactMessage("Contact available")
+      setContactValid(true)
+      } else {
+      setContactMessage("Contact already taken")
+      setContactValid(false)
+      }
+    }, 300)
+
+  return () => clearTimeout(timeout);
   }, [contact])
+>>>>>>> d08843dee413c9ae39586ae87c3e9cb7fc320b0a
 
   useEffect(() => {
     if (!password) {
@@ -221,10 +287,8 @@ useEffect(() => {
     }
   }, [confirmpassword, password]);
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
 
     if (!usernameValid) {
       alert("Please enter a valid and available username.");
@@ -260,7 +324,6 @@ useEffect(() => {
     if (ok) navigate("/");
   };
 
-
   return (
     <form onSubmit={handleSubmit}>
       <div className="flex justify-center">
@@ -268,59 +331,50 @@ useEffect(() => {
           src="/images/disklogo.png"
           alt="Diskly Logo"
           className="w-20 h-20 object-contain cursor-pointer"
-          onClick={() => {window.location.href = "/"}}
+          onClick={() => {
+            window.location.href = "/";
+          }}
         />
       </div>
       <h2>Register</h2>
 
-
-<div className="form-row">
-  <div className="form-group">
-    <label>First Name</label>
-    <input
-      type="text"
-      value={firstname}
-      onChange={(e) => setFirstName(e.target.value.toUpperCase())}
-      required
-      className={`
+      <div className="form-row">
+        <div className="form-group">
+          <label>First Name</label>
+          <input
+            type="text"
+            value={firstname}
+            onChange={(e) => setFirstName(e.target.value.toUpperCase())}
+            required
+            className={`
         border-cyan-400 border-2 rounded-[10px]
         bg-[#D6DCDE]
         text-black
         ${
-          firstname === ""
-            ? ""
-            : firstnameValid
-            ? "Inputvalid"
-            : "Inputinvalid"
+          firstname === "" ? "" : firstnameValid ? "Inputvalid" : "Inputinvalid"
         }
       `}
-    />
-    {firstname && <small>{firstnamemessage}</small>}
-  </div>
+          />
+          {firstname && <small>{firstnamemessage}</small>}
+        </div>
 
-  <div className="form-group">
-    <label>Last Name</label>
-    <input
-      type="text"
-      value={lastname}
-      onChange={(e) => setLastName(e.target.value.toUpperCase())}
-      required
-      className={`
+        <div className="form-group">
+          <label>Last Name</label>
+          <input
+            type="text"
+            value={lastname}
+            onChange={(e) => setLastName(e.target.value.toUpperCase())}
+            required
+            className={`
         border-cyan-400 border-2 rounded-[10px]
         bg-[#D6DCDE]
         text-black
-        ${
-          lastname === ""
-            ? ""
-            : lastnameValid
-            ? "Inputvalid"
-            : "Inputinvalid"
-        }
+        ${lastname === "" ? "" : lastnameValid ? "Inputvalid" : "Inputinvalid"}
       `}
-    />
-    {lastname && <small>{lastnamemessage}</small>}
-  </div>
-</div>
+          />
+          {lastname && <small>{lastnamemessage}</small>}
+        </div>
+      </div>
 
       <div className="form-row">
         <div className="form-group">
@@ -335,19 +389,21 @@ useEffect(() => {
             bg-[#D6DCDE]
             text-black
             ${
-            username === ""
-            ? ""
-            : usernameValid
-            ? "Inputvalid"
-            : "Inputinvalid"
+              username === ""
+                ? ""
+                : usernameValid
+                ? "Inputvalid"
+                : "Inputinvalid"
             }
               `}
           />
           {username && (
-              <small className={usernameValid ? "message-valid" : "message-invalid"}>
+            <small
+              className={usernameValid ? "message-valid" : "message-invalid"}
+            >
               {usernameMessage}
-              </small>
-            )}
+            </small>
+          )}
         </div>
         <div className="form-group">
           <label>Email</label>
@@ -360,18 +416,10 @@ useEffect(() => {
             border-cyan-400 border-2 rounded-[10px]
             bg-[#D6DCDE]
             text-black
-            ${ email === ""
-            ? ""
-            : emailValid
-            ? "Inputvalid"
-            : "Inputinvalid" }
+            ${email === "" ? "" : emailValid ? "Inputvalid" : "Inputinvalid"}
               `}
           />
-          {email && (
-              <small>
-                {emailMessage}
-              </small>
-            )}
+          {email && <small>{emailMessage}</small>}
         </div>
       </div>
 
@@ -388,159 +436,156 @@ useEffect(() => {
             bg-[#D6DCDE]
             text-black
             ${
-            birthday === ""
-            ? ""
-            : birthdayValid
-            ? "Inputvalid"
-            : "Inputinvalid"
+              birthday === ""
+                ? ""
+                : birthdayValid
+                ? "Inputvalid"
+                : "Inputinvalid"
             }
             `}
           />
-          {birthday && (
-              <small>
-                {birthdayMessage}
-              </small>
-            )}
-
+          {birthday && <small>{birthdayMessage}</small>}
         </div>
 
-<div className="form-group">
-  <label>Contact Number ( PH )</label>
-  <div className="flex items-center border-cyan-400 border-2 rounded-[10px] bg-[#D6DCDE]">
-    <span className="pl-3 pr-2 text-gray-700 select-none">+63</span>
-    <input
-      type="tel"
-      value={contact}
-      onChange={(e) => setContact(e.target.value)}
-      required
-      className={`
+        <div className="form-group">
+          <label>Contact Number ( PH )</label>
+          <div className="flex items-center border-cyan-400 border-2 rounded-[10px] bg-[#D6DCDE]">
+            <span className="pl-3 pr-2 text-gray-700 select-none">+63</span>
+            <input
+              type="tel"
+              value={contact}
+              onChange={(e) => setContact(e.target.value)}
+              required
+              className={`
         flex-1
         bg-transparent
         focus:outline-none
         text-black
         rounded-r-[10px]
         py-2
-        ${
-          contact === ""
-          ? ""
-          : contactValid
-          ? "Inputvalid"
-          : "Inputinvalid"
-        }
+        ${contact === "" ? "" : contactValid ? "Inputvalid" : "Inputinvalid"}
       `}
-    />
-  </div>
-  {contact && <small>{contactMessage}</small>}
-</div>
+            />
+          </div>
+          {contact && <small>{contactMessage}</small>}
+        </div>
       </div>
 
       <div className="form-row">
         <div className="form-group">
           <label>Password</label>
           <div className="password-wrapper">
-          <input
-            type={showPassword ? "text" : "password"}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className={`
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className={`
             border-cyan-400 border-2 rounded-[10px]
             bg-[#D6DCDE]
             text-black
             ${
-            password === ""
-            ? ""
-            : passwordValid
-            ? "Inputvalid"
-            : "Inputinvalid"
+              password === ""
+                ? ""
+                : passwordValid
+                ? "Inputvalid"
+                : "Inputinvalid"
             }
               `}
-          />
-
-          <button
-            type="button"
-            className="toggle-password"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            <img
-              src={showPassword ? shownIcon : hiddenIcon}
-              alt={showPassword ? "Hide password" : "Show password"}
             />
-          </button>
-          </div>
-          {password && (
-              <small>
-                {passwordMessage}
-              </small>
-            )}
 
+            <button
+              type="button"
+              className="toggle-password"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              <img
+                src={showPassword ? shownIcon : hiddenIcon}
+                alt={showPassword ? "Hide password" : "Show password"}
+              />
+            </button>
+          </div>
+          {password && <small>{passwordMessage}</small>}
         </div>
         <div className="form-group">
           <label>Confirm Password</label>
           <div className="password-wrapper">
-          <input
-            type={showPassword ? "text" : "password"}
-            value={confirmpassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            className={`
+            <input
+              type={showPassword ? "text" : "password"}
+              value={confirmpassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              className={`
             border-cyan-400 border-2 rounded-[10px]
             bg-[#D6DCDE]
             text-black
             ${
-            confirmpassword === "" ? "" :
-            confirmpasswordValid
-            ? "Inputvalid"
-            : "Inputinvalid"
+              confirmpassword === ""
+                ? ""
+                : confirmpasswordValid
+                ? "Inputvalid"
+                : "Inputinvalid"
             }
             `}
-          />
-
-          <button
-            type="button"
-            className="toggle-password"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            <img
-              src={showPassword ? shownIcon : hiddenIcon}
-              alt={showPassword ? "Hide password" : "Show password"}
             />
-          </button>
-      </div>
 
-          {confirmpassword && (
-              <small>
-                {confirmpasswordMessage}
-              </small>
-        )}
+            <button
+              type="button"
+              className="toggle-password"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              <img
+                src={showPassword ? shownIcon : hiddenIcon}
+                alt={showPassword ? "Hide password" : "Show password"}
+              />
+            </button>
+          </div>
+
+          {confirmpassword && <small>{confirmpasswordMessage}</small>}
         </div>
-
-
       </div>
 
       <div className="form-group checkbox-group">
         <label>
           <input type="checkbox" required /> I agree to the{" "}
-          <a href="/terms" target="_blank" rel="noopener noreferrer" className="terms-link">
+          <a
+            href="/terms"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="terms-link"
+          >
             Terms and Conditions
           </a>
         </label>
       </div>
 
       <div className="button-stack">
-        <button type="submit" className="btn btn-primary"
-        disabled={!usernameValid || !emailValid || password.length < 6 || password !== confirmpassword || !contactValid}>
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={
+            !usernameValid ||
+            !emailValid ||
+            password.length < 6 ||
+            password !== confirmpassword ||
+            !contactValid
+          }
+        >
           Register
         </button>
 
         <div className="button-row">
-          <button type="button" className="btn btn-back" onClick={() => navigate(-1)}>
+          <button
+            type="button"
+            className="btn btn-back"
+            onClick={() => navigate(-1)}
+          >
             Go Back
           </button>
         </div>
       </div>
 
-      <hr/>
+      <hr />
       <p className="toggle-text">
         Already have an account?{" "}
         <button type="button" className="btn btn-toggle" onClick={toggleForm}>
@@ -549,4 +594,4 @@ useEffect(() => {
       </p>
     </form>
   );
-};
+}

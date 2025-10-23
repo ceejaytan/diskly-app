@@ -39,6 +39,7 @@ export default function DeleteConfirmStock({id, cancelbtn, refetchData}:more_boi
             <h1 className="leading-snug text-center">
               Are you sure you want to delete this record?
             </h1>
+              <p>Deleting this will deny all pending transactions with this game cd</p>
 
             <div className="flex gap-4 w-full justify-center">
               <button

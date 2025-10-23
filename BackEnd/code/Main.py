@@ -7,13 +7,25 @@ from fastapi.staticfiles import StaticFiles
 from .Routes.AccountsValidation import router as accounts_router
 from .Routes.GamediskAPI import router as GamediskAPI
 from .Routes.Admin import router as Admin
+from .Routes.User import router as UserRouter
+
+
+from .Sql import InitializeTables
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print(f"""
-    {app.title}
-          """)
+
+    if InitializeTables.SqliteFile_Exists():
+        InitializeTables.create_tables()
+        print(f"""
+        {app.title}
+            """)
+    else:
+        print("db/sqlite.db doesnt exist, creating...")
+        InitializeTables.create_sqlite_file()
+        InitializeTables.create_tables()
+
     yield
     print("closing...")
 
@@ -44,6 +56,7 @@ app.mount("/images/gamecover", StaticFiles(directory="images/gamecover"), name="
 app.include_router(accounts_router, prefix="/accounts")
 app.include_router(GamediskAPI, prefix="/games")
 app.include_router(Admin, prefix="/admin")
+app.include_router(UserRouter, prefix="/user")
 
 
 @app.get("/")
