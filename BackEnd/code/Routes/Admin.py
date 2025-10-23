@@ -42,6 +42,7 @@ def delete_rental(
 
 @router.get("/view-rental-detail")
 def view_rental_detail(
+    logged_in: str = Cookie(None),
     id: int = 0
 ):
     return SqlAdmin.view_rental_detail(id)

@@ -11,8 +11,8 @@ router = APIRouter()
 
 cookie_setting = {
     "httponly":True,
-    "secure":False,
-    "samesite":"lax",
+    "secure":True,
+    "samesite":"none",
 }
 
 @router.get("/")
