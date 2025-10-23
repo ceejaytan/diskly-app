@@ -43,7 +43,9 @@ return (
       onClick={cancelbtn}
     >
       <div
-        className="rent-form-container bg-[#0b0e13] border-2 border-cyan-400 rounded-2xl w-full max-w-xl p-8 text-cyan-100"
+        className="
+          rent-form-container bg-[#0b0e13] border-2 border-cyan-400 rounded-2xl w-full max-w-xl p-8 text-cyan-100
+          max-h-[100vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="rent-form flex flex-col gap-6">
@@ -59,73 +61,104 @@ return (
             />
           </div>
 
+          {/* Username */}
           <div className="flex flex-col items-center">
-            <label className="text-sm font-semibold text-cyan-300 mb-1 w-[93%] text-left">
-              First Name
-            </label>
-            <p className="bg-[#D6DCDE] border border-cyan-400/60 text-black rounded-[13px] h-[40px] w-[100%] flex items-center">
-              {customersData?.first_name ?? "Loading..."}
-            </p>
-            <label className="text-sm font-semibold text-cyan-300 mb-1 w-[93%] text-left">
-              Last Name
-            </label>
-            <p className="bg-[#D6DCDE] border border-cyan-400/60 text-black rounded-[13px] h-[40px] w-[100%] flex items-center">
-              {customersData?.last_name ?? "Loading..."}
-            </p>
-
             <label className="text-sm font-semibold text-cyan-300 mb-1 w-[93%] text-left">
               Username
             </label>
-            <p className="bg-[#D6DCDE] border border-cyan-400/60 text-black rounded-[13px] h-[40px] w-[100%] flex items-center">
+            <p className="bg-[#D6DCDE] border border-cyan-400/60 text-black rounded-[13px] h-[40px] w-[93%] flex items-center px-3">
               {customersData?.username ?? "Loading..."}
             </p>
           </div>
 
-          {/* Dates */}
+          {/* First + Last Name */}
           <div className="flex flex-col items-center">
-            <label className="text-sm font-semibold text-cyan-300 mb-1 w-[93%] text-left">
-              Account Created Date
-            </label>
-            <p className="bg-[#D6DCDE] border border-cyan-400/60 text-black rounded-[13px] h-[40px] w-[100%] flex items-center">
-              {customersData
-                ? new Date(customersData?.created_on).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "2-digit",
-                    year: "numeric",
-                  })
-                : "Loading..."}
-            </p>
+            <div className="form-row flex gap-4 w-[93%]">
+              <div className="form-group flex-1">
+                <label className="text-sm font-semibold text-cyan-300 mb-1 text-left block">
+                  First Name
+                </label>
+                <p className="bg-[#D6DCDE] border border-cyan-400/60 text-black rounded-[13px] h-[40px] flex items-center px-3">
+                  {customersData?.first_name ?? "Loading..."}
+                </p>
+              </div>
 
-            <label className="text-sm font-semibold text-cyan-300 mb-1 w-[93%] text-left">
-              Birthday
-            </label>
-            <p className="bg-[#D6DCDE] border border-cyan-400/60 text-black rounded-[13px] h-[40px] w-[100%] flex items-center">
-              {customersData
-                ? new Date(customersData?.birthday).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "2-digit",
-                    year: "numeric",
-                  })
-                : "Loading..."}
-            </p>
+              <div className="form-group flex-1">
+                <label className="text-sm font-semibold text-cyan-300 mb-1 text-left block">
+                  Last Name
+                </label>
+                <p className="bg-[#D6DCDE] border border-cyan-400/60 text-black rounded-[13px] h-[40px] flex items-center px-3">
+                  {customersData?.last_name ?? "Loading..."}
+                </p>
+              </div>
+            </div>
           </div>
 
-
+          {/* Email + Contact */}
           <div className="flex flex-col items-center">
-            <label className="text-sm font-semibold text-cyan-300 mb-1 w-[93%] text-left">
-               Email
-            </label>
-            <p className="bg-[#D6DCDE] border border-cyan-400/60 text-black rounded-[13px] h-[40px] w-[100%] flex items-center">
-              {customersData?.email ?? "Loading..."}
-            </p>
-            <label className="text-sm font-semibold text-cyan-300 mb-1 w-[93%] text-left">
-              Contact Number
-            </label>
-            <p className="bg-[#D6DCDE] border border-cyan-400/60 text-black rounded-[13px] h-[40px] w-[100%] flex items-center">
-              {customersData?.contact ?? "Loading..."}
-            </p>
+            <div className="form-row flex gap-4 w-[93%]">
+              <div className="form-group flex-1">
+                <label className="text-sm font-semibold text-cyan-300 mb-1 text-left block">
+                  Email
+                </label>
+                <p className="bg-[#D6DCDE] border border-cyan-400/60 text-black rounded-[13px] h-[40px] flex items-center px-3 truncate">
+                  {customersData?.email ?? "Loading..."}
+                </p>
+              </div>
+
+              <div className="form-group flex-1">
+                <label className="text-sm font-semibold text-cyan-300 mb-1 text-left block">
+                  Contact Number
+                </label>
+                <p className="bg-[#D6DCDE] border border-cyan-400/60 text-black rounded-[13px] h-[40px] flex items-center px-3">
+                  0{customersData?.contact ?? "Loading..."}
+                </p>
+              </div>
+            </div>
           </div>
 
+          {/* Account Created + Birthday */}
+          <div className="flex flex-col items-center">
+            <div className="form-row flex gap-4 w-[93%]">
+              <div className="form-group flex-1">
+                <label className="text-sm font-semibold text-cyan-300 mb-1 text-left block">
+                  Account Created Date
+                </label>
+                <p className="bg-[#D6DCDE] border border-cyan-400/60 text-black rounded-[13px] h-[40px] flex items-center px-3">
+                  {customersData
+                    ? new Date(customersData.created_on).toLocaleDateString(
+                        "en-US",
+                        {
+                          month: "short",
+                          day: "2-digit",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }
+                      )
+                    : "Loading..."}
+                </p>
+              </div>
+
+              <div className="form-group flex-1">
+                <label className="text-sm font-semibold text-cyan-300 mb-1 text-left block">
+                  Birthday
+                </label>
+                <p className="bg-[#D6DCDE] border border-cyan-400/60 text-black rounded-[13px] h-[40px] flex items-center px-3">
+                  {customersData
+                    ? new Date(customersData.birthday).toLocaleDateString(
+                        "en-US",
+                        {
+                          month: "short",
+                          day: "2-digit",
+                          year: "numeric",
+                        }
+                      )
+                    : "Loading..."}
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* Buttons */}
           <div className="flex flex-col gap-3">

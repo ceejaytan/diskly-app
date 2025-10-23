@@ -9,10 +9,10 @@ import "../components/Home/Home.css"
 
 import checkLoginSession from "../components/Login/CheckLoginSession";
 
-type SessionType = { username: string; } | null;
 
 export default function HomeContent() {
 
+  type SessionType = { userid: number; username: string; status: string } | null;
   const [userSession, setUserSession] = useState<SessionType>(null);
   const [loading, setLoading] = useState(true);
 
@@ -20,7 +20,7 @@ export default function HomeContent() {
     (async () => {
       const userdata = await checkLoginSession();
       if (userdata && userdata.logged_in) {
-        setUserSession({ username: userdata.username });
+        setUserSession({ userid: userdata.user_id, username: userdata.username, status: userdata.status });
       } else {
         setUserSession(null);
       }

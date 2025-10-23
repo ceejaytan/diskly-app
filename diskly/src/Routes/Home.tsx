@@ -12,7 +12,7 @@ import User_completed from "../components/Userprofile/User_completed";
 
 
 export default function UserProfile() {
-  type SessionType = { userid: number; username: string } | null;
+  type SessionType = { userid: number; username: string; status: string } | null;
   const [session, setSession] = useState<SessionType>(null);
   const [activeTab, setActiveTab] = useState<"Transactions" | "Rentals" | "Completed">("Transactions");
 
@@ -24,7 +24,7 @@ export default function UserProfile() {
     (async () => {
       const userdata = await checkLoginSession();
       if (userdata) {
-        setSession({ userid: userdata.user_id, username: userdata.username });
+        setSession({ userid: userdata.user_id, username: userdata.username, status: userdata.status });
       } else {
         setSession(null);
       }

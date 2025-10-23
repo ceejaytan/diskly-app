@@ -6,7 +6,9 @@ import "../Css/Header.css";
 
 type HeaderProps = {
   userSession: {
-    username: string
+    userid: number;
+    username: string;
+    status: string;
   } | null
 }
 
@@ -31,10 +33,6 @@ export default function Header_for_GameSearch({userSession}: HeaderProps) {
   }, []);
 
 
-
-  // ↓↓↓ do not touch this ↓↓↓
-  // its for search while typing
-
   const [searchParams, setSearchParams] = useSearchParams();
 
   const searchValue = searchParams.get("search") || "";
@@ -46,10 +44,12 @@ export default function Header_for_GameSearch({userSession}: HeaderProps) {
   }
 
 
-  // ↑↑↑ do not touch this ↑↑↑
-  // reactjs is ****
-
   return (
+
+    <>
+      {userSession?.status === "Banned" && (
+      <div className="bg-red-600 text-white">You Have Been Banned From Renting</div>
+      )}
     <header className="header">
       <div className="logo">
         <img
@@ -132,5 +132,6 @@ export default function Header_for_GameSearch({userSession}: HeaderProps) {
       </nav>
 
     </header>
+</>
   );
 }

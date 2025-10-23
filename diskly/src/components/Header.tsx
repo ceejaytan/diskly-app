@@ -5,16 +5,19 @@ import "../Css/Header.css";
 
 type HeaderProps = {
   userSession: {
-    username: string
+    userid: number;
+    username: string;
+    status: string;
   } | null
 }
 
-export default function Header_for_GameSearch({userSession}: HeaderProps) {
+export default function Header({userSession}: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
+    console.log(userSession)
     const handleClickOutside = (event: MouseEvent) => {
       if (
         menuRef.current &&
@@ -40,7 +43,12 @@ export default function Header_for_GameSearch({userSession}: HeaderProps) {
   }
 
   return (
+    <>
+      {userSession?.status === "Banned" && (
+      <div className="bg-red-600 text-white">You Have Been Banned From Renting</div>
+      )}
     <header className="header">
+
       <div className="logo">
         <img
           src="/images/diskly-logo.png"
@@ -60,8 +68,6 @@ export default function Header_for_GameSearch({userSession}: HeaderProps) {
         <button type="submit">🔍︎</button>
 
       </form>
-
-
 
       <button
         ref={buttonRef}
@@ -123,5 +129,6 @@ export default function Header_for_GameSearch({userSession}: HeaderProps) {
       </nav>
 
     </header>
+</>
   );
 }

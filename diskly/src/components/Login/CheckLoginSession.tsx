@@ -12,6 +12,8 @@ export default async function checkLoginSession(){
     if (!res.ok){ return null; }
 
     const data = await res.json();
+    console.log(data);
+    
 
     return data;
 

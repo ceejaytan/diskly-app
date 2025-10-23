@@ -10,12 +10,12 @@ type Customers = {
   first_name: string;
   last_name: string;
   contact: string;
-  status: "placeholer 1" | "placeholder 2";
+  status: "Active" | "Banned";
 };
 
 
 export default function Customer_Dashboard() {
-  const [activeTab, setActiveTab] = useState<"All Accounts" | "placeholder 1" | "placeholder 2">("All Accounts");
+  const [activeTab, setActiveTab] = useState<"All Accounts" | "Active" | "Banned">("All Accounts");
   const [rentalsData, setRentalsData] = useState<Customers[]>([]);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
 
@@ -31,10 +31,9 @@ export default function Customer_Dashboard() {
 
   async function fetchRentals(status = activeTab) {
 
-    const statusFilter = 
-      status === "All Accounts" ? "" : status;
+    const statusFilter = status === "All Accounts" ? "" : status;
 
-    const res = await fetch(`${API_URL}/admin/customers?page=${page}&searchbyname=${searchByUsername}&searchbyemail=${searchByEmail}&searchbycontact=${searchByContact}`, {
+    const res = await fetch(`${API_URL}/admin/customers?page=${page}&searchbyname=${searchByUsername}&searchbyemail=${searchByEmail}&searchbycontact=${searchByContact}&searchbystatus=${statusFilter}`, {
       credentials: "include",
     });
     const data = await res.json();
@@ -56,8 +55,6 @@ export default function Customer_Dashboard() {
     activeTab === "All Accounts"
       ? rentalsData
       : rentalsData.filter((r) => r.status === activeTab);
-
-
   function digits_only_page(e: any){
     const val = e.target.value
     if (val === ""){
@@ -147,7 +144,7 @@ export default function Customer_Dashboard() {
 
 
         <div className="flex gap-3 w-full text-left xl:w-[40%]">
-          {(["All Accounts", "placeholder 1", "placeholder 2"] as const).map((tab) => (
+          {(["All Accounts", "Active", "Banned"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -168,7 +165,7 @@ export default function Customer_Dashboard() {
           <div
             className="
               adminpage-rental-headers-fix
-              grid grid-cols-[0.4fr_2fr_2fr_2fr_auto]
+              grid grid-cols-[0.4fr_2fr_2fr_2fr_1fr_auto]
               font-semibold text-gray-700
             "
           >
@@ -176,6 +173,7 @@ export default function Customer_Dashboard() {
             <div>Username</div>
             <div>Email</div>
             <div>Contact</div>
+            <div>Status</div>
             <div>Action</div>
           </div>
 
@@ -185,7 +183,7 @@ export default function Customer_Dashboard() {
                 key={customers.id}
                 className="
                   adminpage-rentals-individual-rows
-                  grid grid-cols-[0.4fr_2fr_2fr_2fr_auto]
+                  grid grid-cols-[0.4fr_2fr_2fr_2fr_1fr_auto]
                   items-center rounded-[17px] border bg-white relative
                 "
               >
@@ -203,7 +201,13 @@ export default function Customer_Dashboard() {
 
                 <div className="truncate">{customers.email}</div>
 
-                <div className="truncate">+63 {customers.contact}</div>
+                <div className="">+63 {customers.contact}</div>
+
+                <div 
+                  className={`
+                  ${customers.status === "Active" ? "text-green-700" : "text-red-700"}
+                  `}
+                  >{customers.status}</div>
 
 
                 <div className="text-right relative" >

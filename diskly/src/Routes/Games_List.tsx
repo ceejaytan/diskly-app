@@ -33,7 +33,7 @@ enum platform{
 
 export default function GamesPage() {
 
-  type SessionType = { userid: number; username: string; } | null;
+  type SessionType = { userid: number; username: string; status: string } | null;
   const [session, setSession] = useState<SessionType>(null);
 
 
@@ -46,7 +46,7 @@ export default function GamesPage() {
     (async () => {
       const userdata = await checkLoginSession();
       if (userdata) {
-        setSession({ userid: userdata.user_id, username: userdata.username });
+        setSession({ userid: userdata.user_id, username: userdata.username, status: userdata.status });
       } else {
         setSession(null);
       }
@@ -187,17 +187,21 @@ export default function GamesPage() {
             <p>₱{game.price_to_rent} per day</p>
 
 
-            {session && (
+            {session?.status === "Banned" ? (
             <button  onClick={() => { openRentForm(); fetch_game_info(game.id) }}
             className="
                   rent-btn
                   "
                 >Rent Now</button>
-            )}
+            ): session?.status === "Active" &&
+            <button className="rent-btn not-loggedin" >Can't rent with this account</button>
+              
+            }
 
             {!session && (
             <button className="rent-btn not-loggedin" onClick={login_to_rent}>Login to rent</button>
             )}
+
 
           </div>
         ))}

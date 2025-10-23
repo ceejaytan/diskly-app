@@ -125,6 +125,7 @@ export default function Edit_CD({game_id, cancelbtn}:more_boilerplate_because_re
       setAddCDFailed(data.toString());
     }
       setLoading(false);
+      cancelbtn();
 
   }
 
