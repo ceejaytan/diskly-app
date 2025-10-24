@@ -17,6 +17,7 @@ type Rental = {
   quantity: number;
   console: string;
   game_id: number;
+  days_overdue: number;
 };
 
 
@@ -375,6 +376,7 @@ export default function Rentals_Dashboard() {
           id={rentalsData.find(r => r.id === openDropdownId)?.id ?? 0}
           cd_name={rentalsData.find(r => r.id === openDropdownId)?.title ?? "Loading.."}
           game_id={rentalsData.find(r => r.id === openDropdownId)?.game_id ?? 0}
+          total_price={rentalsData.find(r => r.id === openDropdownId)?.price ?? 0}
           cancelbtn={() => setConfirmReturned(false)}
           refetchRentalData={() => { fetchRentals(); setOpenDropdownId(null) } }
         />
@@ -384,6 +386,7 @@ export default function Rentals_Dashboard() {
       <Rental_Summary
           transaction_id={rentalsData.find(r => r.id === openDropdownId)?.transaction_id ?? 0}
           rental_status={rentalsData.find(r => r.id === openDropdownId)?.status ?? ''}
+          days_overdue={rentalsData.find(r => r.id === openDropdownId)?.days_overdue ?? 0}
           cancelbtn={() => {setRental_Summary(false)}}/>
       )}
 

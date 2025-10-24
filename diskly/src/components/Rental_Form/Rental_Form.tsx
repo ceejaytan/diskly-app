@@ -10,6 +10,7 @@ type game_rent_info = {
   total_stocks: number,
   total: number,
   rental_start_date: Date
+  description: string,
 }
 
 type userinfo = {
@@ -112,7 +113,7 @@ async function submitForm(e:any) {
   if (!info || !userinfo) return;
   
 
-  const success = await Submit_Rental_Form({
+  const result = await Submit_Rental_Form({
     userid: userinfo.userid,
     username: userinfo.username,
     game_id: info.game_id,
@@ -123,7 +124,8 @@ async function submitForm(e:any) {
     quantity: Number(Quantity),
     total_cost: rentTotal,
   });
-    setSuccess(success);
+    setSuccess(result.success);
+    setErrorMessage(result.message);
     setRentalForm_Submitted(true)
 }
 
@@ -132,6 +134,7 @@ async function submitForm(e:any) {
     <>
         <Rental_Form_Message_Success 
           success={success}
+          message={errorMessage || ""}
           cancelbtn={() => {cancelbtn(); setRentalForm_Submitted(false)}}
           refreshbtn={() => {window.location.reload()}}
         />
@@ -141,7 +144,10 @@ async function submitForm(e:any) {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/80  z-50 p-4" onClick={cancelbtn}>
-      <div className="rent-form-container bg-[#0b0e13] border-2 border-cyan-400 rounded-2xl w-full max-w-xl p-8 text-cyan-100" onClick={(e) => e.stopPropagation()}>
+      <div className="
+        rent-form-container bg-[#0b0e13] border-2 border-cyan-400 rounded-2xl w-full max-w-xl p-8 text-cyan-100
+        max-h-[100vh] overflow-y-auto"
+         onClick={(e) => e.stopPropagation()}>
         <form className="rent-form flex flex-col gap-6">
           <h2 className="text-2xl font-bold text-cyan-400 text-center mb-2">
             Diskly CD Rental Form
@@ -171,6 +177,22 @@ async function submitForm(e:any) {
               items-center
               ">
               {info?.game_title || "none"}
+            </p>
+
+            <label className="text-sm font-semibold text-cyan-300 mb-1 w-[93%] text-left">
+              description
+            </label>
+            <p className="
+              bg-[#D6DCDE]
+              border
+              border-cyan-400/60
+              text-black
+              rounded-[13px]
+              h-[40px] w-[100%]
+              flex
+              items-center
+              ">
+              {info?.description || "none"}
             </p>
           </div>
 

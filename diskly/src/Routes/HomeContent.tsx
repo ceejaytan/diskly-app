@@ -54,7 +54,7 @@ export default function HomeContent() {
   )}
 
   if(userSession?.username === "admin"){
-    window.location.href = "/Stock"
+    window.location.href = "/Admin"
   }
 
   return (

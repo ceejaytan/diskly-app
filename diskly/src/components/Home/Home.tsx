@@ -4,7 +4,9 @@ import Footer from "../Footer"
 
 type HeaderProps = {
   userSession: {
-    username: string
+    userid: number;
+    username: string;
+    status: string;
   } | null
 }
 

@@ -11,6 +11,7 @@ class AdminValidations:
 
     class add_games_model(BaseModel):
         game_name: str
+        description: str
         platform: str
         price: float
         quantity: int

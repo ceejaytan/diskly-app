@@ -10,8 +10,9 @@ type GameTitles = {
   id: number;
   Title: string;
   Date_Added: string;
-  Quantity: string;
+  Quantity: number;
   status: "Available" | "Out of Stock";
+  console: string;
 };
 
 
@@ -164,11 +165,12 @@ export default function Stocks_Dashboard() {
       <div
         className="
           adminpage-rental-headers-fix
-          grid grid-cols-[3fr_2fr_1fr_1fr_auto]
+          grid grid-cols-[1.5fr_1.5fr_1.5fr_1fr_1fr_auto]
           font-semibold text-gray-700
         "
       >
         <div>Title</div>
+        <div>Console</div>
         <div>Date Added</div>
         <div>Quantity</div>
         <div>Status</div>
@@ -183,12 +185,16 @@ export default function Stocks_Dashboard() {
             className="
           adminpage-rental-headers-fix
               adminpage-Games-individual-rows
-              grid grid-cols-[3fr_2fr_1fr_1fr_auto]
+              grid grid-cols-[1.5fr_1.5fr_1.5fr_1fr_1fr_auto]
               items-center rounded-[17px] border bg-white relative
             "
           >
             <div className="flex items-center gap-3">
               <p className="font-medium">{Games.Title}</p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <p className="font-medium">{Games.console}</p>
             </div>
 
             <div>
