@@ -1,8 +1,140 @@
+import { useEffect, useState } from "react";
+import { API_URL } from "../API/config";
 import "../Css/ContactUs.css";
 
 export default function ContactUs() {
+
+  const [firstname, setFirstName] = useState("");
+
+  const [lastname, setLastName] = useState("");
+
+  const [email, setEmail] = useState("");
+  const [emailMessage, setEmailMessage] = useState("");
+  const [emailValid, setEmailValid] = useState(false);
+
+  const [contact, setContact] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
+  const [contactValid, setContactValid] = useState(false);
+
+  const [UserIssue, SetUserIssue] = useState("");
+  const [UserIssueValid, SetUserIssueValid] = useState(false);
+
+
+  const [loading, setLoading] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState("");
+
+
+  const emailRegex = /^[A-Za-z0-9._+-]{3,20}@[^\s@]+\.[A-Za-z]{2,}$/;
+  const contactRegex = /^9\d{9}$/;
+
+
+  useEffect(() => {
+    if (!email) {
+      setEmailMessage("");
+      setEmailValid(false);
+      return;
+    }
+
+    if (!emailRegex.test(email)) {
+      setEmailMessage("Invalid email");
+      setEmailValid(false);
+      return;
+    }else {
+      setEmailMessage("");
+      setEmailValid(true);
+    }
+
+  }, [email]);
+
+  useEffect(() => {
+    if (!contact) {
+      setContactMessage("");
+      setContactValid(false);
+      return;
+    }
+    if(!contactRegex.test(contact)) {
+      setContactMessage("Invalid Contact! example: 9232404697")
+      setContactValid(false)
+      return;
+    }else {
+      setContactMessage("");
+      setContactValid(true);
+    }
+  }, [contact])
+
+
+
+  useEffect(() => {
+    if (UserIssue.length > 120 ){
+      SetUserIssueValid(true)
+    }else{
+      SetUserIssueValid(false)
+    }
+  })
+
+  async function SubmitData(e: any){
+    e.preventDefault();
+    setLoading(true);
+    setSubmitMessage("")
+
+    const formdata = new FormData();
+    formdata.append("first_name", firstname);
+    formdata.append("last_name", lastname);
+    formdata.append("email", email);
+    formdata.append("contact", contact);
+    formdata.append("user_issue", UserIssue);
+
+    try{
+      const res = await fetch(`${API_URL}/user/contact-us`, {
+        method: "POST",
+        body: formdata
+      });
+      if (res.ok) {
+        setLoading(false);
+        setSubmitMessage("Successfully Submitted")
+        setFirstName("");
+        setLastName("");
+        setEmail("");
+        setContact("");
+        SetUserIssue("");
+      }else{
+        setLoading(false);
+        setSubmitMessage("Failed to submit")
+      }
+    }catch (err){
+      console.log(err);
+      setLoading(false);
+      setSubmitMessage("Something went wrong")
+    }
+    setLoading(false);
+  }
+
+
+
   return (
+
+
     <div className="contactus-container">
+{loading && (
+  <div className="fixed inset-0 flex flex-col items-center justify-center bg-black/70 z-50">
+    <div className="w-14 h-14 border-4 border-cyan-300 border-t-transparent rounded-full animate-spin"></div>
+    <p className="mt-4 text-cyan-300 text-lg font-semibold">Submitting...</p>
+  </div>
+)}
+
+    {submitMessage && (
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-black/70 z-50">
+        <div className="submitMessage bg-[#0b0e13] border-2 border-cyan-400 rounded-2xl text-center">
+          <h3 className="text-cyan-300 text-xl font-bold ">Message Sent</h3>
+          <p className="text-gray-300 mb-4">{submitMessage}</p>
+          <button
+            onClick={() => setSubmitMessage("")}
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    )}
       <div className="back-arrow" onClick={() => window.history.back()}>
         ←
       </div>
@@ -55,22 +187,65 @@ export default function ContactUs() {
           <h2>Get in Touch</h2>
           <p>You can reach us anytime</p>
 
-          <form className="contact-form">
+          <form className="contact-form" onSubmit={(e) => SubmitData(e)}>
             <div className="form-row">
-              <input type="text" placeholder="First name" required />
-              <input type="text" placeholder="Last name" required />
+              <input 
+                value={firstname}
+                onChange={(e) => {setFirstName(e.target.value)}}
+                type="text"
+                placeholder="First name"
+                required
+              />
+              <input
+                value={lastname}
+                onChange={(e) => {setLastName(e.target.value)}}
+                type="text"
+                placeholder="Last name"
+                required />
             </div>
-            <input type="email" placeholder="Your email" required />
-            <div className="form-row">
-              <select>
-                <option>+63</option>
-                <option>+1</option>
-                <option>+44</option>
-              </select>
-              <input type="tel" placeholder="Phone number" required />
+              <div className="input-group">
+                {email && <small className="text-red-500">{emailMessage}</small>}
+                <input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={`${email === "" ? "" : emailValid ? "Inputvalid" : "Inputinvalid"}`}
+                  type="email"
+                  placeholder="Your email"
+                  required
+                />
+              </div>
+            <div className="form-group">
+              {contact && <small className="text-red-500">{contactMessage}</small>}
+              <div className="contact-field">
+                <span className="country-code">+63</span>
+                <input
+                  type="tel"
+                  value={contact}
+                  onChange={(e) => setContact(e.target.value)}
+                  required
+                  className={`
+                    ${contact === "" ? "" : contactValid ? "Inputvalid" : "Inputinvalid"}
+                  `}
+                />
+              </div>
             </div>
-            <textarea placeholder="How can we help?" required></textarea>
-            <button type="submit" className="submit-btn">
+
+              {UserIssueValid && <small className="text-red-500">Max 120 characters ( {UserIssue.length} / 120 )</small>}
+            <textarea
+              value={UserIssue}
+              onChange={(e) => {SetUserIssue(e.target.value)}}
+              className={`
+                ${UserIssue === "" ? "" : UserIssue.length < 120 ? "Inputvalid" : "Inputinvalid"}
+              `}
+              placeholder="How can we help? ( 120 characters )"
+              required></textarea>
+            <button 
+              type="submit"
+              className="
+              submit-btn
+              "
+              disabled={!firstname || !lastname || !emailValid || !contactValid || !UserIssue || UserIssue.length > 120}
+            >
               Submit
             </button>
             <p className="policy-text">

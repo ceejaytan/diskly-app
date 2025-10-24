@@ -164,7 +164,7 @@ export default function Transaction_action({editdata, cancelbtn}:more_boilerplat
                 flex
                 items-center
                 ">
-                  {editdata.price}
+                  ₱{editdata.price.toFixed(2)}
               </p>
             </div>
           </div>

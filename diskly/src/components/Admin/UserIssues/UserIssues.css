@@ -1,0 +1,81 @@
+/* Container */
+.user-issues-container {
+  padding: 2rem;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* Header */
+.user-issues-container h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: black;
+  margin-bottom: 0.3rem;
+}
+
+.user-issues-container p {
+  color: black;
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+}
+
+.user-issues-empty {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  margin-top: 3rem;
+}
+
+.user-issues-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.user-issue-card {
+  background-color: white;
+  border: 2px solid #33D6D6;
+  border-radius: 14px;
+  padding: 1.3rem 1.5rem;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.05);
+  transition: box-shadow 0.25s ease;
+}
+
+.user-issue-card:hover {
+  box-shadow: 0 0 14px rgba(0, 255, 255, 0.15);
+}
+
+.user-issue-header {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.9rem;
+}
+
+.user-issue-info h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: black;
+}
+
+.user-issue-info p {
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+.user-issue-id {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.user-issue-body {
+  border: 1px solid #777;
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  line-height: 1.4;
+  color: black;
+  word-wrap: break-word;
+  font-size: 0.95rem;
+  min-height: 120px;
+  max-height: 120px;
+  overflow-y: auto;
+}

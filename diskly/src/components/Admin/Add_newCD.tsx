@@ -159,16 +159,17 @@ async function submit_saveCD(e: any){
             <label className="text-sm font-semibold text-cyan-300 mb-1 w-[93%] text-left">
               Description
             </label>
-            <input
+            <textarea
               className="
               bg-[#D6DCDE]
               border
               border-cyan-400/60
               text-black
               rounded-[13px]
-              h-[40px] w-[100%]
+              h-[120px] w-full
               flex
               items-center
+              overflow-y-auto
               "
               value={Description}
               onChange={(e) => setDescription(e.target.value) }

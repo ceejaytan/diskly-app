@@ -67,7 +67,8 @@ export default function Edit_CD({game_id, cancelbtn}:more_boilerplate_because_re
       return;
     }
     const numval = Number(val);
-    if (/^\d*$/.test(val) && numval > -1 && val !== "0" && val < 2147483647) {
+    const current_rented = game_detail?.currently_rented ?? -1;
+    if (/^\d*$/.test(val) && numval > current_rented && val !== "0" && val < 2147483647) {
       setQuantity(val)
       setQuantityValid(true);
     }
@@ -92,7 +93,7 @@ export default function Edit_CD({game_id, cancelbtn}:more_boilerplate_because_re
     const data = await res.json();
     setGame_Detail(data);
     setGameTitle(data.game_name);
-    setDescription(data.description);
+    setDescription(data.description ?? "");
     setPrice(data.price_to_rent);
     setQuantity(data.total_stocks);
     setConsolePlatform(data.platform)
@@ -119,18 +120,26 @@ export default function Edit_CD({game_id, cancelbtn}:more_boilerplate_because_re
     formdata.append("image", imageFile);
     }
 
-    const res = await fetch(`${API_URL}/admin/update-game`, {
-      method: "POST",
-      credentials: "include",
-      body: formdata
-    });
-    const data = await res.json()
-    if(res.ok){
-      setAddCDFailed(data.toString());
-    }
+    try{
+      const res = await fetch(`${API_URL}/admin/update-game`, {
+        method: "POST",
+        credentials: "include",
+        body: formdata
+      });
+      const data = await res.json()
+      if(res.ok){
+        setAddCDFailed(data.toString());
+      }
+        setLoading(false);
+    }catch (err){
+    {
       setLoading(false);
-
+        console.log(err);
+        
+    }
+    setLoading(false);
   }
+}
 
 
   return (
@@ -187,16 +196,17 @@ export default function Edit_CD({game_id, cancelbtn}:more_boilerplate_because_re
             <label className="text-sm font-semibold text-cyan-300 mb-1 w-[93%] text-left">
               Description
             </label>
-            <input
+            <textarea
               className="
-              bg-[#D6DCDE]
-              border
-              border-cyan-400/60
-              text-black
-              rounded-[13px]
-              h-[40px] w-[100%]
-              flex
-              items-center
+            bg-[#D6DCDE]
+            border
+            border-cyan-400/60
+            text-black
+            rounded-[13px]
+            h-[120px] w-full
+            flex
+            items-start
+            overflow-y-auto
               "
               value={Description}
               onChange={(e) => setDescription(e.target.value) }
@@ -205,7 +215,7 @@ export default function Edit_CD({game_id, cancelbtn}:more_boilerplate_because_re
           </div>
 
           {/* Console / Quantity / Price */}
-          <div className="grid grid-cols-[2fr_1fr_2fr] gap-4">
+          <div className="grid grid-cols-[2fr_1.2fr_2fr] gap-4">
             {/* Console */}
             <div className="flex flex-col items-center">
               <label className="text-sm font-semibold text-cyan-300 mb-1 w-[85%] text-left">
@@ -237,23 +247,51 @@ export default function Edit_CD({game_id, cancelbtn}:more_boilerplate_because_re
               <label className="text-sm font-semibold text-cyan-300 mb-1 w-[85%] text-left">
                 Quantity
               </label>
-              <div className="flex w-full max-w-[100%]">
-                <input
-                  type="text"
-                  className={`
+              <div
+                className="
+                  flex
+                  items-center
                   bg-[#D6DCDE]
                   border-2
-                  text-black
-                  rounded-[13px]
-                  h-[40px] w-full
-                  items-center
                   border-cyan-400/60
+                  rounded-[13px]
+                  h-[40px]
+                  overflow-hidden
+                  px-3
+                "
+              >
+                <span
+                  className="
+                    padding-fix
+                    text-black
+                    font-semibold
+                    flex-shrink-0
+                  "
+                  title="Currently rented — cannot go lower than this"
+                >
+                  {game_detail?.currently_rented ?? 0} /
+                </span>
 
-                  `}
-              value={Quantity}
-              onChange={(e) => digits_only_quantity(e) }
+                <input
+                  type="text"
+                  className="
+                    bg-[#D6DCDE]
+                    border-2
+                    border-l-0
+                    border-cyan-400/60
+                    text-black
+                    rounded-r-[13px]
+                    h-[40px]
+                    w-[80px]
+                    focus:outline-none
+                  "
+                  value={Quantity}
+                  onChange={(e) => digits_only_quantity(e)}
                 />
               </div>
+              <small className="text-xs text-gray-400 mt-1">
+                min / total stocks
+              </small>
             </div>
 
             {/* Price */}

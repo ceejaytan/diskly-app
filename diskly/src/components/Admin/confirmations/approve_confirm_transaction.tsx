@@ -34,7 +34,7 @@ async function approve_rental(id: number){
             <h1 className="leading-snug text-center">
               Approve this transaction?
             </h1>
-            <p>Make sure user has paid the following ₱{total_cost}</p>
+            <p>Make sure user has paid the following ₱{total_cost.toFixed(2)}</p>
 
             <small>( Note that others "Pending" Transactions will get auto denied if there's not enough stocks. )</small>
 

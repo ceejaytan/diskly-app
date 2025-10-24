@@ -134,11 +134,22 @@
   background-color: #4bc3ca;
 }
 
+.submit-btn:disabled {
+  background-color: #4bc3ca;
+  opacity: 50%;
+  cursor: not-allowed;
+}
+
+.contact-form .Inputinvalid{
+  border: 2px solid red !important;
+}
+
 .policy-text {
   font-size: 0.8rem;
   text-align: center;
   color: #bbb;
 }
+
 
 .policy-text a {
   color: #63d6dd;
@@ -148,6 +159,41 @@
 .policy-text a:hover {
   text-decoration: underline;
 }
+
+
+.contact-form .input-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.contact-form .contact-field {
+  display: flex;
+  justify-content: center;
+}
+
+.contact-form .country-code {
+  padding: 17px 10px;
+  font-weight: 500;
+}
+
+.contact-field input:focus {
+  box-shadow: 0 0 0 2px #22d3ee inset;
+}
+
+.contactus-container .submitMessage{
+  padding: 20px ;
+}
+
+.contactus-container .submitMessage button{
+  margin-top: 20px;
+  background-color: #5BE0E5;
+  color: black;
+}
+
+
+
+
 
 /* Responsive */
 @media (max-width: 900px) {

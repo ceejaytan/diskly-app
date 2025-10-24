@@ -232,7 +232,7 @@ export default function Rentals_Dashboard() {
                   }
                 </div>
 
-                <div>₱{rental.price}</div>
+                <div>₱{rental.price.toFixed(2)}</div>
 
                 <div
                   className={

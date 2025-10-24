@@ -183,14 +183,15 @@ async function submitForm(e:any) {
               description
             </label>
             <p className="
-              bg-[#D6DCDE]
-              border
-              border-cyan-400/60
-              text-black
-              rounded-[13px]
-              h-[40px] w-[100%]
-              flex
-              items-center
+            bg-[#D6DCDE]
+            border
+            border-cyan-400/60
+            text-black
+            rounded-[13px]
+            h-[120px] w-full
+            flex
+            items-start
+            overflow-y-auto
               ">
               {info?.description || "none"}
             </p>
@@ -314,7 +315,7 @@ async function submitForm(e:any) {
                 flex
                 items-center
                 ">
-                ₱{rentTotal || "0"}
+                ₱{rentTotal.toFixed(2) || "0"}
               </p>
             </div>
           </div>

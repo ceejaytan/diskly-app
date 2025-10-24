@@ -82,6 +82,11 @@
   padding: 3px;
 }
 
+
+.rent-form .padding-fix {
+  padding: 10px;
+}
+
 /* ---------------------------- */
 
 .rental-dashboard{
