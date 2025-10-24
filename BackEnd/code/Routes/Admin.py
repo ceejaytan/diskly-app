@@ -5,6 +5,11 @@ from ..Sql import SqlAdmin
 from ..Validations import AdminValidations
 
 
+def admin_secret_key_check(logged_in: str = Cookie(None)):
+    if not logged_in or logged_in != "0f32c0fe13ad509e1a2fadbe72d5ad8f7fae769c332d0e34c9ef0fba0cebacb9":
+        print("not an admin")
+        return True
+    return False
 
 
 router = APIRouter()
@@ -33,9 +38,9 @@ def delete_rental(
     logged_in: str = Cookie(None),
     id: int = 0
 ):
-    if not logged_in or logged_in != "0f32c0fe13ad509e1a2fadbe72d5ad8f7fae769c332d0e34c9ef0fba0cebacb9":
-        print("not an admin")
+    if admin_secret_key_check(logged_in):
         raise HTTPException(status_code=400, detail="Your not an admin")
+
     print("deleting a rental...")
     SqlAdmin.delete_rental(id)
     return JSONResponse(status_code=200, content="deleted succesfully")
@@ -59,10 +64,8 @@ def view_transactions(
     searchbygame: str = "",
     searchbydate: str = "",
 ):
-    # print("viewing transactions")
-    # if not logged_in or logged_in != "0f32c0fe13ad509e1a2fadbe72d5ad8f7fae769c332d0e34c9ef0fba0cebacb9":
-    #     print("not an admin")
-    #     raise HTTPException(status_code=400, detail="Your not an admin")
+    if admin_secret_key_check(logged_in):
+        raise HTTPException(status_code=400, detail="Your not an admin")
 
     return SqlAdmin.view_transactions(
         page,
@@ -80,6 +83,9 @@ def approve_transaction(
 ):
     print("approving transaction...")
 
+    if admin_secret_key_check(logged_in):
+        raise HTTPException(status_code=400, detail="Your not an admin")
+
     SqlAdmin.approve_transaction(id)
     SqlAdmin.insertinto_rentals(id)
 
@@ -88,7 +94,11 @@ def deny_transaction(
     logged_in: str = Cookie(None),
     id: int = 0
 ):
+
     print("denying transaction...")
+    if admin_secret_key_check(logged_in):
+        raise HTTPException(status_code=400, detail="Your not an admin")
+
     SqlAdmin.deny_transaction(id)
 
 
@@ -100,9 +110,9 @@ def delete_transaction(
     id: int = 0
 ):
 
-    if not logged_in or logged_in != "0f32c0fe13ad509e1a2fadbe72d5ad8f7fae769c332d0e34c9ef0fba0cebacb9":
-        print("not an admin")
+    if admin_secret_key_check(logged_in):
         raise HTTPException(status_code=400, detail="Your not an admin")
+
     print("deleting a rental...")
     SqlAdmin.delete_transaction(id)
     return JSONResponse(status_code=200, content="deleted succesfully")
@@ -134,12 +144,16 @@ def view_games(
 
 @router.post("/add_game")
 async def add_game(
+    logged_in: str = Cookie(None),
     game_name: str = Form(...),
     platform: str = Form(...),
     price: float = Form(...),
     quantity: int = Form(...),
     image: Optional[UploadFile] = File(None)
 ):
+
+    if admin_secret_key_check(logged_in):
+        raise HTTPException(status_code=400, detail="Your not an admin")
 
     request = AdminValidations.add_games_model(
         game_name=game_name,
@@ -160,6 +174,7 @@ async def add_game(
 
 @router.post("/update-game")
 async def update_game(
+    logged_in: str = Cookie(None),
     game_id: int = Form(...),
     game_name: str = Form(...),
     platform: str = Form(...),
@@ -167,6 +182,10 @@ async def update_game(
     quantity: int = Form(...),
     image: Optional[UploadFile] = File(None)
 ):
+
+    if admin_secret_key_check(logged_in):
+        raise HTTPException(status_code=400, detail="Your not an admin")
+
     request = AdminValidations.add_games_model(
         game_name=game_name,
         platform=platform,
@@ -194,8 +213,7 @@ def delete_game(
     game_id: int = 0
 ):
     print("deleting game...")
-    if not logged_in or logged_in != "0f32c0fe13ad509e1a2fadbe72d5ad8f7fae769c332d0e34c9ef0fba0cebacb9":
-        print("not an admin")
+    if admin_secret_key_check(logged_in):
         raise HTTPException(status_code=400, detail="Your not an admin")
 
     if SqlAdmin.check_if_can_delete_game(game_id):
@@ -211,14 +229,21 @@ def delete_game(
 @router.get("/Transactions-more-info")
 def Transactions_more_info(id: int):
     print()
+    # TODO
+    
 
 
 @router.post("/confirm-return-rental")
 def return_rental(
-        logged_in: str = Cookie(None),
-        id: int = 0
+    logged_in: str = Cookie(None),
+    id: int = 0,
+    total_price: int = 0
 ):
-    SqlAdmin.confirm_return(id)
+
+    if admin_secret_key_check(logged_in):
+        raise HTTPException(status_code=400, detail="Your not an admin")
+
+    SqlAdmin.confirm_return(id, total_price)
     return {"returned"}
 
 
@@ -248,3 +273,35 @@ def view_customers(
 def view_customer_info(id: int):
     print(f"viewing userID: ${id} ")
     return SqlAdmin.view_customer_info(id)
+
+
+@router.post("/ban-user")
+def ban_user(
+    logged_in: str = Cookie(None),
+    id: int = 0,
+):
+
+    if admin_secret_key_check(logged_in):
+        raise HTTPException(status_code=400, detail="Your not an admin")
+
+    if SqlAdmin.ban_user(id):
+        return {"detail": "succesfully banned user"}
+    else:
+        raise HTTPException(status_code=400, detail="Failed to ban user")
+
+
+
+@router.post("/unban-user")
+def unban_user(
+    logged_in: str = Cookie(None),
+    id: int = 0,
+):
+
+    if admin_secret_key_check(logged_in):
+        raise HTTPException(status_code=400, detail="Your not an admin")
+
+    if SqlAdmin.unban_user(id):
+        return {"detail": "succesfully unbanned user"}
+    else:
+        raise HTTPException(status_code=400, detail="Failed to unban user")
+

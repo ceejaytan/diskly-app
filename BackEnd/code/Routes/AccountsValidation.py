@@ -25,7 +25,7 @@ def login(
     request: Accounts.LoginRequest = Form(...)
     ):
 
-    if request.username == "admin" and request.password == "admin":
+    if request.username.strip() == "admin" and request.password == "admin":
 
         print("admin login")
         response.set_cookie(

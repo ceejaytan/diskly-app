@@ -26,10 +26,14 @@ def submit_rent_form(
 
     print(logged_in)
     print("renting...")
+
+    if SqlGameCatalog_API.check_if_user_is_banned(request.userid):
+        return JSONResponse(status_code=400, content={"message": "You have been banned from renting."})
+
     print(request)
     if SqlGameCatalog_API.check_rent_info_before_transaction(request.game_id, request.quantity):
         SqlGameCatalog_API.save_transcation_info(request)
         return JSONResponse(status_code=200, content={"message": "info added"})
     else:
-        raise HTTPException(status_code=400, detail={"message": "not enough stock"})
+        return JSONResponse(status_code=400, content={"message": "Looks like the game is out of stock or invalid game please refresh and try again."})
 
