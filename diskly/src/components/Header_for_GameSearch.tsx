@@ -91,7 +91,8 @@ export default function Header_for_GameSearch({userSession}: HeaderProps) {
                   className="profile-avatar"
                 />
                 <span className="profile-username">
-                  Your profile: {userSession.username}
+                username: <b><i>{userSession.username}</i></b>
+                <p>View Profile</p>
                 </span>
               </li>
 
@@ -115,7 +116,7 @@ export default function Header_for_GameSearch({userSession}: HeaderProps) {
                     logout_session();
                   }}
                 >
-                  Logout
+                  Sign Out
                 </button>
 
               </li>
