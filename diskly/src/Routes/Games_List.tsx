@@ -14,7 +14,8 @@ type game_rent_info = {
   console: string,
   total_stocks: number,
   total: number,
-  rental_start_date: Date
+  rental_start_date: Date,
+  description: string,
 } | null;
 
 type Game = {

@@ -234,7 +234,7 @@ useEffect(() => {
                   }
                 </div>
 
-                <div>₱{rental.price}</div>
+                <div>₱{rental.price.toFixed(2)}</div>
 
                 <div
                   className={

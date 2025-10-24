@@ -7,6 +7,7 @@ import Rentals_Dashboard from "../components/Admin/Rentals";
 import Transaction_Dashboard from "../components/Admin/Transactions";
 import Stocks_Dashboard from "../components/Admin/Stocks";
 import Customer_Dashboard from "../components/Admin/customer/customers";
+import User_Issues from "../components/Admin/UserIssues/UserIssues";
 import "../Css/AdminPage.css";
 
 type SessionType = { username: string } | null;
@@ -16,6 +17,7 @@ enum admin_dashboard {
   Transactions = "Transactions",
   Stock = "Stock",
   Customers = "Customers",
+  User_Issues = "User Issues",
 }
 
 export default function AdminPage() {
@@ -62,6 +64,7 @@ export default function AdminPage() {
     { label: "Transactions", type: admin_dashboard.Transactions },
     { label: "Stock", type: admin_dashboard.Stock },
     { label: "Customers", type: admin_dashboard.Customers },
+    { label: "User Issues", type: admin_dashboard.User_Issues },
   ];
 
   return (
@@ -133,6 +136,7 @@ export default function AdminPage() {
         {admin_dashboard_type === admin_dashboard.Transactions && <Transaction_Dashboard />}
         {admin_dashboard_type === admin_dashboard.Stock && <Stocks_Dashboard />}
         {admin_dashboard_type === admin_dashboard.Customers && <Customer_Dashboard />}
+        {admin_dashboard_type === admin_dashboard.User_Issues && <User_Issues />}
       </main>
     </div>
   );

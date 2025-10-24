@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Form
+from fastapi.responses import JSONResponse
 from ..Sql import SqlUser
-
+from ..Accounts import Accounts
 
 
 router = APIRouter()
@@ -31,3 +32,15 @@ def user_completed(
 ):
     print("fetching user completed")
     return SqlUser.list_user_completed(user_id, page)
+
+
+
+@router.post("/contact-us")
+def contact_us(
+        request:Accounts.contact_us_model = Form(...)
+):
+    print("contact us request...")
+    if SqlUser.contact_us(request):
+        return JSONResponse(status_code=200, content={"message": "successfully sent."})
+    else:
+        return JSONResponse(status_code=400, content={"message": "Something went wrong."})

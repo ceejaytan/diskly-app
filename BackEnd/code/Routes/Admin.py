@@ -309,3 +309,9 @@ def unban_user(
     else:
         raise HTTPException(status_code=400, detail="Failed to unban user")
 
+
+@router.get("/user-issues")
+def user_issues():
+    print("showing user issues...")
+    return SqlAdmin.user_issues()
+
