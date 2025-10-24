@@ -111,6 +111,7 @@ export default function Edit_CD({game_id, cancelbtn}:more_boilerplate_because_re
     const formdata = new FormData();
     formdata.append("game_id", game_id.toString());
     formdata.append("game_name", GameTitle);
+    formdata.append("game_description", Description);
     formdata.append("platform", ConsolePlatform);
     formdata.append("price", Price.toString());
     formdata.append("quantity", Quantity.toString());
@@ -128,7 +129,6 @@ export default function Edit_CD({game_id, cancelbtn}:more_boilerplate_because_re
       setAddCDFailed(data.toString());
     }
       setLoading(false);
-      cancelbtn();
 
   }
 

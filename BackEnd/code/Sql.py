@@ -816,13 +816,15 @@ class SqlAdmin:
                 SET game_name = ?,
                     platform = ?,
                     price_to_rent = ?,
-                    total_stocks = ?
+                    total_stocks = ?,
+                    description = ?
                 WHERE ID = ?
                 """,(
                     request.game_name,
                     request.platform,
                     request.price,
                     request.quantity,
+                    request.description,
                     game_id
                                ))
                 conn.commit()
@@ -845,14 +847,14 @@ class SqlAdmin:
                     platform = ?,
                     price_to_rent = ?,
                     total_stocks = ?,
-                    cover_image_path = ?
+                    description = ?
                 WHERE ID = ?
                 """,(
                     request.game_name,
                     request.platform,
                     request.price,
                     request.quantity,
-                    cover_image_path,
+                    request.description,
                     game_id
                                ))
                 conn.commit()
