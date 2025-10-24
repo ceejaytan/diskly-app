@@ -660,6 +660,7 @@ class SqlAdmin:
                     "cover_image_path": row[5],
                     "date_added": row[6],
                     "currently_rented": row[7],
+                    "description": row[8],
                 }
                 return row
         except sqlite3.Error as err:
@@ -780,10 +781,10 @@ class SqlAdmin:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    INSERT INTO game_catalog (game_name, platform, price_to_rent, total_stocks, cover_image_path, date_added, currently_rented)
-                    VALUES ( ?, ?, ?, ?, ?, ?, 0)
+                    INSERT INTO game_catalog (game_name, platform, price_to_rent, total_stocks, cover_image_path, date_added, currently_rented, description)
+                    VALUES ( ?, ?, ?, ?, ?, ?, 0, ?)
                                """, 
-                    (game_info.game_name, game_info.platform, game_info.price, game_info.quantity, cover_image_path, datetime.now(manila_time))
+                    (game_info.game_name, game_info.platform, game_info.price, game_info.quantity, cover_image_path, datetime.now(manila_time), game_info.description)
                                      )
 
                 conn.commit()
@@ -1078,7 +1079,8 @@ class SqlGameCatalog_API:
                         g.total_stocks,
                         g.price_to_rent,
                         IFNULL(SUM(r.quantity), 0) AS rented_quantity,
-                        g.cover_image_path
+                        g.cover_image_path,
+                        g.description
                     FROM game_catalog g
                     LEFT JOIN rentals r
                         ON g.ID = r.game_id
@@ -1100,6 +1102,7 @@ class SqlGameCatalog_API:
                     "total": row[4],
                     "rental_start_date": datetime.now(manila_time),
                     "cover_image_path": row[6],
+                    "description": row[7],
                 }
                 print(row["rental_start_date"].isoformat())
 

@@ -32,18 +32,19 @@ export default async function Submit_Rental_Form(
       credentials: "include",
       body: formdata
     });
-    if (!res.ok){
-      console.log("failed to submit rent");
-      return false;
-    }
 
     const data = await res.json();
+
+    if (!res.ok){
+      console.log("failed to submit rent");
+     return { success: false, message: data?.message || "Failed to submit rental form" };
+    }
     console.log(data);
-    return true;
+    return { success: true, message: data?.message || "Rental submitted successfully" };
 
   } catch (error) {
-    console.log(error)
-      return false;
+    console.log(error);
+    return { success: false, message: "Network or server error" };
   }
 
 }

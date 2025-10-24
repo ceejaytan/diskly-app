@@ -16,10 +16,11 @@ type Rental = {
 type more_boilerplate_because_reactjs_moment = {
   transaction_id: number;
   rental_status: string;
+  days_overdue: number;
   cancelbtn: () => void;
   }
 
-export default function Rental_Summary({transaction_id, rental_status, cancelbtn}:more_boilerplate_because_reactjs_moment){
+export default function Rental_Summary({transaction_id, rental_status, days_overdue, cancelbtn}:more_boilerplate_because_reactjs_moment){
   const [rentalsData, setRentalsData] = useState<Rental| null>(null);
 
   async function fetchData(){
@@ -131,6 +132,7 @@ export default function Rental_Summary({transaction_id, rental_status, cancelbtn
                   })
                   : "Loading..."}
                 </p>
+                <p className="text-red-500">{ days_overdue } days overdue</p>
             </div>
           </div>
 
@@ -172,7 +174,7 @@ export default function Rental_Summary({transaction_id, rental_status, cancelbtn
             </div>
             <div className="flex flex-col items-center">
               <label className="text-sm font-semibold text-cyan-300 mb-1 w-[85%] text-left">
-                Total
+                Total 
               </label>
               <p className="
                 bg-[#D6DCDE]
@@ -184,8 +186,10 @@ export default function Rental_Summary({transaction_id, rental_status, cancelbtn
                 flex
                 items-center
                 ">
-                  ₱{rentalsData?.price}
+                  ₱{( rentalsData?.price || 0 ) * 2**days_overdue}
               </p>
+
+                  {rentalsData?.isOverdue ? " Orignal Price: ₱" + rentalsData.price : ""}
             </div>
           </div>
 

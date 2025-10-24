@@ -56,7 +56,7 @@ function formatDate(datetimeStr: string) {
             <img src={`${API_URL}/${ item.cover_image_path }` || `${API_URL}/images/gamecover/Image_not_found.jpg`} alt={item.game_name} className="uprof-card-cover" />
             <div className="uprof-card-info">
               <h3>{item.game_name}</h3>
-              <p>Console: ₱{item.total_price.toLocaleString()}</p>
+              <p>Total: ₱{item.total_price.toLocaleString()} {item.status === "Overdue"  &&" ( With penalty applied )"}</p>
               <p>Console: {item.console}</p>
               <p>Quantity: {item.quantity}</p>
               <p>Rented On: {formatDate( item.rented_on )}</p>

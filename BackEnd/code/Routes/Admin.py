@@ -146,6 +146,7 @@ def view_games(
 async def add_game(
     logged_in: str = Cookie(None),
     game_name: str = Form(...),
+    game_description: str = Form(...),
     platform: str = Form(...),
     price: float = Form(...),
     quantity: int = Form(...),
@@ -157,6 +158,7 @@ async def add_game(
 
     request = AdminValidations.add_games_model(
         game_name=game_name,
+        description=game_description,
         platform=platform,
         price=price,
         quantity=quantity
@@ -177,6 +179,7 @@ async def update_game(
     logged_in: str = Cookie(None),
     game_id: int = Form(...),
     game_name: str = Form(...),
+    game_description: str = Form(...),
     platform: str = Form(...),
     price: float = Form(...),
     quantity: int = Form(...),
@@ -188,6 +191,7 @@ async def update_game(
 
     request = AdminValidations.add_games_model(
         game_name=game_name,
+        description=game_description,
         platform=platform,
         price=price,
         quantity=quantity

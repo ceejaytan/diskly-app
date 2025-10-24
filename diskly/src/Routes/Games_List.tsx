@@ -187,13 +187,13 @@ export default function GamesPage() {
             <p>₱{game.price_to_rent} per day</p>
 
 
-            {session?.status === "Banned" ? (
+            {session?.status === "Active" ? (
             <button  onClick={() => { openRentForm(); fetch_game_info(game.id) }}
             className="
                   rent-btn
                   "
                 >Rent Now</button>
-            ): session?.status === "Active" &&
+            ): session?.status === "Banned" &&
             <button className="rent-btn not-loggedin" >Can't rent with this account</button>
               
             }

@@ -13,6 +13,7 @@ type game_detail_model = {
   cover_image_path: string;
   date_added: string;
   currently_rented: number;
+  description: string;
 }
 
 
@@ -35,6 +36,7 @@ export default function Edit_CD({game_id, cancelbtn}:more_boilerplate_because_re
   const [imageFile, setImageFile] = useState<File | undefined>(undefined);
   const [ConsolePlatform, setConsolePlatform] = useState(Console_Platform.Playstation);
   const [GameTitle, setGameTitle] = useState("");
+  const [Description, setDescription] = useState("");
   const [Quantity, setQuantity] = useState(1);
   const [QuantityValid, setQuantityValid] = useState(true);
   const [Price, setPrice] = useState(100);
@@ -90,6 +92,7 @@ export default function Edit_CD({game_id, cancelbtn}:more_boilerplate_because_re
     const data = await res.json();
     setGame_Detail(data);
     setGameTitle(data.game_name);
+    setDescription(data.description);
     setPrice(data.price_to_rent);
     setQuantity(data.total_stocks);
     setConsolePlatform(data.platform)
@@ -178,6 +181,25 @@ export default function Edit_CD({game_id, cancelbtn}:more_boilerplate_because_re
               "
               value={GameTitle}
               onChange={(e) => setGameTitle(e.target.value) }
+              required
+            />
+
+            <label className="text-sm font-semibold text-cyan-300 mb-1 w-[93%] text-left">
+              Description
+            </label>
+            <input
+              className="
+              bg-[#D6DCDE]
+              border
+              border-cyan-400/60
+              text-black
+              rounded-[13px]
+              h-[40px] w-[100%]
+              flex
+              items-center
+              "
+              value={Description}
+              onChange={(e) => setDescription(e.target.value) }
               required
             />
           </div>

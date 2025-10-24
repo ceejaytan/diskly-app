@@ -19,6 +19,7 @@ export default function Add_newCD({cancelbtn}:more_boilerplate_because_reactjs_m
   const [imageFile, setImageFile] = useState<File | undefined>(undefined);
   const [ConsolePlatform, setConsolePlatform] = useState(Console_Platform.Playstation);
   const [GameTitle, setGameTitle] = useState("");
+  const [Description, setDescription] = useState("");
   const [Quantity, setQuantity] = useState(1);
   const [QuantityValid, setQuantityValid] = useState(true);
   const [Price, setPrice] = useState(100);
@@ -82,6 +83,7 @@ async function submit_saveCD(e: any){
 
     const formdata = new FormData();
     formdata.append("game_name", GameTitle);
+    formdata.append("game_description", Description);
     formdata.append("platform", ConsolePlatform);
     formdata.append("price", Price.toString());
     formdata.append("quantity", Quantity.toString());
@@ -151,6 +153,25 @@ async function submit_saveCD(e: any){
               "
               value={GameTitle}
               onChange={(e) => setGameTitle(e.target.value) }
+              required
+            />
+
+            <label className="text-sm font-semibold text-cyan-300 mb-1 w-[93%] text-left">
+              Description
+            </label>
+            <input
+              className="
+              bg-[#D6DCDE]
+              border
+              border-cyan-400/60
+              text-black
+              rounded-[13px]
+              h-[40px] w-[100%]
+              flex
+              items-center
+              "
+              value={Description}
+              onChange={(e) => setDescription(e.target.value) }
               required
             />
           </div>
@@ -278,7 +299,7 @@ async function submit_saveCD(e: any){
           <button
             type="submit"
             className="rent-form-submitrentalbtn hover:bg-cyan-300 disabled:opacity-50 disabled:bg-cyan-400/20"
-            disabled={!QuantityValid || !PriceValid || !GameTitle || !imageFile || loading}
+            disabled={!QuantityValid || !PriceValid || !GameTitle || !Description || !imageFile || loading}
           >
             {loading ? "Saving..." : "Save New CD"}
           </button>

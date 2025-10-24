@@ -102,9 +102,12 @@ export default function RegisterForm({ toggleForm }: RegisterFormProps) {
     if (birthDate > today) {
       setBirthdayValid(false);
       setBirthdayMessage("Cannot be in the future");
-    } else if (adjustedAge < minAge || adjustedAge > maxAge) {
+    } else if (adjustedAge < minAge) {
       setBirthdayValid(false);
       setBirthdayMessage("Invalid Birthdate ( Must be 13+ )");
+    } else if (adjustedAge > maxAge) {
+      setBirthdayValid(false);
+      setBirthdayMessage("( there's no way your 120+ years old )");
     } else {
       setBirthdayValid(true);
       setBirthdayMessage("");
@@ -154,7 +157,6 @@ export default function RegisterForm({ toggleForm }: RegisterFormProps) {
         setEmailValid(false);
         return;
       }
-
       const res = await fetch(`${API_URL}/accounts/check-email?email=${email}`);
       const data = await res.json();
       if (data.Available) {
@@ -175,14 +177,26 @@ export default function RegisterForm({ toggleForm }: RegisterFormProps) {
       setContactValid(false);
       return;
     }
-    if (!contactRegex.test(contact)) {
-      setContactMessage("Invalid Contact! example: 9232404697");
-      setContactValid(false);
-    } else {
-      setContactMessage("");
-      setContactValid(true);
-    }
-  }, [contact]);
+    if(!contactRegex.test(contact)) {
+      setContactMessage("Invalid Contact! example: 9232404697")
+      setContactValid(false)
+      return;
+    } 
+
+    const timeout = setTimeout(async() => {
+      const res = await fetch(`${API_URL}/accounts/check-contact?contact=${contact}`)
+      const data = await res.json()
+      if (data.Available) {
+      setContactMessage("")
+      setContactValid(true)
+      } else {
+      setContactMessage("Contact already taken")
+      setContactValid(false)
+      }
+    }, 300)
+
+  return () => clearTimeout(timeout);
+  }, [contact])
 
   useEffect(() => {
     if (!password) {
@@ -371,7 +385,7 @@ export default function RegisterForm({ toggleForm }: RegisterFormProps) {
             }
             `}
           />
-          {birthday && <small>{birthdayMessage}</small>}
+          {birthday && <small className="text-red-500">{birthdayMessage}</small>}
         </div>
 
         <div className="form-group">
@@ -394,7 +408,7 @@ export default function RegisterForm({ toggleForm }: RegisterFormProps) {
       `}
             />
           </div>
-          {contact && <small>{contactMessage}</small>}
+          {contact && <small className="text-red-500">{contactMessage}</small>}
         </div>
       </div>
 

@@ -3,9 +3,10 @@ type more_boilerplate_because_reactjs_moment = {
   refreshbtn: () => void;
   cancelbtn: () => void;
   success: boolean;
+  message: string;
   }
 
-export default function Rental_Form_Message_Success({refreshbtn, cancelbtn, success}: more_boilerplate_because_reactjs_moment){
+export default function Rental_Form_Message_Success({refreshbtn, cancelbtn, success, message}: more_boilerplate_because_reactjs_moment){
   return(
   <>
     <div className="fixed inset-0 flex items-center justify-center bg-black/80  z-50 p-4" onClick={success ? cancelbtn : refreshbtn}>
@@ -39,8 +40,7 @@ export default function Rental_Form_Message_Success({refreshbtn, cancelbtn, succ
             {!success && (
               <>
             <h1 className=" leading-snug">
-              Looks like someone has already rented this disk<br />
-              Please reload the page and try again.
+                  {message}
             </h1>
 
             <button

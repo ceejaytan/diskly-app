@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { API_URL } from "../../../API/config";
 
 import Customer_ViewMore from "./customers_viewmore";
+import BanUser from "./confirm_ban";
+import UnBanUser from "./confirm_unban";
 
 type Customers = {
   id: number;
@@ -20,6 +22,8 @@ export default function Customer_Dashboard() {
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
 
   const [openCustomerInfo, setOpenCustomerInfo] = useState(false);
+  const [openBanConfirm, setOpenBanConfirm] = useState(false);
+  const [openUnBanConfirm, setOpenUnBanConfirm] = useState(false);
 
 
   const [searchByUsername, setSearchByUsername] = useState("");
@@ -236,16 +240,6 @@ export default function Customer_Dashboard() {
                       z-10
                       ">
 
-                      {/* <button  */}
-                      {/*   onClick={() => {}} */}
-                      {/*   className=" */}
-                      {/*   adminpage-rentals-delete_btn */}
-                      {/*   w-full */}
-                      {/*   text-left */}
-                      {/*   "> */}
-                      {/*   Delete */}
-                      {/* </button> */}
-
                       <button
                         onClick={() => {setOpenCustomerInfo(true)}}
                         className="
@@ -256,9 +250,38 @@ export default function Customer_Dashboard() {
                         ">
                         View more
                       </button>
+
+
+                      {customers.status === "Active" && (
+                      <button
+                        onClick={() => {setOpenBanConfirm(true)}}
+                        className="
+                        adminpage-rentals-delete_btn
+                        block
+                        w-full
+                        text-left
+                        hover:bg-gray-100
+                        ">
+                        Ban user
+                      </button>
+                      )}
+
+                      {customers.status === "Banned" && (
+                      <button
+                        onClick={() => {setOpenUnBanConfirm(true)}}
+                        className="
+                        adminpage-rentals-green-txt
+                        block
+                        w-full
+                        text-left
+                        hover:bg-gray-100
+                        ">
+                        Activate user
+                      </button>
+                      )}
+
                     </div>
                   )}
-                  {/* drop down fix dont touch */}
                     {openDropdownId && (
                       <div
                         onClick={() => setOpenDropdownId(null)}
@@ -321,6 +344,24 @@ export default function Customer_Dashboard() {
         <Customer_ViewMore
           user_id={rentalsData.find((r) => r.id === openDropdownId)?.id ?? 0}
           cancelbtn={() => setOpenCustomerInfo(false)}
+        />
+      )}
+
+      {openBanConfirm && (
+        <BanUser
+          id={rentalsData.find((r) => r.id === openDropdownId)?.id ?? 0}
+          username={rentalsData.find((r) => r.id === openDropdownId)?.username ?? ""}
+          cancelbtn={() => setOpenBanConfirm(false)}
+          refetchRentalData={() => fetchRentals()}
+        />
+      )}
+
+      {openUnBanConfirm && (
+        <UnBanUser
+          id={rentalsData.find((r) => r.id === openDropdownId)?.id ?? 0}
+          username={rentalsData.find((r) => r.id === openDropdownId)?.username ?? ""}
+          cancelbtn={() => setOpenUnBanConfirm(false)}
+          refetchRentalData={() => fetchRentals()}
         />
       )}
     </main>
