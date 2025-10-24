@@ -49,12 +49,8 @@ class InitializeTables:
                         first_name TEXT,
                         last_name TEXT,
                         birthday DATE,
-<<<<<<< HEAD
                         contact TEXT,
                         created_on datetime
-=======
-                        contact TEXT
->>>>>>> main
                     );
                 """)
 
@@ -359,22 +355,22 @@ class SqlAdmin:
 
     @staticmethod
     def view_rentals(page: int, status_filter: str = "", searchbyname: str = "", searchbygame: str = "", searchbydate: str = ""):
-        """Mark overdue rentals using SQL, then return all rows."""
+        """Mark overdue rentals using SQL, then return computed overdue totals (not saved)."""
         manila_time = ZoneInfo("Asia/Manila")
-        now_ph = datetime.now(manila_time).isoformat()
+        now_ph = datetime.now(manila_time).replace(tzinfo=None)
 
         try:
             with sqlite3.connect(db_path) as conn:
                 conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
 
+                # Update overdue statuses only (optional)
                 cursor.execute("""
                     UPDATE rentals
                     SET status = 'Overdue'
                     WHERE status = 'Ongoing' AND return_on < ?
-                """, (now_ph,))
+                """, (now_ph.isoformat(),))
                 conn.commit()
-
 
                 status_filter_format = f"%{status_filter}%"
                 searchbyname_format = f"%{searchbyname}%"
@@ -383,29 +379,42 @@ class SqlAdmin:
                 offset = (page - 1) * 10
 
                 cursor.execute("""
-                    SELECT ID, user_name, game_name, rented_on, return_on, total_price, status, transaction_id, game_id
+                    SELECT ID, user_name, game_name, rented_on, return_on, total_price, status,
+                        transaction_id, game_id
                     FROM rentals
                     WHERE status LIKE ? COLLATE NOCASE
                     AND ( user_name LIKE ? COLLATE NOCASE AND game_name LIKE ? COLLATE NOCASE )
                     AND ( rented_on LIKE ? COLLATE NOCASE )
-                    ORDER BY ID desc
+                    ORDER BY ID DESC
                     LIMIT 10 OFFSET ?
-                """, (status_filter_format, searchbyname_format, searchbygame_format, searchbydate_format, offset))
+                """, (status_filter_format, searchbyname_format,
+                    searchbygame_format, searchbydate_format, offset))
                 rows = cursor.fetchall()
 
-                return [
-                    {
+                result = []
+                for r in rows:
+                    return_on = datetime.fromisoformat(r["return_on"]).replace(tzinfo=None)
+                    days_overdue = max(0, (now_ph.date() - return_on.date()).days)
+                    display_price = (
+                        r["total_price"] * (2 ** days_overdue)
+                        if r["status"] == "Overdue"
+                        else r["total_price"]
+                    )
+
+                    result.append({
                         "id": r["ID"],
                         "name": r["user_name"],
                         "title": r["game_name"],
                         "rented_on": r["rented_on"],
-                        "price": r["total_price"],
+                        "return_on": r["return_on"],
+                        "price": display_price,
                         "status": r["status"],
                         "transaction_id": r["transaction_id"],
                         "game_id": r["game_id"],
-                    }
-                    for r in rows
-                ]
+                        "days_overdue": days_overdue,
+                    })
+
+                return result
 
         except sqlite3.Error as err:
             print(err)
@@ -413,7 +422,7 @@ class SqlAdmin:
 
 
     @staticmethod
-    def confirm_return(id: int):
+    def confirm_return(id: int, total_price: int):
 
         manila_time = ZoneInfo("Asia/Manila")
         now_ph = datetime.now(manila_time).isoformat()
@@ -436,9 +445,12 @@ class SqlAdmin:
 
                 cursor.execute("""
                     UPDATE rentals
-                    SET status = 'Returned', returned_on = ?
+                    SET 
+                        status = 'Returned',
+                        returned_on = ?,
+                        total_price = ?
                     WHERE ID = ?
-                """, (now_ph, id ))
+                """, (now_ph, total_price, id ))
 
                 cursor.execute("""
                     UPDATE game_catalog
@@ -674,7 +686,8 @@ class SqlAdmin:
                         date_added,
                         platform,
                         total_stocks,
-                        currently_rented
+                        currently_rented,
+                        platform
                     FROM game_catalog
                     WHERE game_name LIKE ? COLLATE NOCASE
                     AND date_added LIKE ? COLLATE NOCASE
@@ -686,7 +699,7 @@ class SqlAdmin:
 
                 gametitles = []
                 for row in rows:
-                    game_id, name, date_added, console, total, rented = row
+                    game_id, name, date_added, console, total, rented, console = row
                     remaining = max(total - rented, 0)
                     status = "Available" if remaining > 0 else "Out of Stock"
 
@@ -699,7 +712,8 @@ class SqlAdmin:
                         "Date_Added": date_added,
                         "Console": console,
                         "Quantity": f"{remaining}/{total}",
-                        "status": status
+                        "status": status,
+                        "console": console
                     })
 
                 return gametitles
@@ -981,6 +995,39 @@ class SqlAdmin:
             return None
 
 
+    @staticmethod
+    def ban_user(id: int):
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                UPDATE accounts
+                set status = 'Banned'
+                WHERE ID = ?
+                """, (id, ))
+                conn.commit()
+                return True
+        except sqlite3.Error as err:
+            print(err)
+            return False
+
+    @staticmethod
+    def unban_user(id: int):
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                UPDATE accounts
+                set status = 'Active'
+                WHERE ID = ?
+                """, (id, ))
+                conn.commit()
+                return True
+        except sqlite3.Error as err:
+            print(err)
+            return False
+
+
 
 class SqlGameCatalog_API:
 
@@ -1076,18 +1123,35 @@ class SqlGameCatalog_API:
 
                 if row is None:
                     return False
-
                 total_stocks, currently_rented = row
                 available_stocks = total_stocks - currently_rented
-
                 if quantity > available_stocks:
                     return False
 
-                return True
 
+                return True
         except sqlite3.Error as err:
             print(err)
             return False
+
+    @staticmethod
+    def check_if_user_is_banned(user_id):
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                SELECT 1 FROM accounts
+                WHERE ID = ? AND status = 'Banned'
+                """,(user_id, ))
+                row = cursor.fetchone()
+                if row is None:
+                    return False
+                return True
+        except sqlite3.Error as err:
+            print(err)
+            return False
+
+
 
 
     @staticmethod
@@ -1158,10 +1222,16 @@ class SqlUser:
 
     @staticmethod
     def list_user_rentals(user_id: int, page: int):
-        """List user rentals with pagination"""
+        """List user rentals with computed overdue totals (not saved)."""
+        manila_time = ZoneInfo("Asia/Manila")
+        now_ph = datetime.now(manila_time).replace(tzinfo=None)
+
         try:
             with sqlite3.connect(db_path) as conn:
+                conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
+
+                offset = (page - 1) * 10
                 cursor.execute("""
                     SELECT
                         rentals.ID,
@@ -1174,31 +1244,43 @@ class SqlUser:
                         rentals.status,
                         game_catalog.cover_image_path,
                         rentals.returned_on
-                    FROM rentals AS rentals
-                    LEFT JOIN game_catalog AS game_catalog
+                    FROM rentals
+                    LEFT JOIN game_catalog
                         ON rentals.game_id = game_catalog.ID
-                    LEFT JOIN transactions AS transactions
+                    LEFT JOIN transactions
                         ON rentals.transaction_id = transactions.ID
                     WHERE rentals.user_id = ? AND rentals.status NOT LIKE 'Returned'
                     ORDER BY rentals.ID DESC
-                """, (user_id,))
-                rows = cursor.fetchall()
+                """, (user_id, ))
 
-                return [
-                    {
-                        "id": r[0],
-                        "game_name": r[1],
-                        "console": r[2],
-                        "quantity": r[3],
-                        "rented_on": r[4],
-                        "return_on": r[5],
-                        "total_price": r[6],
-                        "status": r[7],
-                        "cover_image_path": r[8],
-                        "returned_on": r[9],
-                    }
-                    for r in rows
-                ]
+                rows = cursor.fetchall()
+                result = []
+
+                for r in rows:
+                    return_on = datetime.fromisoformat(r["return_on"]).replace(tzinfo=None)
+                    days_overdue = max(0, (now_ph.date() - return_on.date()).days)
+                    display_price = (
+                        r["total_price"] * (2 ** days_overdue)
+                        if r["status"] == "Overdue"
+                        else r["total_price"]
+                    )
+
+                    result.append({
+                        "id": r["ID"],
+                        "game_name": r["game_name"],
+                        "console": r["game_console"],
+                        "quantity": r["quantity"],
+                        "rented_on": r["rented_on"],
+                        "return_on": r["return_on"],
+                        "total_price": display_price,
+                        "status": r["status"],
+                        "cover_image_path": r["cover_image_path"],
+                        "returned_on": r["returned_on"],
+                        "days_overdue": days_overdue,
+                    })
+
+                return result
+
         except sqlite3.Error as err:
             print(err)
             return None
