@@ -12,6 +12,7 @@ import Home from "./Routes/Home";
 import GamesPage from "./Routes/Games_List";
 import NotFound from "./Routes/NotFound";
 import AdminPage from "./Routes/AdminPage";
+import ContactUs from "./components/ContactUs";
 
 const App: React.FC = () => {
   return (
@@ -19,6 +20,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<HomeContent />} />
         <Route path="/Terms" element={<TermsWrapper />} />
+        <Route path="/contact-us" element={<ContactUs/>}/>
         <Route path="/AuthPage" element={<AuthPage />} />
 
         <Route path="/home" element={<Home />} />
