@@ -100,7 +100,7 @@ export default function Header({userSession}: HeaderProps) {
                 <a href="/games-list">Catalog</a>
               </li>
               <li>
-                <a href="#">Contact Us</a>
+                <a href="/contact-us">Contact Us</a>
               </li>
               <li>
                 <a href="/Terms">T&C</a>
