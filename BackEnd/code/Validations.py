@@ -61,12 +61,13 @@ class AdminValidations:
             print(err)
             return ""
 
-        # safe_name = "".join(c for c in image_file_name if c.isalnum() or c in (" ", "-", "_")).strip()
-        # safe_name = safe_name.replace(" ", "_")
+        safe_name = "".join(c for c in image_file_name if c.isalnum() or c in (" ", "-", "_")).strip()
+        safe_name = safe_name.replace(" ", "_")
         file_name = f"{image_file_name}.{file_extension}"
         image_dir = "images/gamecover"
         os.makedirs(image_dir, exist_ok=True)
-        image_path = os.path.join(image_dir, file_name)
+        # image_path = os.path.join(image_dir, file_name)
+        image_path = os.path.join(image_dir, file_name).replace("\\", "/")
 
         counter = 1
         while os.path.isfile(image_path):
@@ -78,10 +79,10 @@ class AdminValidations:
                 f.write(image_contents)
             print(f"Image saved as {image_path}")
 
-            if old_image_path and os.path.exists(old_image_path):
-                if "DEFAULT_PIC.png" not in old_image_path:
-                    os.remove(old_image_path)
-                    print(f"Old image {old_image_path} removed.")
+            # if old_image_path and os.path.exists(old_image_path):
+            #     if "DEFAULT_PIC.png" not in old_image_path:
+            #         os.remove(old_image_path)
+            #         print(f"Old image {old_image_path} removed.")
 
             return image_path
 

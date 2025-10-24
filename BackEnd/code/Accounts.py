@@ -21,6 +21,14 @@ class Accounts:
         confirmpassword: str
 
 
+    class contact_us_model(BaseModel):
+        first_name: str
+        last_name: str
+        email: str
+        contact: str
+        user_issue: str
+
+
     forget_pass_email = "diskly.forgetpass@gmail.com"
     forget_pass_email_app_pass = "ahru uclf oics ohjr"
 

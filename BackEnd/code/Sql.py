@@ -847,7 +847,8 @@ class SqlAdmin:
                     platform = ?,
                     price_to_rent = ?,
                     total_stocks = ?,
-                    description = ?
+                    description = ?,
+                    cover_image_path = ?
                 WHERE ID = ?
                 """,(
                     request.game_name,
@@ -855,6 +856,7 @@ class SqlAdmin:
                     request.price,
                     request.quantity,
                     request.description,
+                    cover_image_path,
                     game_id
                                ))
                 conn.commit()
@@ -1029,6 +1031,36 @@ class SqlAdmin:
         except sqlite3.Error as err:
             print(err)
             return False
+
+
+    @staticmethod
+    def user_issues():
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                SELECT * FROM user_issues
+                ORDER BY ID DESC
+                """)
+
+                rows = cursor.fetchall()
+
+                return [
+                    {
+                        "id": r[0],
+                        "first_name": r[1],
+                        "last_name": r[2],
+                        "email": r[3],
+                        "contact": r[4],
+                        "user_issue": r[5],
+                    }
+                for r in rows
+                ]
+        except sqlite3.Error as err:
+            print(err)
+            return None
+
+
 
 
 
@@ -1337,3 +1369,26 @@ class SqlUser:
         except sqlite3.Error as err:
             print(err)
             return None
+
+
+
+    @staticmethod
+    def contact_us(request: Accounts.contact_us_model):
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                INSERT INTO user_issues(first_name, last_name, email, contact, user_issue)
+                VALUES (?, ?, ?, ?, ?)
+                               """,(
+                               request.first_name,
+                               request.last_name,
+                               request.email,
+                               request.contact,
+                               request.user_issue,
+                                    ))
+                conn.commit()
+                return True
+        except sqlite3.Error as err:
+            print(err)
+            return False
