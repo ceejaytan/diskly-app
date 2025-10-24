@@ -90,8 +90,8 @@ useEffect(() => {
     <main className="rental-dashboard flex-1">
       <div className="flex flex-col gap-6">
         <div className="adminpage-dashboard-titles">
-          <h1>Trasactions</h1>
-          <p className="rental-p text-sm">{rentalsData?.length} Rentals found</p>
+          <h1>Transactions</h1>
+          <p className="rental-p text-sm">{rentalsData?.length} Transactions found</p>
           </div>
 
         <div className="flex gap-3 ">

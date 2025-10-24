@@ -5,7 +5,7 @@
   padding: 0.25rem 0.5rem;
   border: 1px solid #63D6DD;
   border-radius: 8px;
-  background-color: #f0faff;
+  background-color: #63D6DD;
 }
 
 .menu-toggle {
@@ -30,24 +30,36 @@
 
 .profile-username {
   font-weight: bold;
-  color: #63D6DD;
+  color: #171F21;
   font-size: 0.95rem;
+  height: 50px;
+  width: 100%;
+  padding-top: 4px;
+}
+
+.profile-username p {
+  font-weight: bold;
+  color: #333;
+  font-size: 12px;
+  font-style: italic;
 }
 
 .logout-btn {
   margin-left: auto;
-  background-color: #ff6b6b;
-  color: white;
+  background-color: #63D6DD;
+  color: #171F21;
   border: none;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.85rem;
   width: 100%;
+  font-weight: bold;
+  height: 40px;
 }
 
 .logout-btn:hover {
-  background-color: #ff4b4b;
+  background-color: #cc3535;
 }
 
 .header {

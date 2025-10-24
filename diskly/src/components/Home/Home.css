@@ -3,27 +3,40 @@
   padding-bottom: 0px !important;
 }
 
+.main-home-content p {
+color: white !important;
+
+
+}
 .home-content-bluebox{
   background-color: #5ADFE4;
   width: 100%;
-  height: 30px;
+  height: 40px;
   text-align: center;
 }
 
 .home-content-bluebox{
-  color: #000;
+  color: #171F21;
+  padding-top: 7px ;
+}
 
+.home-content-bluebox p {
+font-size: 17px !important;
+color: #171F21;
 }
 
 .home-content-title{
-  font-size: 5rem !important;
-  color: white !important;
+  font-size: 6rem !important;
+  color: #63D6DD !important;
+  font-weight: bold;
+
 }
+
 
 
 .faqs-button{
   background-color: transparent;
-  color: black;
+  color: #171F21;
   border: 2px solid #63D6DD;
   padding: 12px 60px;
   font-size: 16px;
@@ -31,6 +44,13 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: bold;
+
+}
+
+.faqs-button:hover {
+  background-color: #171F21;
+  color: #63D6DD;
+  border-color: #171F21;
 }
 
 .loading-error {
@@ -49,6 +69,7 @@
   animation: spin 1s linear infinite;
   margin-bottom: 20px;
 }
+
 
 @media (max-width: 700px) {
   .home-content-title {
