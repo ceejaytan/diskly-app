@@ -55,7 +55,7 @@ export default function UserProfile() {
       alt="Profile"
       className="w-28 h-28 rounded-full mb-4"
     />
-    <h1 className="uprof-title">Welcome, {session?.username}</h1>
+    <h1 className="uprof-title">Welcome, <i> {session?.username}</i>!</h1>
   </div>
 
         <div className="uprof-tabs">

@@ -28,7 +28,7 @@ Browse our collection of the latest and <br></br>classic game CDs,  rent your fa
         </p>
         <div className="buttons">
           <button className="rent-now-btn" onClick={() => window.location.href = "/games-list"}>Rent Now</button>
-          <button className="faqs-button" >FAQ's</button>
+          
         </div>
       </main>
 
