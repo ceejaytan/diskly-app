@@ -54,8 +54,17 @@ useEffect(() => {
   return () => clearTimeout(timeout);
 }, [email]);
 
+
+  async function sendCode(){
+    await fetch(`${API_URL}/accounts/forget-password-sendcode?email=${email}`,{
+      method: "POST",
+      credentials: "include",
+    });
+    }
+
   async function handleNext(e: React.FormEvent) {
     e.preventDefault();
+    sendCode();
 
     setSubmitted(true);
   }

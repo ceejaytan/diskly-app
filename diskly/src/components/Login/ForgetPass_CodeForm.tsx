@@ -44,11 +44,11 @@ export default function ForgetPassFormCode({ email, toggleForm, goback }: Forget
 
 const hasSentRef = React.useRef(false);
 
-useEffect(() => {
-  if (hasSentRef.current) return;
-  hasSentRef.current = true;
-  sendCode();
-}, []);
+// useEffect(() => {
+//   if (hasSentRef.current) return;
+//   hasSentRef.current = true;
+//   sendCode();
+// }, []);
 
   function handleResend() {
     setTimer(300);

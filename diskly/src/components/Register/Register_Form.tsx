@@ -44,6 +44,10 @@ export default function RegisterForm({ toggleForm }: RegisterFormProps) {
   const [birthdayMessage, setBirthdayMessage] = useState("");
   const [birthdayValid, setBirthdayValid] = useState(true);
 
+
+  const [loading, setLoading] = useState(false);
+
+
   const birthDate = new Date(birthday);
   const today = new Date();
 
@@ -230,24 +234,29 @@ export default function RegisterForm({ toggleForm }: RegisterFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     if (!usernameValid) {
       alert("Please enter a valid and available username.");
+      setLoading(false);
       return;
     }
 
     if (!emailValid) {
       alert("Please enter a valid and available email.");
+      setLoading(false);
       return;
     }
 
     if (password !== confirmpassword) {
       alert("Passwords do not match.");
+      setLoading(false);
       return;
     }
 
     if (password.length < 6) {
       alert("Password must be at least 6 characters long.");
+      setLoading(false);
       return;
     }
 
@@ -263,10 +272,18 @@ export default function RegisterForm({ toggleForm }: RegisterFormProps) {
     });
 
     if (ok) navigate("/");
+    setLoading(false);
   };
 
   return (
     <form onSubmit={handleSubmit}>
+
+{loading && (
+  <div className="fixed inset-0 flex flex-col items-center justify-center bg-black/70 z-50">
+    <div className="w-14 h-14 border-4 border-cyan-300 border-t-transparent rounded-full animate-spin"></div>
+    <p className="mt-4 text-cyan-300 text-lg font-semibold">Submitting...</p>
+  </div>
+)}
       <div className="flex justify-center">
         <img
           src="/images/disklogo.png"

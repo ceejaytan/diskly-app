@@ -92,7 +92,13 @@ export default function Header_for_GameSearch({userSession}: HeaderProps) {
                 />
                 <span className="profile-username">
                 username: <b><i>{userSession.username}</i></b>
-                <p>View Profile</p>
+                <p 
+                  className="
+                      hover:cursor-pointer
+                      hover:font-bold
+                      hover:text-red-500
+                      "
+                  onClick={() => {window.location.href = "/home"}}>View Profile</p>
                 </span>
               </li>
 
