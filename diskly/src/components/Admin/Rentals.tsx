@@ -21,7 +21,12 @@ type Rental = {
 };
 
 
-export default function Rentals_Dashboard() {
+type more_boilerplate_because_reactjs_moment = {
+  refetch_low_stock: () => void;
+  }
+
+
+export default function Rentals_Dashboard({refetch_low_stock}: more_boilerplate_because_reactjs_moment) {
   const [activeTab, setActiveTab] = useState<"All Rentals" | "Ongoing" | "Returned" | "Overdue">("All Rentals");
   const [rentalsData, setRentalsData] = useState<Rental[]>([]);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
@@ -378,7 +383,7 @@ export default function Rentals_Dashboard() {
           game_id={rentalsData.find(r => r.id === openDropdownId)?.game_id ?? 0}
           total_price={rentalsData.find(r => r.id === openDropdownId)?.price ?? 0}
           cancelbtn={() => setConfirmReturned(false)}
-          refetchRentalData={() => { fetchRentals(); setOpenDropdownId(null) } }
+          refetchRentalData={() => { fetchRentals(); setOpenDropdownId(null); refetch_low_stock() } }
         />
       )}
 

@@ -36,11 +36,7 @@ app.title = "GameDISK rental API"
 
 origins = [
     "https://diskly-mockup.web.app",
-    "http://10.84.173.15:8080",
-    "http://localhost:6969",
     "http://localhost:5173",
-    "http://192.168.1.7:6969",
-    ,
 ]
 
 app.add_middleware(

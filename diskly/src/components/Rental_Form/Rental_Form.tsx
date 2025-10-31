@@ -35,6 +35,9 @@ export default function Rental_form({userinfo, info, cancelbtn }: more_boilerpla
   const [rentTotal, setRentTotal] = useState(info?.total ?? 0);
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [transaction_id, setTransaction_id] = useState<number | null>(null);
+
+  const [loading, setLoading] = useState(false);
 
 useEffect(() => {
   if (!Return_Date || !info?.rental_start_date) {
@@ -111,6 +114,7 @@ useEffect(() => {
 async function submitForm(e:any) {
     e.preventDefault()
   if (!info || !userinfo) return;
+  setLoading(true);
   
 
   const result = await Submit_Rental_Form({
@@ -127,6 +131,8 @@ async function submitForm(e:any) {
     setSuccess(result.success);
     setErrorMessage(result.message);
     setRentalForm_Submitted(true)
+    setTransaction_id(result.transaction_id ?? null);
+    setLoading(false);
 }
 
   if (rentalForm_submitted){
@@ -137,6 +143,7 @@ async function submitForm(e:any) {
           message={errorMessage || ""}
           cancelbtn={() => {cancelbtn(); setRentalForm_Submitted(false)}}
           refreshbtn={() => {window.location.reload()}}
+          transaction_id={transaction_id ?? null}
         />
     </>
     )
@@ -144,6 +151,13 @@ async function submitForm(e:any) {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/80  z-50 p-4" onClick={cancelbtn}>
+
+    {loading && (
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-black/70 z-50">
+        <div className="w-14 h-14 border-4 border-cyan-300 border-t-transparent rounded-full animate-spin"></div>
+        <p className="mt-4 text-cyan-300 text-lg font-semibold">Submitting...</p>
+      </div>
+    )}
       <div className="
         rent-form-container bg-[#0b0e13] border-2 border-cyan-400 rounded-2xl w-full max-w-xl p-8 text-cyan-100
         max-h-[100vh] overflow-y-auto"

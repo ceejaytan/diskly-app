@@ -68,7 +68,12 @@ export default function Edit_CD({game_id, cancelbtn}:more_boilerplate_because_re
     }
     const numval = Number(val);
     const current_rented = game_detail?.currently_rented ?? -1;
-    if (/^\d*$/.test(val) && numval > current_rented && val !== "0" && val < 2147483647) {
+    if (/^\d*$/.test(val) && val !== "0" && val < 2147483647) {
+      if (numval < current_rented){
+        setQuantityValid(false);
+        setQuantity(val);
+        return
+      }
       setQuantity(val)
       setQuantityValid(true);
     }
@@ -360,7 +365,7 @@ export default function Edit_CD({game_id, cancelbtn}:more_boilerplate_because_re
           <button
             type="submit"
             className="rent-form-submitrentalbtn hover:bg-cyan-300 disabled:opacity-50 disabled:bg-cyan-400/20"
-            disabled={!Quantity || !Price || !GameTitle}
+            disabled={!Quantity || !Price || !GameTitle || !QuantityValid}
           >
             {loading ? "Saving..." : "Save New CD"}
           </button>

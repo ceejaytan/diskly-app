@@ -79,10 +79,10 @@ class AdminValidations:
                 f.write(image_contents)
             print(f"Image saved as {image_path}")
 
-            if old_image_path and os.path.exists(old_image_path):
-                if "DEFAULT_PIC.png" not in old_image_path:
-                    os.remove(old_image_path)
-                    print(f"Old image {old_image_path} removed.")
+            # if old_image_path and os.path.exists(old_image_path):
+            #     if "DEFAULT_PIC.png" not in old_image_path:
+            #         os.remove(old_image_path)
+            #         print(f"Old image {old_image_path} removed.")
 
             return image_path
 

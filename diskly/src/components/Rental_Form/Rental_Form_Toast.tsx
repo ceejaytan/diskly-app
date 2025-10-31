@@ -4,9 +4,10 @@ type more_boilerplate_because_reactjs_moment = {
   cancelbtn: () => void;
   success: boolean;
   message: string;
+  transaction_id?: number | null;
   }
 
-export default function Rental_Form_Message_Success({refreshbtn, cancelbtn, success, message}: more_boilerplate_because_reactjs_moment){
+export default function Rental_Form_Message_Success({refreshbtn, cancelbtn, success, message, transaction_id}: more_boilerplate_because_reactjs_moment){
   return(
   <>
     <div className="fixed inset-0 flex items-center justify-center bg-black/80  z-50 p-4" onClick={success ? cancelbtn : refreshbtn}>
@@ -25,12 +26,16 @@ export default function Rental_Form_Message_Success({refreshbtn, cancelbtn, succ
             <h1 className=" leading-snug">
               Rental request recorded.<br />
               Proceed to the counter to complete the transaction.
+
+                  <br/>
+                  <br/>
+              ID #: {transaction_id}
             </h1>
 
             <button
               type="button"
               className="rent-form-cancelbtn hover:bg-cyan-400/10 w-[90%]"
-              onClick={cancelbtn}
+              onClick={refreshbtn}
             >
               Okay
             </button>

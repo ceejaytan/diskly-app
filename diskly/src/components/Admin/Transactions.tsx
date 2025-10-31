@@ -19,7 +19,12 @@ type Rental = {
 };
 
 
-export default function Trasactions_Dashboard() {
+type more_boilerplate_because_reactjs_moment = {
+  refetch_low_stock: () => void;
+  }
+
+
+export default function Trasactions_Dashboard({refetch_low_stock}:more_boilerplate_because_reactjs_moment) {
   const [activeTab, setActiveTab] = useState<"All Trasactions" | "Pending" | "Approved">("All Trasactions");
   const [rentalsData, setRentalsData] = useState<Rental[]>([]);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
@@ -186,10 +191,11 @@ useEffect(() => {
           <div
             className="
               adminpage-rental-headers-fix
-              grid grid-cols-[2fr_2fr_1fr_1fr_1fr_auto]
+              grid grid-cols-[0.3fr_2fr_2fr_1fr_1fr_1fr_auto]
               font-semibold text-gray-700
             "
           >
+            <div>ID</div>
             <div>User</div>
             <div>Title</div>
             <div>Date Rented</div>
@@ -204,7 +210,7 @@ useEffect(() => {
                 key={rental.id}
                 className={`
                   adminpage-rentals-individual-rows
-                  grid grid-cols-[2fr_2fr_1fr_1fr_1fr_auto]
+                  grid grid-cols-[0.3fr_2fr_2fr_1fr_1fr_1fr_auto]
                   items-center rounded-[17px] border relative
                   ${rental.status === "Pending"
                     ? "bg-white"
@@ -212,6 +218,7 @@ useEffect(() => {
                     }
                   `}
               >
+                <div>#{rental.id}</div>
                 {/* Name */}
                 <div className="flex items-center gap-3">
                   <img
@@ -419,7 +426,7 @@ useEffect(() => {
           id={rentalsData.find(r => r.id === openDropdownId)?.id ?? 0}
           total_cost={rentalsData.find(r => r.id === openDropdownId)?.price ?? 0}
           cancelbtn={() => setApproveConfirm(false)}
-          refetchRentalData={() => { fetchRentals(); setOpenDropdownId(null) } }
+          refetchRentalData={() => { fetchRentals(); setOpenDropdownId(null); refetch_low_stock() } }
         />
       )}
 

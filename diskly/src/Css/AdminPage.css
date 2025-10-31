@@ -225,6 +225,84 @@
   }
 }
 
+
+.toast-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #63D6DD;
+  color: black;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  width: 320px;
+  padding: 12px 16px;
+  animation: slideIn 0.4s ease-out;
+  z-index: 9999;
+  font-family: system-ui, sans-serif;
+}
+
+.toast-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.toast-date {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.toast-btn {
+  background-color: white;
+  color: #2563eb;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.toast-btn:hover {
+  background-color: #f0f4ff;
+}
+
+.toast-body {
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+/* Slide-in animation */
+@keyframes slideIn {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+
+
+.low-stock-section {
+  font-family: "Inter", sans-serif;
+}
+
+.low-stock-list::-webkit-scrollbar {
+  width: 6px;
+}
+.low-stock-list::-webkit-scrollbar-thumb {
+  background-color: #47c2c8;
+  border-radius: 10px;
+}
+.low-stock-list::-webkit-scrollbar-track {
+  background: #171f21;
+}
+
 @media (max-width: 600px) {
   .rental-dashboard h1 {
     font-size: 1.2rem;

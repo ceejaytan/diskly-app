@@ -15,8 +15,12 @@ type GameTitles = {
   console: string;
 };
 
+type more_boilerplate_because_reactjs_moment = {
+  refetch_low_stock: () => void;
+  }
 
-export default function Stocks_Dashboard() {
+
+export default function Stocks_Dashboard({refetch_low_stock}: more_boilerplate_because_reactjs_moment) {
   const [activeTab, setActiveTab] = useState<"All Titles" | "Available" | "Out of Stock">("All Titles");
   const [GameTitleData, setGameTitleData] = useState<GameTitles[]>([]);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
@@ -339,6 +343,7 @@ export default function Stocks_Dashboard() {
       cancelbtn={() => {
         setOpenEditCD(false);
         fetchData();
+        refetch_low_stock();
       }}
     />
   )}
@@ -350,6 +355,7 @@ export default function Stocks_Dashboard() {
       refetchData={() => {
         fetchData();
         setOpenDropdownId(null);
+        refetch_low_stock();
       }}
     />
   )}
