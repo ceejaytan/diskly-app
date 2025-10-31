@@ -40,7 +40,11 @@ export default async function Submit_Rental_Form(
      return { success: false, message: data?.message || "Failed to submit rental form" };
     }
     console.log(data);
-    return { success: true, message: data?.message || "Rental submitted successfully" };
+    return {
+      success: true,
+      message: data?.message || "Rental submitted successfully",
+      transaction_id: data?.transaction_id || null
+    };
 
   } catch (error) {
     console.log(error);

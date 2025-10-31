@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import time
 import os
 from zoneinfo import ZoneInfo
@@ -584,6 +584,8 @@ class SqlAdmin:
     def view_transactions(page: int, status_filter: str = "", searchbyname: str = "", searchbygame: str = "", searchbydate: str = ""):
         """view transactions for admin dashboard transactions page"""
 
+        SqlAdmin.expire_pending_transactions()
+
         manila_time = ZoneInfo("Asia/Manila")
         now_ph = datetime.now(manila_time).isoformat()
 
@@ -636,6 +638,23 @@ class SqlAdmin:
         except sqlite3.Error as err:
             print(err)
             return None
+
+
+    @staticmethod
+    def expire_pending_transactions():
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                UPDATE transactions
+                SET status = 'Denied'
+                WHERE status = 'Pending' AND expires_at < ?
+                """, (datetime.now(timezone.utc).timestamp(),))
+                conn.commit()
+        except sqlite3.Error as err:
+            print(err)
+
+
 
 
 
@@ -725,6 +744,57 @@ class SqlAdmin:
 
 
     @staticmethod
+    def low_stock_games():
+        """Return all games that are low (≤30%) or out of stock."""
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT
+                        ID,
+                        game_name,
+                        platform,
+                        total_stocks,
+                        currently_rented
+                    FROM game_catalog
+                    WHERE
+                        (total_stocks - COALESCE(currently_rented, 0)) <= (0.5 * total_stocks)
+                        OR (total_stocks - COALESCE(currently_rented, 0)) <= 0
+                    ORDER BY ID DESC
+                """)
+
+                rows = cursor.fetchall()
+
+                gametitles = []
+                for row in rows:
+                    game_id, name, console, total, rented = row
+                    remaining = max(total - (rented or 0), 0)
+                    ratio = remaining / total if total > 0 else 0
+
+                    if remaining == 0:
+                        status = "Out of Stock"
+                    elif ratio <= 0.5:
+                        status = "Low Stock"
+                    else:
+                        continue
+
+                    gametitles.append({
+                        "id": game_id,
+                        "title": name,
+                        "Console": console,
+                        "Quantity": f"{remaining}/{total}",
+                        "status": status,
+                    })
+
+                return gametitles
+
+        except sqlite3.Error as err:
+            print("Database error:", err)
+            return None
+
+
+
+    @staticmethod
     def delete_rental(id: int):
         """Admin delete rental record from table transactions"""
         try:
@@ -799,14 +869,14 @@ class SqlAdmin:
         request: AdminValidations.add_games_model,
     ):
 
-        old_image_path = SqlAdmin.get_gamecd_cover(game_id)
-        old_name = old_image_path 
-
-        if old_name != request.game_name and old_image_path and os.path.exists(old_image_path):
-            ext = os.path.splitext(old_image_path)[1]
-            new_image_path = f"images/gamecover/{request.game_name}{ext}"
-            os.rename(old_image_path, new_image_path)
-            print(f"Renamed image to {new_image_path}")
+        # old_image_path = SqlAdmin.get_gamecd_cover(game_id)
+        # old_name = old_image_path 
+        #
+        # if old_name != request.game_name and old_image_path and os.path.exists(old_image_path):
+        #     ext = os.path.splitext(old_image_path)[1]
+        #     new_image_path = f"images/gamecover/{request.game_name}{ext}"
+        #     os.rename(old_image_path, new_image_path)
+        #     print(f"Renamed image to {new_image_path}")
 
         try:
             with sqlite3.connect(db_path) as conn:
@@ -1069,34 +1139,49 @@ class SqlGameCatalog_API:
 
     @staticmethod
     def game_search(game_name: str = "", platform: str = "") -> list:
+        SqlAdmin.expire_pending_transactions()
         search_format = f"%{game_name}%"
         platform_format = f"%{platform}%"
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    SELECT ID, game_name, cover_image_path, price_to_rent, platform from game_catalog
+                    SELECT 
+                        g.ID,
+                        g.game_name,
+                        g.cover_image_path,
+                        g.price_to_rent,
+                        g.platform
+                    FROM game_catalog AS g
                     WHERE
-                    game_name LIKE ? COLLATE NOCASE
-                    AND platform LIKE ? COLLATE NOCASE
-                    AND ( total_stocks - IFNULL( currently_rented, 0 ) ) > 0
-                               """, (search_format, platform_format ))
+                        g.game_name LIKE ? COLLATE NOCASE
+                        AND g.platform LIKE ? COLLATE NOCASE
+                        AND (
+                            g.total_stocks
+                            - IFNULL(g.currently_rented, 0)
+                            - IFNULL((
+                                SELECT SUM(t.quantity)
+                                FROM transactions AS t
+                                WHERE t.game_id = g.ID
+                                AND t.status = 'Pending'
+                            ), 0)
+                        ) > 0
+                """, (search_format, platform_format))
 
-                row = cursor.fetchall()
+                rows = cursor.fetchall()
 
-                for i in range(len(row)):
-                    row[i] = {
-                        "id": row[i][0],
-                        "name": row[i][1],
-                        "cover_path": row[i][2],
-                        "price_to_rent": row[i][3]
+                return [
+                    {
+                        "id": r[0],
+                        "name": r[1],
+                        "cover_path": r[2],
+                        "price_to_rent": r[3]
                     }
-
-                return row
+                    for r in rows
+                ]
         except sqlite3.Error as err:
             print(err)
             return []
-
 
 
     @staticmethod
@@ -1105,6 +1190,7 @@ class SqlGameCatalog_API:
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
+
                 cursor.execute("""
                     SELECT
                         g.ID,
@@ -1113,12 +1199,16 @@ class SqlGameCatalog_API:
                         g.total_stocks,
                         g.price_to_rent,
                         IFNULL(SUM(r.quantity), 0) AS rented_quantity,
+                        IFNULL(SUM(t.quantity), 0) AS pending_quantity,
                         g.cover_image_path,
                         g.description
                     FROM game_catalog g
                     LEFT JOIN rentals r
                         ON g.ID = r.game_id
-                        AND ( r.status = 'Ongoing' OR r.status = 'Overdue' )
+                        AND (r.status = 'Ongoing' OR r.status = 'Overdue')
+                    LEFT JOIN transactions t
+                        ON g.ID = t.game_id
+                        AND t.status = 'Pending'
                     WHERE g.ID = ?
                     GROUP BY g.ID
                 """, (game_id,))
@@ -1127,7 +1217,12 @@ class SqlGameCatalog_API:
                 if row is None:
                     print(f"[WARN] No game found with ID={game_id}")
                     return None
-                remaining_stocks = max(row[3] - row[5], 0)
+
+                # row indices:
+                # 0: ID, 1: name, 2: platform, 3: total_stocks,
+                # 4: price_to_rent, 5: rented_quantity, 6: pending_quantity
+                remaining_stocks = max(row[3] - row[5] - row[6], 0)
+
                 row = {
                     "game_id": row[0],
                     "game_title": row[1],
@@ -1135,12 +1230,13 @@ class SqlGameCatalog_API:
                     "total_stocks": remaining_stocks,
                     "total": row[4],
                     "rental_start_date": datetime.now(manila_time),
-                    "cover_image_path": row[6],
-                    "description": row[7],
+                    "cover_image_path": row[7],
+                    "description": row[8],
                 }
-                print(row["rental_start_date"].isoformat())
 
+                print(row["rental_start_date"].isoformat())
                 return row
+
         except sqlite3.Error as err:
             print(err)
             return None
@@ -1193,17 +1289,33 @@ class SqlGameCatalog_API:
 
     @staticmethod
     def save_transcation_info(info: UserRentals.RentalFormModel):
+        expires_at = (info.rental_start_date + timedelta(minutes=60)).timestamp()
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                INSERT INTO transactions(user_id, user_name, game_id, game_name, rented_on, quantity, total_price, status, return_on, game_console)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO transactions(user_id, user_name, game_id, game_name, rented_on, quantity, total_price, status, return_on, game_console, expires_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                                """,
-                (info.userid, info.username, info.game_id, info.game_title, info.rental_start_date, info.quantity, info.total_cost, "Pending", info.return_date, info.console))
+                (
+                 info.userid,
+                 info.username,
+                 info.game_id,
+                 info.game_title,
+                 info.rental_start_date,
+                 info.quantity,
+                 info.total_cost,
+                 "Pending",
+                 info.return_date,
+                 info.console,
+                 expires_at
+                 )
+                    )
+                transaction_id = cursor.lastrowid
                 conn.commit()
                 print(f"Created New Rental from {info.username}")
 
+                return transaction_id
         except sqlite3.Error as err:
             print(err)
 
@@ -1215,6 +1327,7 @@ class SqlUser:
     @staticmethod
     def list_user_transactions(user_id: int, page: int):
         """List user transactions with pagination"""
+        SqlAdmin.expire_pending_transactions()
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()

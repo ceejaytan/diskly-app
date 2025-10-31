@@ -1,8 +1,9 @@
 from typing import Optional
-from fastapi import APIRouter, Cookie, File, Form, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Cookie, File, Form, HTTPException, Query, UploadFile, WebSocket
 from fastapi.responses import JSONResponse
 from ..Sql import SqlAdmin
 from ..Validations import AdminValidations
+from ..Notifications import admin_notify
 
 
 def admin_secret_key_check(logged_in: str = Cookie(None)):
@@ -139,6 +140,13 @@ def view_games(
         searchbydate.strip(),
         filterby.strip()
     )
+
+
+@router.get("/low-stock-games")
+def low_stock_games():
+    print("Viewing Low Stock Games...")
+    return SqlAdmin.low_stock_games()
+    # return []
 
 
 
@@ -314,4 +322,20 @@ def unban_user(
 def user_issues():
     print("showing user issues...")
     return SqlAdmin.user_issues()
+
+
+
+@router.websocket("/ws/notify-transaction-made")
+async def notify_transaction_made(ws: WebSocket):
+    await ws.accept()
+    admin_notify.active_admins.append(ws)
+    print("WebSocket connected for transaction notifications.")
+    try:
+        while True:
+            await ws.receive_text()
+    except Exception as e:
+        print("WebSocket disconnected:", e)
+    finally:
+        admin_notify.active_admins.remove(ws)
+        print(f"Active connections: { len(admin_notify.active_admins) }")
 
