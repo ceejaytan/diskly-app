@@ -47,6 +47,8 @@ export default function AdminPage() {
   const [notification, setNotification] = useState<Notification | null>(null);
   const [showNotification, setShowNotification] = useState(false);
 
+  const [refreshTransactions, setRefreshTransactions] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -275,13 +277,27 @@ export default function AdminPage() {
       New transaction by <b>{notification?.username}</b> for{" "}
       <b>{notification?.game_name || "none"}</b>
     </div>
-      <button className="toast-btn !mt-2">View</button>
+      {admin_dashboard_type === admin_dashboard.Transactions ? (
+      <button
+            onClick={() => {
+              setRefreshTransactions(prev => !prev);
+              setShowNotification(false);
+            }}
+            className="toast-btn !mt-2">Refresh</button>
+      ) : (
+      <button
+            onClick={() => {
+              setAdmin_dashboard_type(admin_dashboard.Transactions);
+              setShowNotification(false);
+            }}
+            className="toast-btn !mt-2">View</button>
+      ) }
   </div>
 )}
 
       <main className="adminpage-main flex-1 overflow-auto lg:ml-64">
         {admin_dashboard_type === admin_dashboard.Rentals && <Rentals_Dashboard refetch_low_stock={fetch_low_stock_games} />}
-        {admin_dashboard_type === admin_dashboard.Transactions && <Transaction_Dashboard refetch_low_stock={fetch_low_stock_games} />}
+        {admin_dashboard_type === admin_dashboard.Transactions && <Transaction_Dashboard refetch_low_stock={fetch_low_stock_games} refresh_trigger={refreshTransactions} />}
         {admin_dashboard_type === admin_dashboard.Stock && <Stocks_Dashboard refetch_low_stock={fetch_low_stock_games} />}
         {admin_dashboard_type === admin_dashboard.Customers && <Customer_Dashboard />}
         {admin_dashboard_type === admin_dashboard.User_Issues && <User_Issues />}

@@ -344,7 +344,7 @@ async function submitForm(e:any) {
                 onChange={(e) => setAgree_TermsCondition(e.target.checked)}
               />
               I agree to the{" "}
-              <a href="#" className="underline text-cyan-400">
+              <a href="/Terms" target="_blank" className="underline text-cyan-400">
                 Terms and Conditions
               </a>
             </label>
@@ -356,7 +356,7 @@ async function submitForm(e:any) {
                 onChange={(e) => setAgree_Late_Fee(e.target.checked)}
               />
               I agree to the{" "}
-              <a href="#" className="underline text-cyan-400">
+              <a href="/Late-Fee" target="_blank" className="underline text-cyan-400">
                 Late Fee Policy
               </a>
             </label>

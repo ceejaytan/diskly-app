@@ -25,12 +25,13 @@ export default function Rental_Form_Message_Success({refreshbtn, cancelbtn, succ
               <>
             <h1 className=" leading-snug">
               Rental request recorded.<br />
-              Proceed to the counter to complete the transaction.
+              Proceed to the store to claim your game!
 
                   <br/>
                   <br/>
               ID #: {transaction_id}
             </h1>
+                <small>Transaction will get auto deny after an hour</small>
 
             <button
               type="button"

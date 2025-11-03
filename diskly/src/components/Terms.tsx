@@ -11,6 +11,17 @@ const TermsPage: React.FC<{ navigateBack: () => void }> = ({
         <div className="back-arrow" onClick={() => window.history.back()}>
           ←
         </div>
+
+      <div className="flex justify-center">
+        <img
+          src="/images/disklogo.png"
+          alt="Diskly Logo"
+          className="w-20 h-20 object-contain cursor-pointer"
+          onClick={() => {
+            window.location.href = "/";
+          }}
+        />
+      </div>
         <div className="first-container">
           <div style={{ padding: "2rem" }}>
             <h1>Terms and Conditions</h1>

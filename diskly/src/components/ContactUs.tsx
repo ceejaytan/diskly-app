@@ -1,8 +1,35 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "../API/config";
 import "../Css/ContactUs.css";
+import checkLoginSession from "./Login/CheckLoginSession";
+
+
+type user_info = {
+  id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  contact: string;
+}
+
 
 export default function ContactUs() {
+
+  type SessionType = { userid: number; username: string; status: string } | null;
+  const [session, setSession] = useState<SessionType>(null);
+
+
+  useEffect(() => {
+    (async () => {
+      const userdata = await checkLoginSession();
+      if (userdata) {
+        setSession({ userid: userdata.user_id, username: userdata.username, status: userdata.status });
+      } else {
+        setSession(null);
+      }
+    })();
+  }, []);
 
   const [firstname, setFirstName] = useState("");
 
@@ -109,6 +136,24 @@ export default function ContactUs() {
     setLoading(false);
   }
 
+
+  async function fetch_user_info(){
+    const res = await fetch(`${API_URL}/user/user-info?id=${session?.userid}`)
+    const data = await res.json();
+
+    setFirstName(data[0].first_name);
+    setLastName(data[0].last_name);
+    setEmail(data[0].email);
+    setContact(data[0].contact);
+    console.log(data[0]);
+    
+  }
+
+useEffect(() => {
+  if (session?.userid) {
+    fetch_user_info();
+  }
+}, [session]);
 
 
   return (

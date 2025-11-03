@@ -44,3 +44,12 @@ def contact_us(
         return JSONResponse(status_code=200, content={"message": "successfully sent."})
     else:
         return JSONResponse(status_code=400, content={"message": "Something went wrong."})
+
+
+
+@router.get("/user-info")
+def user_info(id: int):
+    print("user info")
+    return SqlUser.user_info(id)
+
+

@@ -21,10 +21,11 @@ type Rental = {
 
 type more_boilerplate_because_reactjs_moment = {
   refetch_low_stock: () => void;
+  refresh_trigger:boolean;
   }
 
 
-export default function Trasactions_Dashboard({refetch_low_stock}:more_boilerplate_because_reactjs_moment) {
+export default function Trasactions_Dashboard({refetch_low_stock, refresh_trigger}:more_boilerplate_because_reactjs_moment) {
   const [activeTab, setActiveTab] = useState<"All Trasactions" | "Pending" | "Approved">("All Trasactions");
   const [rentalsData, setRentalsData] = useState<Rental[]>([]);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
@@ -62,7 +63,7 @@ export default function Trasactions_Dashboard({refetch_low_stock}:more_boilerpla
 
   useEffect(() => {
     fetchRentals(activeTab);
-  }, [page, activeTab, searchByUsername, searchByGame, searchByDate]);
+  }, [page, activeTab, searchByUsername, searchByGame, searchByDate, refresh_trigger]);
 
   const filteredRentals =
     activeTab === "All Trasactions"
