@@ -100,7 +100,7 @@ export default function Header({userSession}: HeaderProps) {
               </li>
 
               <li>
-                <a href="/home">Home</a>
+                <a href="/">Home</a>
               </li>
               <li>
                 <a href="/games-list">Catalog</a>

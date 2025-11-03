@@ -1,18 +1,16 @@
 from datetime import datetime, timedelta, timezone
 import time
-import os
 from zoneinfo import ZoneInfo
 import sqlite3
 
 from pathlib import Path
-
-
 
 from .Accounts import Accounts
 from .Validations import UserRentals
 from .Validations import AdminValidations
 
 db_path = "db/sqlite.db"
+transaction_temporary_expires_at_minutes = 60
 
 
 class InitializeTables:
@@ -38,7 +36,6 @@ class InitializeTables:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
 
-                #  accounts table
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS accounts (
                         ID INTEGER PRIMARY KEY,
@@ -59,7 +56,6 @@ class InitializeTables:
                 VALUES ( 'admin', '$2b$12$XIwrTKqWHl6tSum5T2yjxu3Ce8Pynvc9Ie9ejblahDSwryfTXcepW', '0f32c0fe13ad509e1a2fadbe72d5ad8f7fae769c332d0e34c9ef0fba0cebacb9' );
                 """)
 
-                #  game_catalog table
                 cursor.execute("""
                 CREATE TABLE IF NOT EXISTS game_catalog (
                     ID INTEGER PRIMARY KEY,
@@ -73,7 +69,6 @@ class InitializeTables:
                     );
                 """)
 
-                #  transactions table
                 cursor.execute("""
                 CREATE TABLE IF NOT EXISTS transactions (
                 ID INTEGER PRIMARY KEY,
@@ -86,12 +81,12 @@ class InitializeTables:
                 total_price REAL,
                 status TEXT,
                 return_on DATETIME,
-                game_console TEXT
+                game_console TEXT,
+                expires_at real
                 );
                 """)
 
 
-                #  rentals table
                 cursor.execute("""
                 CREATE TABLE IF NOT EXISTS rentals (
                 ID INTEGER PRIMARY KEY,
@@ -108,7 +103,6 @@ class InitializeTables:
                 );
                 """)
 
-                #  forget_password table
                 cursor.execute("""
                 CREATE TABLE IF NOT EXISTS forget_password (
                 ID INTEGER PRIMARY KEY,
@@ -1289,7 +1283,7 @@ class SqlGameCatalog_API:
 
     @staticmethod
     def save_transcation_info(info: UserRentals.RentalFormModel):
-        expires_at = (info.rental_start_date + timedelta(minutes=60)).timestamp()
+        expires_at = (info.rental_start_date + timedelta(minutes=transaction_temporary_expires_at_minutes)).timestamp()
         try:
             with sqlite3.connect(db_path) as conn:
                 cursor = conn.cursor()
@@ -1505,3 +1499,29 @@ class SqlUser:
         except sqlite3.Error as err:
             print(err)
             return False
+
+
+    @staticmethod
+    def user_info(id: int):
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                SELECT ID, NAME, EMAIL, first_name, last_name, contact FROM accounts
+                WHERE ID = ?
+                               """, (id,))
+                row = cursor.fetchone()
+                return [
+                    {
+                    "id": row[0],
+                    "username": row[1],
+                    "email": row[2],
+                    "first_name": row[3],
+                    "last_name": row[4],
+                    "contact": row[5],
+                    }
+                ]
+        except sqlite3.Error as err:
+            print(err)
+
+

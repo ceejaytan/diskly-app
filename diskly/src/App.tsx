@@ -13,12 +13,14 @@ import GamesPage from "./Routes/Games_List";
 import NotFound from "./Routes/NotFound";
 import AdminPage from "./Routes/AdminPage";
 import ContactUs from "./components/ContactUs";
+import Late_Fee from "./components/Late_fee_policy";
 
 const App: React.FC = () => {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<HomeContent />} />
+        <Route path="/Late-Fee" element={<Late_Fee />} />
         <Route path="/Terms" element={<TermsWrapper />} />
         <Route path="/contact-us" element={<ContactUs/>}/>
         <Route path="/AuthPage" element={<AuthPage />} />
